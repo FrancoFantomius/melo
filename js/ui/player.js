@@ -1,6 +1,6 @@
 import { initAudioPlayer, togglePlayPause, playNextTrack, playPrevTrack, seekTo, setVolume, toggleMute, playTrack, savePlayerState, notifyUI, setPlaybackSpeed, getPlaybackSpeed, skipSeconds } from '../player/audio.js';
 import { toggleShuffle, toggleRepeat } from '../player/queue.js';
-import { toggleQueueDrawer, renderQueueDrawerList, toggleLyricsModal, updateLyricsSync, saveSettingsFromModal } from './modals.js';
+import { toggleQueueDrawer, renderQueueDrawerList, toggleLyricsModal, updateLyricsSync, saveSettingsFromModal, openSelectPlaylistModal } from './modals.js';
 import { getArtworkUrl, getItemCached } from '../jellyfin/client.js';
 import { getSession, saveSession } from '../jellyfin/session.js';
 import { isTrackLiked, toggleTrackLiked } from '../player/likes.js';
@@ -17,6 +17,7 @@ export function initPlayerUI() {
   const btnQueue = document.getElementById('player-btn-queue');
   const btnLyrics = document.getElementById('player-btn-lyrics');
   const btnLike = document.getElementById('player-btn-like');
+  const btnAddPlaylist = document.getElementById('player-btn-add-playlist');
   const btnVolume = document.getElementById('player-btn-volume');
   const qualityBadge = document.getElementById('player-quality-badge');
   const progressSlider = document.getElementById('player-progress');
@@ -34,6 +35,7 @@ export function initPlayerUI() {
   const empBtnShuffle = document.getElementById('emp-btn-shuffle');
   const empBtnRepeat = document.getElementById('emp-btn-repeat');
   const empBtnLike = document.getElementById('emp-btn-like');
+  const empBtnAddPlaylist = document.getElementById('emp-btn-add-playlist');
   const empBtnLyrics = document.getElementById('emp-btn-lyrics');
   const empBtnQueue = document.getElementById('emp-btn-queue');
   const empProgressSlider = document.getElementById('emp-progress');
@@ -59,6 +61,24 @@ export function initPlayerUI() {
       }
     });
   };
+
+  const updateAddPlaylistButton = (track) => {
+    const showBtn = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl;
+    [btnAddPlaylist, empBtnAddPlaylist].forEach(btn => {
+      if (!btn) return;
+      btn.style.display = showBtn ? 'flex' : 'none';
+    });
+  };
+
+  [btnAddPlaylist, empBtnAddPlaylist].forEach(btn => {
+    btn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (currentPlayingTrack && currentPlayingTrack.Id && !currentPlayingTrack.isPodcastEpisode) {
+        openSelectPlaylistModal(currentPlayingTrack);
+      }
+    });
+  });
 
   // Open expanded mobile player when mini-player bar is tapped on mobile
   const mainPlayerBar = document.querySelector('.main-player');
@@ -103,6 +123,7 @@ export function initPlayerUI() {
     const track = state.track;
     currentPlayingTrack = track;
     updateLikeButton(track);
+    updateAddPlaylistButton(track);
 
     const coverEl = document.getElementById('player-track-cover');
     const titleEl = document.getElementById('player-track-title');

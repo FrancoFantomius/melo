@@ -58,7 +58,7 @@ export async function renderSearchView(container, query) {
         <div class="search-page-bar-container">
           <div class="search-page-bar">
             <span class="material-symbols-outlined search-page-icon">search</span>
-            <input type="text" id="search-page-input" class="search-page-input" placeholder="${getTranslation('header.search_placeholder', 'Search artists, tracks, albums, podcasts...')}" value="${query.replace(/"/g, '&quot;')}" autocomplete="off" data-i18n-placeholder="header.search_placeholder">
+            <input type="text" id="search-page-input" class="search-page-input" placeholder="Search artists, albums, tracks..." value="${query.replace(/"/g, '&quot;')}" autocomplete="off" data-i18n-placeholder>
             <button id="btn-clear-search-input" class="search-page-clear-btn" title="Clear search" style="${query ? 'display: flex;' : 'display: none;'}"><span class="material-symbols-outlined">close</span></button>
           </div>
         </div>
@@ -84,22 +84,22 @@ export async function renderSearchView(container, query) {
   }
 
   resultsContainer.innerHTML = `
-    <h2 class="section-title"><span data-i18n="search.results_for">${getTranslation('search.results_for', 'Search Results for')}</span> "${query.replace(/</g, '&lt;').replace(/>/g, '&gt;')}"</h2>
+    <h2 class="section-title"><span data-i18n>Search Results for</span> "${query.replace(/</g, '&lt;').replace(/>/g, '&gt;')}"</h2>
 
     <div id="search-artists-section" style="display: none; margin-bottom: 24px;">
-      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="search.artists_and_albums">${getTranslation('search.artists_and_albums', 'Artists & Albums')}</h3>
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n>Artists & Albums</h3>
       <div id="search-media-grid" class="cards-grid"></div>
     </div>
 
     <div id="search-tracks-section" style="margin-bottom: 24px;">
-      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="common.tracks">${getTranslation('common.tracks', 'Tracks')}</h3>
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n>Tracks</h3>
       <div id="search-results-list" class="tracks-list">
-        <div style="color: var(--text-muted);" data-i18n="search.searching_library">${getTranslation('search.searching_library', 'Searching Jellyfin library...')}</div>
+        <div style="color: var(--text-muted);" data-i18n>Searching Jellyfin library...</div>
       </div>
     </div>
 
     <div id="search-podcasts-section" style="display: none; margin-bottom: 24px;">
-      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="nav.podcasts">${getTranslation('nav.podcasts', 'Podcasts')}</h3>
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n>Podcasts</h3>
       <div id="search-podcasts-grid" class="cards-grid"></div>
     </div>
   `;
@@ -179,7 +179,7 @@ export async function renderSearchView(container, query) {
           if (mediaItems.length > 0 && tracksSection) {
             tracksSection.style.display = 'none';
           } else {
-            searchResultsList.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="search.no_tracks">${getTranslation('search.no_tracks', 'No matching tracks found.')}</div>`;
+            searchResultsList.innerHTML = `<div style="color: var(--text-secondary);" data-i18n>No matching tracks found.</div>`;
           }
         } else {
           if (tracksSection) tracksSection.style.display = 'block';
@@ -212,8 +212,8 @@ function renderRecentSearches(resultsContainer) {
   const html = `
     <div class="recent-searches-section">
       <div class="recent-searches-header">
-        <h2 class="section-title" style="font-size: 20px;" data-i18n="search.recent_searches">${getTranslation('search.recent_searches', 'Recent Searches')}</h2>
-        ${recentSearches.length > 0 ? `<button id="btn-clear-all-recent" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-weight: 600;" data-i18n="search.clear_all">${getTranslation('search.clear_all', 'Clear all')}</button>` : ''}
+        <h2 class="section-title" style="font-size: 20px;" data-i18n>Recent Searches</h2>
+        ${recentSearches.length > 0 ? `<button id="btn-clear-all-recent" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-weight: 600;" data-i18n>Clear all</button>` : ''}
       </div>
       ${recentSearches.length > 0 ? `
         <div class="recent-searches-list">
@@ -228,7 +228,7 @@ function renderRecentSearches(resultsContainer) {
           `).join('')}
         </div>
       ` : `
-        <div style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;" data-i18n="search.no_recent">${getTranslation('search.no_recent', 'No recent searches. Search for artists, songs, or podcasts above!')}</div>
+        <div style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;" data-i18n>No recent searches. Search for artists, songs, or podcasts above!</div>
       `}
     </div>
   `;

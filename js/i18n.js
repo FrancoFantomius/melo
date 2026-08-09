@@ -30,18 +30,15 @@ export function getBrowserLanguage() {
   return SUPPORTED_LANGUAGES[navLang] ? navLang : 'en';
 }
 
-export function getTranslation(keyPath, defaultText = '') {
-  if (!keyPath) return defaultText;
-  const keys = keyPath.split('.');
-  let current = translations;
-  for (const k of keys) {
-    if (current && typeof current === 'object' && k in current) {
-      current = current[k];
-    } else {
-      return defaultText || keyPath;
-    }
+export function getTranslation(englishText, defaultText = '') {
+  if (!englishText) return defaultText || '';
+  if (translations && typeof translations === 'object' && englishText in translations) {
+    return translations[englishText];
   }
-  return typeof current === 'string' ? current : (defaultText || keyPath);
+  if (defaultText && translations && typeof translations === 'object' && defaultText in translations) {
+    return translations[defaultText];
+  }
+  return defaultText || englishText;
 }
 
 export async function setLanguage(langMode) {
@@ -79,34 +76,52 @@ export async function setLanguage(langMode) {
 }
 
 export function applyTranslations(container = document) {
-  // 1. Text Content
+  // 1. Text Content with data-i18n
   const textElements = container.querySelectorAll('[data-i18n]');
   textElements.forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    const translated = getTranslation(key);
-    if (translated) {
-      el.textContent = translated;
+    if (!el.dataset.i18nEn) {
+      const attrVal = el.getAttribute('data-i18n');
+      el.dataset.i18nEn = (attrVal && attrVal !== 'true') ? attrVal : el.textContent.trim();
+    }
+    const key = el.dataset.i18nEn;
+    if (key) {
+      const translated = getTranslation(key);
+      if (translated) {
+        el.textContent = translated;
+      }
     }
   });
 
-  // 2. Placeholders
+  // 2. Placeholders with data-i18n-placeholder
   const placeholderElements = container.querySelectorAll('[data-i18n-placeholder]');
   placeholderElements.forEach(el => {
-    const key = el.getAttribute('data-i18n-placeholder');
-    const translated = getTranslation(key);
-    if (translated) {
-      el.placeholder = translated;
+    if (!el.dataset.i18nPlaceholderEn) {
+      const attrVal = el.getAttribute('data-i18n-placeholder');
+      el.dataset.i18nPlaceholderEn = (attrVal && attrVal !== 'true') ? attrVal : el.placeholder;
+    }
+    const key = el.dataset.i18nPlaceholderEn;
+    if (key) {
+      const translated = getTranslation(key);
+      if (translated) {
+        el.placeholder = translated;
+      }
     }
   });
 
-  // 3. Titles / Aria-labels
+  // 3. Titles / Aria-labels with data-i18n-title
   const titleElements = container.querySelectorAll('[data-i18n-title]');
   titleElements.forEach(el => {
-    const key = el.getAttribute('data-i18n-title');
-    const translated = getTranslation(key);
-    if (translated) {
-      el.title = translated;
-      el.setAttribute('aria-label', translated);
+    if (!el.dataset.i18nTitleEn) {
+      const attrVal = el.getAttribute('data-i18n-title');
+      el.dataset.i18nTitleEn = (attrVal && attrVal !== 'true') ? attrVal : el.title;
+    }
+    const key = el.dataset.i18nTitleEn;
+    if (key) {
+      const translated = getTranslation(key);
+      if (translated) {
+        el.title = translated;
+        el.setAttribute('aria-label', translated);
+      }
     }
   });
 }

@@ -1,7 +1,7 @@
 {
   "name": "melo",
-  "version": "0.5.2",
-  "description": "Melo - Music Player powered by Jellyfin backend",
+  "version": "0.5.3",
+  "description": "Melo - Music Player powered by Jellyfin",
   "type": "module",
   "license": "MIT",
   "keywords": [

@@ -277,18 +277,67 @@ export async function getItem(itemId) {
   return await jellyfinFetch(`/Users/${session.userId}/Items/${itemId}`);
 }
 
+export async function createPlaylist({ name, isPublic = false, trackIds = [] }) {
+  const session = getSession();
+  if (!session.serverUrl || !session.userId) {
+    throw new Error('Not logged in to Jellyfin server');
+  }
+  if (!name || !name.trim()) {
+    throw new Error('Playlist name is required');
+  }
+
+  const idsStr = Array.isArray(trackIds) ? trackIds.join(',') : '';
+  let url = `${session.serverUrl}/Playlists?Name=${encodeURIComponent(name.trim())}&UserId=${session.userId}&MediaType=Audio`;
+  if (idsStr) {
+    url += `&Ids=${encodeURIComponent(idsStr)}`;
+  }
+
+  const authHeader = getAuthHeader();
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'X-Emby-Authorization': authHeader,
+      'Authorization': authHeader,
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create playlist (HTTP ${response.status})`);
+  }
+
+  const resData = await response.json();
+  const playlistId = resData.Id;
+
+  if (playlistId && isPublic) {
+    try {
+      await fetch(`${session.serverUrl}/Playlists/${playlistId}`, {
+        method: 'POST',
+        headers: {
+          'X-Emby-Authorization': authHeader,
+          'Authorization': authHeader,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ IsPublic: true })
+      });
+    } catch (err) {
+      console.warn('[Jellyfin] Failed to update public status for playlist:', err);
+    }
+  }
+
+  await clearApiCache();
+  return playlistId;
+}
+
 export async function updatePlaylist(playlistId, { name }) {
   const session = getSession();
   if (!session.serverUrl || !playlistId) return;
 
-  const itemData = await getItem(playlistId);
-  const updatedItem = {
-    ...itemData,
-    Name: name || itemData?.Name
-  };
-
-  const url = `${session.serverUrl}/Items/${playlistId}`;
+  const url = `${session.serverUrl}/Playlists/${playlistId}`;
   const authHeader = getAuthHeader();
+
+  const body = {};
+  if (name) body.Name = name;
 
   const response = await fetch(url, {
     method: 'POST',
@@ -297,7 +346,7 @@ export async function updatePlaylist(playlistId, { name }) {
       'Authorization': authHeader,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(updatedItem)
+    body: JSON.stringify(body)
   });
 
   if (!response.ok) {
@@ -305,7 +354,6 @@ export async function updatePlaylist(playlistId, { name }) {
   }
 
   await clearApiCache();
-  return updatedItem;
 }
 
 export async function uploadPlaylistImage(playlistId, base64ImageString, mimeType = 'image/jpeg') {
@@ -326,6 +374,10 @@ export async function uploadPlaylistImage(playlistId, base64ImageString, mimeTyp
     },
     body: base64Data
   });
+
+  if (response.status === 403) {
+    throw new Error('Image upload requires admin permissions on the Jellyfin server.');
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to upload playlist image (HTTP ${response.status})`);

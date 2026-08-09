@@ -73,6 +73,13 @@
     max-width: 100%;
   }
 
+  .playlists-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
   /* Two-column grid on mobile for playlists and cards */
   .cards-grid {
     display: grid !important;
@@ -111,20 +118,19 @@
   /* Simplified Track Row Layout on Mobile */
   .track-row {
     display: grid !important;
-    grid-template-columns: 44px minmax(0, 1fr) !important;
-    gap: 10px !important;
+    grid-template-columns: 44px minmax(0, 1fr) 32px 32px !important;
+    gap: 8px !important;
     align-items: center !important;
     padding: 8px 10px !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
   }
 
-  /* Hide track index, album name, like button, duration, and play icon on mobile */
+  /* Hide track index, album name, duration, and play icon on mobile */
   .track-row > .track-num,
   .track-row > div:nth-child(4),
-  .track-row > div:nth-child(5),
-  .track-row > div:nth-child(6),
-  .track-row > div:nth-child(7) {
+  .track-row > div:nth-child(7),
+  .track-row > div:nth-child(8) {
     display: none !important;
   }
 

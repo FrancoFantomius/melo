@@ -18,6 +18,18 @@
   letter-spacing: -0.5px;
 }
 
+.playlists-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.playlists-header .section-title {
+  margin-bottom: 0;
+}
+
 /* Category Filter Pills / Pillows */
 .category-pills {
   display: flex;
@@ -354,7 +366,7 @@
 
 .track-row {
   display: grid;
-  grid-template-columns: 36px 48px 2fr 1.5fr 36px 60px 36px;
+  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 60px 36px;
   align-items: center;
   padding: 10px 16px;
   border-radius: var(--radius-sm);
@@ -363,7 +375,8 @@
   cursor: pointer;
 }
 
-.btn-track-like {
+.btn-track-like,
+.btn-track-add-playlist {
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -378,6 +391,11 @@
 
 .btn-track-like:hover {
   color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.btn-track-add-playlist:hover {
+  color: var(--accent);
   background: rgba(249, 115, 22, 0.1);
 }
 
@@ -531,4 +549,3 @@
 .btn-remove-recent:hover {
   color: var(--danger);
 }
-

@@ -1,4 +1,4 @@
-# Contributing to Melo 🎵
+# Contributing to Melo
 
 First off, thank you for considering contributing to Melo! It is contributions like yours that make Melo a great open-source project.
 
@@ -28,4 +28,5 @@ First off, thank you for considering contributing to Melo! It is contributions l
 ## Code Guidelines
 - Keep code clean, modern, and modular (ES6 Modules).
 - Follow standard JavaScript / HTML / CSS conventions.
-- Do not check in hardcoded credentials, personal server URLs, or tokens.
+- Respect the user privacy and do not facilitate privacy.
+- The translations strings can be not included in the pull request.

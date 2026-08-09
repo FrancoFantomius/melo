@@ -1,10 +1,10 @@
 import { getSession, saveSession } from '../jellyfin/session.js';
-import { authenticateServer, getLyrics, getArtworkUrl, updatePlaylist, uploadPlaylistImage, deletePlaylist, addTracksToPlaylist, searchJellyfinCached, getSongsCached } from '../jellyfin/client.js';
+import { authenticateServer, getLyrics, getArtworkUrl, createPlaylist, updatePlaylist, uploadPlaylistImage, deletePlaylist, addTracksToPlaylist, searchJellyfinCached, getSongsCached, getPlaylistsCached } from '../jellyfin/client.js';
 import { updateHeaderUI } from './header.js';
 import { applyTheme, getCurrentTheme } from './theme.js';
 import { getQueueState, setCurrentIndex, getCurrentTrack } from '../player/queue.js';
 import { playTrack, seekTo } from '../player/audio.js';
-import { getCurrentLanguageMode, setLanguage } from '../i18n.js';
+import { getCurrentLanguageMode, setLanguage, getTranslation } from '../i18n.js';
 
 let currentLyricsTrackId = null;
 let currentLyricsLines = [];
@@ -512,6 +512,8 @@ export function renderQueueDrawerList() {
     const artistStr = track.Artists ? track.Artists.join(', ') : (track.AlbumArtist || track.showTitle || 'Unknown Artist');
     const titleStr = track.Name || track.title || 'Unknown Title';
 
+    const canAddToPlaylist = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl;
+
     return `
       <div class="queue-track-item ${isCurrent ? 'playing' : ''}" data-queue-index="${idx}">
         <div class="queue-track-status">
@@ -525,6 +527,11 @@ export function renderQueueDrawerList() {
           <div class="queue-track-title">${escapeHtml(titleStr)}</div>
           <div class="queue-track-artist">${escapeHtml(artistStr)}</div>
         </div>
+        ${canAddToPlaylist ? `
+          <button class="btn-queue-add-playlist btn-icon" title="Add to Playlist" data-queue-index="${idx}" style="margin-left: auto; padding: 4px;">
+            <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
+          </button>
+        ` : ''}
       </div>
     `;
   };
@@ -556,7 +563,20 @@ export function renderQueueDrawerList() {
   container.innerHTML = html;
 
   container.querySelectorAll('.queue-track-item').forEach(row => {
-    row.addEventListener('click', () => {
+    const addBtn = row.querySelector('.btn-queue-add-playlist');
+    if (addBtn) {
+      addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const idx = parseInt(addBtn.getAttribute('data-queue-index'), 10);
+        if (!isNaN(idx) && queue[idx]) {
+          openSelectPlaylistModal(queue[idx]);
+        }
+      });
+    }
+
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-queue-add-playlist')) return;
       const idx = parseInt(row.getAttribute('data-queue-index'), 10);
       if (!isNaN(idx)) {
         setCurrentIndex(idx);
@@ -567,11 +587,72 @@ export function renderQueueDrawerList() {
   });
 }
 
+let currentCreatePlaylistCallback = null;
 let currentEditPlaylistCallback = null;
 let currentAddTracksCallback = null;
 let currentDeletePlaylistCallback = null;
 
 function initPlaylistModals() {
+  // Create Playlist modal triggers
+  const createModal = document.getElementById('create-playlist-modal');
+  const btnCreateClose = document.getElementById('btn-create-playlist-close');
+  const btnCreateCancel = document.getElementById('btn-cancel-create-playlist');
+  const createForm = document.getElementById('create-playlist-form');
+
+  btnCreateClose?.addEventListener('click', () => closeCreatePlaylistModal());
+  btnCreateCancel?.addEventListener('click', () => closeCreatePlaylistModal());
+  createModal?.addEventListener('click', (e) => {
+    if (e.target === createModal) closeCreatePlaylistModal();
+  });
+
+  createForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('create-playlist-name');
+    const publicCheckbox = document.getElementById('create-playlist-public');
+    const fileInput = document.getElementById('create-playlist-image');
+    const submitBtn = document.getElementById('btn-submit-create-playlist');
+    const errorEl = document.getElementById('create-playlist-error');
+
+    const name = nameInput?.value?.trim();
+    const isPublic = publicCheckbox?.checked || false;
+
+    if (!name) return;
+    if (submitBtn) submitBtn.disabled = true;
+    if (errorEl) {
+      errorEl.textContent = '';
+      errorEl.style.display = 'none';
+    }
+
+    try {
+      const playlistId = await createPlaylist({ name, isPublic });
+
+      if (playlistId && fileInput && fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        const base64Str = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        try {
+          await uploadPlaylistImage(playlistId, base64Str, file.type || 'image/jpeg');
+        } catch (imgErr) {
+          console.warn('[Playlist] Image upload failed:', imgErr.message);
+        }
+      }
+
+      closeCreatePlaylistModal();
+      if (currentCreatePlaylistCallback) currentCreatePlaylistCallback(playlistId);
+    } catch (err) {
+      if (errorEl) {
+        errorEl.textContent = err.message || 'Failed to create playlist';
+        errorEl.style.display = 'block';
+      }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  });
+
   // Edit Playlist modal triggers
   const editModal = document.getElementById('edit-playlist-modal');
   const btnEditClose = document.getElementById('btn-edit-playlist-close');
@@ -604,6 +685,7 @@ function initPlaylistModals() {
         await updatePlaylist(playlistId, { name: newName });
       }
 
+      let imageError = null;
       if (fileInput && fileInput.files && fileInput.files[0]) {
         const file = fileInput.files[0];
         const base64Str = await new Promise((resolve, reject) => {
@@ -612,11 +694,20 @@ function initPlaylistModals() {
           reader.onerror = reject;
           reader.readAsDataURL(file);
         });
-        await uploadPlaylistImage(playlistId, base64Str, file.type || 'image/jpeg');
+        try {
+          await uploadPlaylistImage(playlistId, base64Str, file.type || 'image/jpeg');
+        } catch (imgErr) {
+          imageError = imgErr;
+        }
       }
 
       closeEditPlaylistModal();
       if (currentEditPlaylistCallback) currentEditPlaylistCallback();
+
+      if (imageError && errorEl) {
+        // Show a brief notification about the image failure
+        console.warn('[Playlist] Image upload failed:', imageError.message);
+      }
     } catch (err) {
       if (errorEl) {
         errorEl.textContent = err.message;
@@ -691,6 +782,31 @@ function initPlaylistModals() {
     } finally {
       btnConfirmDelete.disabled = false;
     }
+  });
+
+  // Select Playlist modal triggers
+  const selectPlaylistModal = document.getElementById('select-playlist-modal');
+  const btnSelectPlaylistClose = document.getElementById('btn-select-playlist-close');
+  const btnSelectPlaylistCancel = document.getElementById('btn-cancel-select-playlist');
+  const btnSelectPlaylistCreateNew = document.getElementById('btn-select-playlist-create-new');
+
+  btnSelectPlaylistClose?.addEventListener('click', () => closeSelectPlaylistModal());
+  btnSelectPlaylistCancel?.addEventListener('click', () => closeSelectPlaylistModal());
+  selectPlaylistModal?.addEventListener('click', (e) => {
+    if (e.target === selectPlaylistModal) closeSelectPlaylistModal();
+  });
+
+  btnSelectPlaylistCreateNew?.addEventListener('click', () => {
+    closeSelectPlaylistModal();
+    openCreatePlaylistModal(async (newPlaylistId) => {
+      if (newPlaylistId && currentTargetTrackIds && currentTargetTrackIds.length > 0) {
+        try {
+          await addTracksToPlaylist(newPlaylistId, currentTargetTrackIds);
+        } catch (err) {
+          console.error('[Playlist] Failed to add tracks to newly created playlist:', err);
+        }
+      }
+    });
   });
 }
 
@@ -821,4 +937,138 @@ export function closeDeletePlaylistModal() {
   const modal = document.getElementById('delete-playlist-modal');
   if (modal) modal.style.display = 'none';
 }
+
+export function openCreatePlaylistModal(onCreateCallback) {
+  const modal = document.getElementById('create-playlist-modal');
+  const nameInput = document.getElementById('create-playlist-name');
+  const publicCheckbox = document.getElementById('create-playlist-public');
+  const fileInput = document.getElementById('create-playlist-image');
+  const errorEl = document.getElementById('create-playlist-error');
+
+  if (!modal) return;
+  currentCreatePlaylistCallback = onCreateCallback;
+  if (nameInput) nameInput.value = '';
+  if (publicCheckbox) publicCheckbox.checked = false;
+  if (fileInput) fileInput.value = '';
+  if (errorEl) {
+    errorEl.textContent = '';
+    errorEl.style.display = 'none';
+  }
+  modal.style.display = 'flex';
+}
+
+export function closeCreatePlaylistModal() {
+  const modal = document.getElementById('create-playlist-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+let currentTargetTrackIds = [];
+
+export function openSelectPlaylistModal(targetTracks) {
+  const modal = document.getElementById('select-playlist-modal');
+  const listEl = document.getElementById('select-playlist-list');
+  const statusEl = document.getElementById('select-playlist-status');
+
+  if (!modal) return;
+
+  let tracksArray = Array.isArray(targetTracks) ? targetTracks : [targetTracks];
+  currentTargetTrackIds = tracksArray
+    .map(t => typeof t === 'string' ? t : (t?.Id || t?.id))
+    .filter(Boolean);
+
+  if (currentTargetTrackIds.length === 0) {
+    console.warn('[Playlist] No track IDs provided to openSelectPlaylistModal');
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.textContent = '';
+    statusEl.style.display = 'none';
+  }
+
+  if (listEl) {
+    listEl.innerHTML = `<div style="color: var(--text-muted); font-size: 13px; padding: 16px; text-align: center;">${getTranslation('Loading playlists...')}</div>`;
+  }
+
+  modal.style.display = 'flex';
+
+  getPlaylistsCached().then(res => {
+    renderSelectPlaylistItems(res?.Items || []);
+  }).catch(err => {
+    if (listEl) {
+      listEl.innerHTML = `<div style="color: var(--danger); font-size: 13px; text-align: center;">Failed to load playlists: ${err.message}</div>`;
+    }
+  });
+}
+
+function renderSelectPlaylistItems(playlists) {
+  const listEl = document.getElementById('select-playlist-list');
+  const statusEl = document.getElementById('select-playlist-status');
+  if (!listEl) return;
+
+  if (!playlists || playlists.length === 0) {
+    listEl.innerHTML = `<div style="color: var(--text-secondary); font-size: 13px; padding: 16px; text-align: center;">${getTranslation('No playlists found. Create one to get started!')}</div>`;
+    return;
+  }
+
+  listEl.innerHTML = playlists.map(pl => {
+    const artUrl = getArtworkUrl(pl, 'Primary', 80);
+    const count = pl.ChildCount !== undefined ? `${pl.ChildCount} tracks` : 'Playlist';
+    return `
+      <div class="select-playlist-item" data-playlist-id="${pl.Id}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='var(--bg-tertiary)'">
+        <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1;">
+          <img src="${artUrl}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" alt="Cover">
+          <div style="overflow: hidden;">
+            <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary);">${escapeHtml(pl.Name || 'Playlist')}</div>
+            <div style="font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(count)}</div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-add-to-this-playlist" data-playlist-id="${pl.Id}" style="padding: 6px 12px; font-size: 12px; height: 32px; display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+          <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+          <span data-i18n>Add</span>
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  const handleAddToPlaylist = async (playlistId, playlistName) => {
+    if (!playlistId || currentTargetTrackIds.length === 0) return;
+    if (statusEl) {
+      statusEl.textContent = getTranslation('Adding to playlist...');
+      statusEl.style.color = 'var(--accent)';
+      statusEl.style.display = 'block';
+    }
+
+    try {
+      await addTracksToPlaylist(playlistId, currentTargetTrackIds);
+      if (statusEl) {
+        statusEl.textContent = `✓ ${getTranslation('Added')} ${currentTargetTrackIds.length > 1 ? `${currentTargetTrackIds.length} ${getTranslation('tracks')}` : getTranslation('track')} ${getTranslation('to')} ${playlistName || getTranslation('playlist')}`;
+        statusEl.style.color = 'var(--success)';
+      }
+      setTimeout(() => {
+        closeSelectPlaylistModal();
+      }, 900);
+    } catch (err) {
+      if (statusEl) {
+        statusEl.textContent = `${getTranslation('Failed to add to playlist')}: ${err.message}`;
+        statusEl.style.color = 'var(--danger)';
+      }
+    }
+  };
+
+  listEl.querySelectorAll('.select-playlist-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      const playlistId = item.getAttribute('data-playlist-id');
+      const playlistName = item.querySelector('div[style*="font-weight: 600"]')?.textContent;
+      handleAddToPlaylist(playlistId, playlistName);
+    });
+  });
+}
+
+export function closeSelectPlaylistModal() {
+  const modal = document.getElementById('select-playlist-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+
 

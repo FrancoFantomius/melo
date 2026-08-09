@@ -6,6 +6,7 @@ import { openAlbum } from './albums.js';
 import { openPlaylist } from './playlists.js';
 import { isTrackLiked, toggleTrackLiked, registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
+import { openSelectPlaylistModal } from '../modals.js';
 
 export function getAlbumArtistsInfo(item) {
   if (!item) return [];
@@ -25,7 +26,7 @@ export function getAlbumArtistsInfo(item) {
 }
 
 export function renderArtistLinksHTML(artistsInfo) {
-  if (!artistsInfo || artistsInfo.length === 0) return getTranslation('artists.unknown_artist', 'Unknown Artist');
+  if (!artistsInfo || artistsInfo.length === 0) return getTranslation('Unknown Artist');
   return artistsInfo.map(artist => `
     <span class="artist-link" data-artist-id="${artist.id || ''}" data-artist-name="${artist.name || ''}" style="color: var(--text-secondary); text-decoration: none; cursor: pointer; font-weight: 500;" onmouseover="this.style.color='var(--accent)'; this.style.textDecoration='underline'" onmouseout="this.style.color='var(--text-secondary)'; this.style.textDecoration='none'">
       ${artist.name}
@@ -67,8 +68,8 @@ export function renderAlbumCardHTML(item, typeLabel = 'Album') {
         <div class="card-thumb liked-songs-thumb" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; border-radius: var(--radius-sm); box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);">
           <span class="material-symbols-outlined" style="font-size: 56px; color: #ffffff; font-variation-settings: 'FILL' 1;">favorite</span>
         </div>
-        <div class="card-title" data-i18n="albums.liked_songs">${getTranslation('albums.liked_songs', 'Liked Songs')}</div>
-        <div class="card-subtitle" data-i18n="albums.liked_songs_subtitle">${getTranslation('albums.liked_songs_subtitle', 'Playlist • Favorite Songs')}</div>
+        <div class="card-title" data-i18n>Liked Songs</div>
+        <div class="card-subtitle" data-i18n>Playlist • Favorite Songs</div>
         <div class="card-play-btn" title="Play">
           <span class="material-symbols-outlined">play_arrow</span>
         </div>
@@ -111,6 +112,11 @@ export function renderTrackRowHTML(track, index) {
       <div style="display: flex; justify-content: center; align-items: center;">
         <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${track.Id}" title="${isLiked ? 'Unlike' : 'Like'}">
           <span class="material-symbols-outlined" style="font-size: 18px;">${isLiked ? 'favorite' : 'favorite_border'}</span>
+        </button>
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <button class="btn-track-add-playlist" data-track-id="${track.Id}" title="Add to Playlist">
+          <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
         </button>
       </div>
       <div style="color: var(--text-muted); font-size: 12px; text-align: right;">${timeStr}</div>
@@ -171,8 +177,8 @@ export function bindAlbumCards(container) {
 export function bindTrackRows(container, tracks) {
   container.querySelectorAll('.track-row').forEach(row => {
     row.addEventListener('click', (e) => {
-      // Ignore click if user clicked directly on artist link or like button
-      if (e.target.closest('.artist-link') || e.target.closest('.btn-track-like')) {
+      // Ignore click if user clicked directly on artist link, like button, or add playlist button
+      if (e.target.closest('.artist-link') || e.target.closest('.btn-track-like') || e.target.closest('.btn-track-add-playlist')) {
         return;
       }
       const index = parseInt(row.getAttribute('data-index'), 10);
@@ -188,6 +194,17 @@ export function bindTrackRows(container, tracks) {
         const trackId = likeBtn.getAttribute('data-track-id');
         const trackObj = tracks.find(t => String(t.Id) === String(trackId)) || { Id: trackId };
         await toggleTrackLiked(trackObj);
+      });
+    }
+
+    const addPlaylistBtn = row.querySelector('.btn-track-add-playlist');
+    if (addPlaylistBtn) {
+      addPlaylistBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const trackId = addPlaylistBtn.getAttribute('data-track-id');
+        const trackObj = tracks.find(t => String(t.Id) === String(trackId)) || { Id: trackId };
+        openSelectPlaylistModal(trackObj);
       });
     }
   });

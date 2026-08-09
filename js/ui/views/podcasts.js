@@ -73,28 +73,28 @@ export async function renderPodcastsView(container, viewData = 'all') {
     <div class="view-section">
       <div class="podcast-header-actions">
         <div>
-          <h1 class="section-title" data-i18n="podcasts.title">${getTranslation('podcasts.title', 'Podcasts')}</h1>
-          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" data-i18n="podcasts.subtitle">${getTranslation('podcasts.subtitle', 'Stream and discover client-side podcast RSS feeds')}</p>
+          <h1 class="section-title" data-i18n>Podcasts</h1>
+          <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" data-i18n>Stream and discover client-side podcast RSS feeds</p>
         </div>
         <button id="btn-open-add-podcast" class="btn-primary">
           <span class="material-symbols-outlined">add</span>
-          <span data-i18n="modals.add_podcast">${getTranslation('modals.add_podcast', 'Add Podcast')}</span>
+          <span data-i18n>Add Podcast</span>
         </button>
       </div>
 
       <!-- Category Filter Pills -->
       <div class="category-pills" id="podcast-category-pills">
-        <button class="category-pill ${activeCategory === 'all' ? 'active' : ''}" data-category="all" data-i18n="pills.all">${getTranslation('pills.all', 'All')}</button>
-        <button class="category-pill ${activeCategory === 'subscribed' ? 'active' : ''}" data-category="subscribed" data-i18n="pills.subscribed_podcasts">${getTranslation('pills.subscribed_podcasts', 'Subscribed Podcasts')}</button>
-        <button class="category-pill ${activeCategory === 'continue' ? 'active' : ''}" data-category="continue" data-i18n="pills.continue_playing">${getTranslation('pills.continue_playing', 'Continue Playing')}</button>
-        <button class="category-pill ${activeCategory === 'latest' ? 'active' : ''}" data-category="latest" data-i18n="pills.latest_episodes">${getTranslation('pills.latest_episodes', 'Latest Episodes')}</button>
-        <button class="category-pill ${activeCategory === 'discover' ? 'active' : ''}" data-category="discover" data-i18n="pills.discover_podcasts">${getTranslation('pills.discover_podcasts', 'Discover Podcasts')}</button>
+        <button class="category-pill ${activeCategory === 'all' ? 'active' : ''}" data-category="all" data-i18n>All</button>
+        <button class="category-pill ${activeCategory === 'subscribed' ? 'active' : ''}" data-category="subscribed" data-i18n>Subscribed Podcasts</button>
+        <button class="category-pill ${activeCategory === 'continue' ? 'active' : ''}" data-category="continue" data-i18n>Continue Playing</button>
+        <button class="category-pill ${activeCategory === 'latest' ? 'active' : ''}" data-category="latest" data-i18n>Latest Episodes</button>
+        <button class="category-pill ${activeCategory === 'discover' ? 'active' : ''}" data-category="discover" data-i18n>Discover Podcasts</button>
       </div>
 
       <!-- Section 1: Subscribed Podcasts Carousel -->
       <section id="podcast-subscribed-section" class="podcast-view-section" data-category="subscribed">
         <div class="podcast-section-header">
-          <h2 class="podcast-section-title" data-i18n="pills.subscribed_podcasts">${getTranslation('pills.subscribed_podcasts', 'Subscribed Podcasts')}</h2>
+          <h2 class="podcast-section-title" data-i18n>Subscribed Podcasts</h2>
           <div style="display: flex; gap: 8px;">
             <button id="carousel-prev-subscribed" class="carousel-nav-btn" title="Previous">
               <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
@@ -105,14 +105,14 @@ export async function renderPodcastsView(container, viewData = 'all') {
           </div>
         </div>
         <div id="podcast-subscribed-carousel" class="cards-carousel">
-          <div style="color: var(--text-muted);" data-i18n="podcasts.loading_subscribed">${getTranslation('podcasts.loading_subscribed', 'Loading subscribed podcasts...')}</div>
+          <div style="color: var(--text-muted);" data-i18n>Loading subscribed podcasts...</div>
         </div>
       </section>
 
       <!-- Section 2: Continue Playing Carousel -->
       <section id="podcast-continue-section" class="podcast-view-section" data-category="continue">
         <div class="podcast-section-header">
-          <h2 class="podcast-section-title" data-i18n="pills.continue_playing">${getTranslation('pills.continue_playing', 'Continue Playing')}</h2>
+          <h2 class="podcast-section-title" data-i18n>Continue Playing</h2>
           <div style="display: flex; gap: 8px;">
             <button id="carousel-prev-continue" class="carousel-nav-btn" title="Previous">
               <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
@@ -123,24 +123,24 @@ export async function renderPodcastsView(container, viewData = 'all') {
           </div>
         </div>
         <div id="podcast-continue-carousel" class="episodes-carousel">
-          <div style="color: var(--text-muted);" data-i18n="podcasts.loading_in_progress">${getTranslation('podcasts.loading_in_progress', 'Loading episodes in progress...')}</div>
+          <div style="color: var(--text-muted);" data-i18n>Loading episodes in progress...</div>
         </div>
       </section>
 
       <!-- Section 3: Latest Episodes 2 Columns -->
       <section id="podcast-latest-section" class="podcast-view-section" data-category="latest">
         <div class="podcast-section-header">
-          <h2 class="podcast-section-title" data-i18n="pills.latest_episodes">${getTranslation('pills.latest_episodes', 'Latest Episodes')}</h2>
+          <h2 class="podcast-section-title" data-i18n>Latest Episodes</h2>
         </div>
         <div id="podcast-latest-grid" class="podcast-tracks-grid-2col">
-          <div style="color: var(--text-muted); grid-column: 1/-1;" data-i18n="podcasts.loading_latest">${getTranslation('podcasts.loading_latest', 'Loading latest episodes...')}</div>
+          <div style="color: var(--text-muted); grid-column: 1/-1;" data-i18n>Loading latest episodes...</div>
         </div>
       </section>
 
       <!-- Section 4: Discover Podcasts Grid -->
       <section id="podcast-discover-section" class="podcast-view-section" data-category="discover">
         <div class="podcast-section-header">
-          <h2 class="podcast-section-title" data-i18n="pills.discover_podcasts">${getTranslation('pills.discover_podcasts', 'Discover Podcasts')}</h2>
+          <h2 class="podcast-section-title" data-i18n>Discover Podcasts</h2>
         </div>
         <div id="podcast-discover-container"></div>
       </section>
@@ -252,8 +252,8 @@ export function renderSubscribedCarousel(container, feeds) {
   if (!container) return;
   if (!feeds || feeds.length === 0) {
     container.innerHTML = `
-      <div style="padding: 20px 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13px; width: 100%;" data-i18n="podcasts.no_subscribed">
-        ${getTranslation('podcasts.no_subscribed', 'No podcasts subscribed yet. Search or browse the Discover section below to subscribe!')}
+      <div style="padding: 20px 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13px; width: 100%;" data-i18n>
+        No podcasts subscribed yet. Search or browse the Discover section below to subscribe!
       </div>
     `;
     return;
@@ -265,9 +265,9 @@ export function renderSubscribedCarousel(container, feeds) {
       <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
         <div class="card-title" title="${feed.title}">${feed.title}</div>
         <div class="card-subtitle" title="${feed.author}">${feed.author || 'Podcast'}</div>
-        <div style="font-size: 11px; color: var(--accent); margin-top: 4px;">${feed.episodeCount || 0} ${getTranslation('common.episodes', 'episodes')}</div>
+        <div style="font-size: 11px; color: var(--accent); margin-top: 4px;">${feed.episodeCount || 0} ${getTranslation('Episodes')}</div>
       </div>
-      <button class="btn-icon btn-delete-podcast" data-feed-url="${encodeURIComponent(feed.feedUrl)}" title="${getTranslation('podcasts.unsubscribe', 'Unsubscribe')}" style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;">
+      <button class="btn-icon btn-delete-podcast" data-feed-url="${encodeURIComponent(feed.feedUrl)}" title="Unsubscribe" data-i18n-title style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;">
         <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
       </button>
     </div>
@@ -285,7 +285,7 @@ export function renderSubscribedCarousel(container, feeds) {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const url = decodeURIComponent(btn.getAttribute('data-feed-url'));
-      if (confirm(getTranslation('podcasts.unsubscribe_confirm', 'Unsubscribe from this podcast?'))) {
+      if (confirm(getTranslation('Unsubscribe from this podcast?'))) {
         await removePodcastFeedUrl(url);
         const viewContainer = document.getElementById('view-container');
         if (viewContainer) renderPodcastsView(viewContainer, 'all');
@@ -315,8 +315,8 @@ export function renderContinuePlayingCarousel(container, feeds) {
 
   if (inProgressEpisodes.length === 0) {
     container.innerHTML = `
-      <div style="padding: 20px 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13px; width: 100%;" data-i18n="podcasts.no_in_progress">
-        ${getTranslation('podcasts.no_in_progress', 'No episodes in progress. Play any podcast episode to resume listening here anytime!')}
+      <div style="padding: 20px 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13px; width: 100%;" data-i18n>
+        No episodes in progress. Play any podcast episode to resume listening here anytime!
       </div>
     `;
     return;
@@ -344,8 +344,8 @@ export function renderContinuePlayingCarousel(container, feeds) {
             <div class="episode-progress-fill" style="width: ${progressPct}%;"></div>
           </div>
           <div class="continue-playing-meta">
-            <span>${progressPct}% ${getTranslation('podcasts.listened', 'listened')}</span>
-            <span>${remainingFormatted} ${getTranslation('podcasts.left', 'left')}</span>
+            <span>${progressPct}% ${getTranslation('listened')}</span>
+            <span>${remainingFormatted} ${getTranslation('left')}</span>
           </div>
         </div>
       </div>
@@ -382,8 +382,8 @@ export function renderLatestEpisodesGrid(container, feeds) {
 
   if (latestTop.length === 0) {
     container.innerHTML = `
-      <div style="padding: 20px 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13px; grid-column: 1/-1;" data-i18n="podcasts.no_latest">
-        ${getTranslation('podcasts.no_latest', 'No podcast episodes found. Subscribe to podcast feeds to see the latest episodes here!')}
+      <div style="padding: 20px 24px; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-secondary); font-size: 13px; grid-column: 1/-1;" data-i18n>
+        No podcast episodes found. Subscribe to podcast feeds to see the latest episodes here!
       </div>
     `;
     return;
@@ -424,7 +424,7 @@ export function renderLatestEpisodesGrid(container, feeds) {
 
 export function renderEpisodeListHtml(container, episodes, is2Col = false) {
   if (!episodes || episodes.length === 0) {
-    container.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-secondary); grid-column: 1/-1;" data-i18n="podcasts.no_episodes">${getTranslation('podcasts.no_episodes', 'No episodes found.')}</div>`;
+    container.innerHTML = `<div style="padding: 30px; text-align: center; color: var(--text-secondary); grid-column: 1/-1;" data-i18n>No episodes found.</div>`;
     return;
   }
 
@@ -434,9 +434,9 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
     let badgeHtml = '';
 
     if (state.isPlayed) {
-      badgeHtml = `<span class="episode-badge played" title="Completed" data-i18n="podcasts.played">${getTranslation('podcasts.played', 'Played')}</span>`;
+      badgeHtml = `<span class="episode-badge played" title="Completed" data-i18n>Played</span>`;
     } else if (state.position > 5) {
-      badgeHtml = `<span class="episode-badge in-progress" title="${Math.floor(state.position/60)}m ${getTranslation('podcasts.listened', 'listened')}"><span data-i18n="podcasts.in_progress">${getTranslation('podcasts.in_progress', 'In Progress')}</span> (${progressPct}%)</span>`;
+      badgeHtml = `<span class="episode-badge in-progress" title="${Math.floor(state.position/60)}m listened"><span data-i18n>In Progress</span> (${progressPct}%)</span>`;
     }
 
     const uniqueNoteId = `notes-${Math.random().toString(36).substr(2, 9)}-${idx}`;
@@ -454,9 +454,7 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
               ${ep.pubDate ? `<span>• ${ep.pubDate}</span>` : ''}
               ${ep.durationFormatted ? `<span>• ${ep.durationFormatted}</span>` : ''}
               ${badgeHtml}
-              <button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" style="background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; flex-shrink: 0;" data-i18n="podcasts.show_notes">
-                ${getTranslation('podcasts.show_notes', 'Show Notes')}
-              </button>
+              <button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" style="background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; flex-shrink: 0;" data-i18n>Show Notes</button>
               <button class="btn-toggle-played" data-id="${ep.id}" style="background: none; border: none; color: var(--text-muted); cursor: pointer; flex-shrink: 0;" title="Toggle Played State">
                 <span class="material-symbols-outlined" style="font-size: 18px;">${state.isPlayed ? 'check_circle' : 'radio_button_unchecked'}</span>
               </button>
@@ -471,7 +469,7 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
         ` : ''}
 
         <div class="episode-show-notes" id="${uniqueNoteId}">
-          ${ep.description || getTranslation('podcasts.no_show_notes', 'No show notes available for this episode.')}
+          ${ep.description || 'No show notes available for this episode.'}
         </div>
       </div>
     `;
@@ -503,7 +501,7 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
       if (notesEl) {
         const isExpanded = notesEl.classList.contains('expanded');
         notesEl.classList.toggle('expanded');
-        btn.textContent = isExpanded ? getTranslation('podcasts.show_notes', 'Show Notes') : getTranslation('podcasts.hide_notes', 'Hide Notes');
+        btn.textContent = isExpanded ? getTranslation('Show Notes') : getTranslation('Hide Notes');
       }
     });
   });
@@ -527,8 +525,8 @@ export async function renderPodcastDetailView(container, viewData) {
   }
 
   container.innerHTML = `
-    <div style="padding: 40px; text-align: center; color: var(--text-secondary);" data-i18n="podcasts.loading_show">
-      ${getTranslation('podcasts.loading_show', 'Loading podcast show...')}
+    <div style="padding: 40px; text-align: center; color: var(--text-secondary);" data-i18n>
+      Loading podcast show...
     </div>
   `;
 
@@ -551,7 +549,7 @@ export async function renderPodcastDetailView(container, viewData) {
       <div class="view-section">
         <button id="btn-podcast-back" class="btn-secondary" style="align-self: flex-start; margin-bottom: 16px;">
           <span class="material-symbols-outlined">arrow_back</span>
-          <span data-i18n="podcasts.back_to_podcasts">${getTranslation('podcasts.back_to_podcasts', 'Back to Podcasts')}</span>
+          <span data-i18n>Back to Podcasts</span>
         </button>
 
         <div class="podcast-detail-banner">
@@ -561,16 +559,16 @@ export async function renderPodcastDetailView(container, viewData) {
             <div class="podcast-author">${feed.author}</div>
             <div class="podcast-description">${feed.description}</div>
             <div class="podcast-banner-actions">
-              <span style="font-size: 13px; color: var(--text-secondary);">${feed.episodeCount || 0} ${getTranslation('common.episodes', 'episodes')}</span>
+              <span style="font-size: 13px; color: var(--text-secondary);">${feed.episodeCount || 0} ${getTranslation('Episodes')}</span>
               ${isSubscribed ? `
                 <button id="btn-unsubscribe-show" class="btn-secondary" style="color: var(--danger); border-color: rgba(241,94,108,0.3);">
                   <span class="material-symbols-outlined">delete</span>
-                  <span data-i18n="podcasts.unsubscribe">${getTranslation('podcasts.unsubscribe', 'Unsubscribe')}</span>
+                  <span data-i18n>Unsubscribe</span>
                 </button>
               ` : `
                 <button id="btn-subscribe-show" class="btn-primary">
                   <span class="material-symbols-outlined">add</span>
-                  <span data-i18n="podcasts.subscribe">${getTranslation('podcasts.subscribe', 'Subscribe')}</span>
+                  <span data-i18n>Subscribe</span>
                 </button>
               `}
             </div>
@@ -578,39 +576,39 @@ export async function renderPodcastDetailView(container, viewData) {
         </div>
 
         <div class="podcast-episodes-header">
-          <h2 class="section-title" data-i18n="podcasts.episodes">${getTranslation('podcasts.episodes', 'Episodes')}</h2>
+          <h2 class="section-title" data-i18n>Episodes</h2>
           <div class="podcast-episodes-actions">
-            <input type="text" id="episode-search-input" class="episode-search-input" placeholder="${getTranslation('podcasts.search_episodes_placeholder', 'Search episodes...')}" data-i18n-placeholder="podcasts.search_episodes_placeholder">
+            <input type="text" id="episode-search-input" class="episode-search-input" placeholder="Search episodes..." data-i18n-placeholder>
             <div class="sort-dropdown-container">
               <button id="btn-sort-episodes" class="btn-secondary btn-sort-episodes" aria-label="Sort episodes">
                 <span class="material-symbols-outlined">swap_vert</span>
-                <span id="current-sort-label" data-i18n="podcasts.sort_newest">${getTranslation('podcasts.sort_newest', 'Newest First')}</span>
+                <span id="current-sort-label" data-i18n>Newest First</span>
                 <span class="material-symbols-outlined" style="font-size: 18px;">expand_more</span>
               </button>
               <div id="sort-episodes-menu" class="sort-dropdown-menu" style="display: none;">
                 <div class="sort-dropdown-item active" data-sort="newest">
                   <span class="material-symbols-outlined">calendar_today</span>
-                  <span data-i18n="podcasts.sort_newest">${getTranslation('podcasts.sort_newest', 'Newest First')}</span>
+                  <span data-i18n>Newest First</span>
                 </div>
                 <div class="sort-dropdown-item" data-sort="oldest">
                   <span class="material-symbols-outlined">history</span>
-                  <span data-i18n="podcasts.sort_oldest">${getTranslation('podcasts.sort_oldest', 'Oldest First')}</span>
+                  <span data-i18n>Oldest First</span>
                 </div>
                 <div class="sort-dropdown-item" data-sort="title-asc">
                   <span class="material-symbols-outlined">sort_by_alpha</span>
-                  <span data-i18n="podcasts.sort_title_asc">${getTranslation('podcasts.sort_title_asc', 'Title (A-Z)')}</span>
+                  <span data-i18n>Title (A-Z)</span>
                 </div>
                 <div class="sort-dropdown-item" data-sort="title-desc">
                   <span class="material-symbols-outlined">sort_by_alpha</span>
-                  <span data-i18n="podcasts.sort_title_desc">${getTranslation('podcasts.sort_title_desc', 'Title (Z-A)')}</span>
+                  <span data-i18n>Title (Z-A)</span>
                 </div>
                 <div class="sort-dropdown-item" data-sort="duration-desc">
                   <span class="material-symbols-outlined">schedule</span>
-                  <span data-i18n="podcasts.sort_duration_desc">${getTranslation('podcasts.sort_duration_desc', 'Longest First')}</span>
+                  <span data-i18n>Longest First</span>
                 </div>
                 <div class="sort-dropdown-item" data-sort="duration-asc">
                   <span class="material-symbols-outlined">schedule</span>
-                  <span data-i18n="podcasts.sort_duration_asc">${getTranslation('podcasts.sort_duration_asc', 'Shortest First')}</span>
+                  <span data-i18n>Shortest First</span>
                 </div>
               </div>
             </div>
@@ -627,7 +625,7 @@ export async function renderPodcastDetailView(container, viewData) {
     });
 
     document.getElementById('btn-unsubscribe-show')?.addEventListener('click', async () => {
-      if (confirm(getTranslation('podcasts.unsubscribe_confirm', 'Unsubscribe from this podcast?'))) {
+      if (confirm(getTranslation('Unsubscribe from this podcast?'))) {
         await removePodcastFeedUrl(feedUrl);
         renderPodcastDetailView(container, viewData);
       }
@@ -644,12 +642,12 @@ export async function renderPodcastDetailView(container, viewData) {
       let currentSearchQuery = '';
 
       const sortLabels = {
-        'newest': getTranslation('podcasts.sort_newest', 'Newest First'),
-        'oldest': getTranslation('podcasts.sort_oldest', 'Oldest First'),
-        'title-asc': getTranslation('podcasts.sort_title_asc', 'Title (A-Z)'),
-        'title-desc': getTranslation('podcasts.sort_title_desc', 'Title (Z-A)'),
-        'duration-desc': getTranslation('podcasts.sort_duration_desc', 'Longest First'),
-        'duration-asc': getTranslation('podcasts.sort_duration_asc', 'Shortest First')
+        'newest': getTranslation('Newest First'),
+        'oldest': getTranslation('Oldest First'),
+        'title-asc': getTranslation('Title (A-Z)'),
+        'title-desc': getTranslation('Title (Z-A)'),
+        'duration-desc': getTranslation('Longest First'),
+        'duration-asc': getTranslation('Shortest First')
       };
 
       const updateEpisodesList = () => {
@@ -739,21 +737,21 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
     <div class="discovery-container">
       <div class="discovery-search-box">
         <span class="material-symbols-outlined" style="color: var(--text-muted);">search</span>
-        <input type="text" id="discovery-search-input" placeholder="${getTranslation('podcasts.discover_search_placeholder', 'Search millions of podcasts (e.g. Science, Tech, Daily, Huberman)...')}" data-i18n-placeholder="podcasts.discover_search_placeholder">
+        <input type="text" id="discovery-search-input" placeholder="Search millions of podcasts (e.g. Science, Tech, Daily, Huberman)..." data-i18n-placeholder>
       </div>
 
       <div class="discovery-pills">
-        <button class="discovery-pill active" data-term="podcast" data-i18n="podcasts.discover_top_charts">${getTranslation('podcasts.discover_top_charts', 'Top Charts')}</button>
-        <button class="discovery-pill" data-term="technology" data-i18n="podcasts.discover_technology">${getTranslation('podcasts.discover_technology', 'Technology')}</button>
-        <button class="discovery-pill" data-term="news" data-i18n="podcasts.discover_news">${getTranslation('podcasts.discover_news', 'News')}</button>
-        <button class="discovery-pill" data-term="science" data-i18n="podcasts.discover_science">${getTranslation('podcasts.discover_science', 'Science')}</button>
-        <button class="discovery-pill" data-term="business" data-i18n="podcasts.discover_business">${getTranslation('podcasts.discover_business', 'Business')}</button>
-        <button class="discovery-pill" data-term="comedy" data-i18n="podcasts.discover_comedy">${getTranslation('podcasts.discover_comedy', 'Comedy')}</button>
-        <button class="discovery-pill" data-term="society" data-i18n="podcasts.discover_society">${getTranslation('podcasts.discover_society', 'Society')}</button>
+        <button class="discovery-pill active" data-term="podcast" data-i18n>Top Charts</button>
+        <button class="discovery-pill" data-term="technology" data-i18n>Technology</button>
+        <button class="discovery-pill" data-term="news" data-i18n>News</button>
+        <button class="discovery-pill" data-term="science" data-i18n>Science</button>
+        <button class="discovery-pill" data-term="business" data-i18n>Business</button>
+        <button class="discovery-pill" data-term="comedy" data-i18n>Comedy</button>
+        <button class="discovery-pill" data-term="society" data-i18n>Society</button>
       </div>
 
       <div id="discovery-results" class="cards-grid">
-        <div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n="podcasts.loading_popular">${getTranslation('podcasts.loading_popular', 'Loading popular podcasts...')}</div>
+        <div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n>Loading popular podcasts...</div>
       </div>
     </div>
   `;
@@ -766,7 +764,7 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
 
   async function loadTerm(term) {
     if (!resultsGrid) return;
-    resultsGrid.innerHTML = `<div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n="podcasts.searching_directory">${getTranslation('podcasts.searching_directory', 'Searching directory...')}</div>`;
+    resultsGrid.innerHTML = `<div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n>Searching directory...</div>`;
     const results = await getPopularPodcasts(term, 24);
     renderDiscoveryGrid(resultsGrid, results, subscribedFeedUrls);
   }
@@ -783,7 +781,7 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
     debounceTimer = setTimeout(async () => {
       if (q.length > 0) {
         if (!resultsGrid) return;
-        resultsGrid.innerHTML = `<div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);">${getTranslation('podcasts.searching_directory', 'Searching directory...')} "${q}"...</div>`;
+        resultsGrid.innerHTML = `<div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);"><span data-i18n>Searching directory...</span> "${q}"...</div>`;
         const results = await searchPodcastDirectory(q, 24);
         renderDiscoveryGrid(resultsGrid, results, subscribedFeedUrls);
       } else {
@@ -806,7 +804,7 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
 
 export function renderDiscoveryGrid(gridEl, items, subscribedUrls = []) {
   if (!items || items.length === 0) {
-    gridEl.innerHTML = `<div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n="podcasts.no_podcasts_found">${getTranslation('podcasts.no_podcasts_found', 'No podcasts found. Try another search query.')}</div>`;
+    gridEl.innerHTML = `<div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n>No podcasts found. Try another search query.</div>`;
     return;
   }
 
@@ -823,7 +821,7 @@ export function renderDiscoveryGrid(gridEl, items, subscribedUrls = []) {
         <div style="margin-top: 8px;">
           <button class="btn-subscribe ${isSubscribed ? 'subscribed' : ''}" data-feed-url="${encodeURIComponent(item.feedUrl)}" data-idx="${idx}" ${isSubscribed ? 'disabled' : ''}>
             <span class="material-symbols-outlined" style="font-size: 16px;">${isSubscribed ? 'check' : 'add'}</span>
-            <span data-i18n="${isSubscribed ? 'podcasts.subscribed' : 'podcasts.subscribe'}">${isSubscribed ? getTranslation('podcasts.subscribed', 'Subscribed') : getTranslation('podcasts.subscribe', 'Subscribe')}</span>
+            <span data-i18n>${isSubscribed ? 'Subscribed' : 'Subscribe'}</span>
           </button>
         </div>
       </div>
@@ -843,7 +841,7 @@ export function renderDiscoveryGrid(gridEl, items, subscribedUrls = []) {
       e.stopPropagation();
       const feedUrl = decodeURIComponent(btn.getAttribute('data-feed-url'));
       btn.disabled = true;
-      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">hourglass_empty</span><span data-i18n="podcasts.subscribing">${getTranslation('podcasts.subscribing', 'Subscribing...')}</span>`;
+      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">hourglass_empty</span><span data-i18n>Subscribing...</span>`;
 
       try {
         await savePodcastFeedUrl(feedUrl);
@@ -851,11 +849,11 @@ export function renderDiscoveryGrid(gridEl, items, subscribedUrls = []) {
         subscribedUrls.push(feedUrl);
 
         btn.classList.add('subscribed');
-        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">check</span><span data-i18n="podcasts.subscribed">${getTranslation('podcasts.subscribed', 'Subscribed')}</span>`;
+        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">check</span><span data-i18n>Subscribed</span>`;
       } catch (err) {
         console.error('[Discovery] Subscribe failed:', err);
         btn.disabled = false;
-        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">add</span><span data-i18n="podcasts.subscribe">${getTranslation('podcasts.subscribe', 'Subscribe')}</span>`;
+        btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 16px;">add</span><span data-i18n>Subscribe</span>`;
       }
     });
   });

@@ -3,10 +3,10 @@
   <div class="modal-header queue-header">
     <h3 class="modal-title">
       <span class="material-symbols-outlined" style="color: var(--accent);">queue_music</span>
-      <span data-i18n="player.play_queue">Play Queue</span>
+      <span data-i18n>Play Queue</span>
       <span id="queue-count-badge" class="queue-count-badge"></span>
     </h3>
-    <button id="btn-queue-close" class="btn-icon" title="Close Queue" aria-label="Close Queue" data-i18n-title="player.close_queue"><span class="material-symbols-outlined">close</span></button>
+    <button id="btn-queue-close" class="btn-icon" title="Close Queue" aria-label="Close Queue" data-i18n-title><span class="material-symbols-outlined">close</span></button>
   </div>
   <div id="queue-tracks-list" class="tracks-list" style="overflow-y: auto; flex: 1;"></div>
 </div>
@@ -17,7 +17,7 @@
     <div class="modal-header">
       <h2 class="modal-title">
         <span class="material-symbols-outlined" style="color: var(--accent);">settings</span>
-        <span data-i18n="settings.title">App & Audio Settings</span>
+        <span data-i18n>App & Audio Settings</span>
       </h2>
       <button id="btn-settings-close" class="btn-icon" aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
@@ -26,9 +26,9 @@
 
     <!-- Language Selector -->
     <div class="input-group">
-      <label for="setting-language" data-i18n="settings.language">Language</label>
+      <label for="setting-language" data-i18n>Language</label>
       <select id="setting-language">
-        <option value="auto" data-i18n="settings.lang_auto">Auto (Browser Default)</option>
+        <option value="auto" data-i18n>Auto (Browser Default)</option>
         <option value="en">English</option>
         <option value="it">Italiano</option>
         <option value="es">Español</option>
@@ -41,31 +41,31 @@
     </div>
 
     <div class="input-group">
-      <label for="setting-quality-wifi" data-i18n="settings.wifi_quality">WiFi Streaming Quality</label>
+      <label for="setting-quality-wifi" data-i18n>WiFi Streaming Quality</label>
       <select id="setting-quality-wifi">
-        <option value="Direct" data-i18n="settings.quality_direct">Direct Play (Lossless/Original)</option>
-        <option value="320000" data-i18n="settings.quality_320">320 kbps (High Quality MP3)</option>
-        <option value="256000" data-i18n="settings.quality_256">256 kbps (Medium Quality)</option>
-        <option value="128000" data-i18n="settings.quality_128">128 kbps (Data Saver)</option>
-        <option value="64000" data-i18n="settings.quality_64">64 kbps (Low Bandwidth)</option>
+        <option value="Direct" data-i18n>Direct Play (Lossless/Original)</option>
+        <option value="320000" data-i18n>320 kbps (High Quality MP3)</option>
+        <option value="256000" data-i18n>256 kbps (Medium Quality)</option>
+        <option value="128000" data-i18n>128 kbps (Data Saver)</option>
+        <option value="64000" data-i18n>64 kbps (Low Bandwidth)</option>
       </select>
     </div>
 
     <div class="input-group">
-      <label for="setting-quality-mobile" data-i18n="settings.mobile_quality">Mobile Data Streaming Quality</label>
+      <label for="setting-quality-mobile" data-i18n>Mobile Data Streaming Quality</label>
       <select id="setting-quality-mobile">
-        <option value="Direct" data-i18n="settings.quality_direct">Direct Play (Lossless/Original)</option>
-        <option value="320000" data-i18n="settings.quality_320">320 kbps (High Quality)</option>
-        <option value="256000" data-i18n="settings.quality_256">256 kbps (Medium Quality)</option>
-        <option value="128000" selected data-i18n="settings.quality_128">128 kbps (Data Saver)</option>
-        <option value="64000" data-i18n="settings.quality_64">64 kbps (Low Bandwidth)</option>
+        <option value="Direct" data-i18n>Direct Play (Lossless/Original)</option>
+        <option value="320000" data-i18n>320 kbps (High Quality MP3)</option>
+        <option value="256000" data-i18n>256 kbps (Medium Quality)</option>
+        <option value="128000" selected data-i18n>128 kbps (Data Saver)</option>
+        <option value="64000" data-i18n>64 kbps (Low Bandwidth)</option>
       </select>
     </div>
 
     <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
       <input type="checkbox" id="setting-force-transcode"
         style="width: 18px; height: 18px; accent-color: var(--accent);">
-      <label for="setting-force-transcode" style="font-size: 13px; font-weight: 600; cursor: pointer;" data-i18n="settings.force_transcode">Force Audio Transcoding (MP3/AAC)</label>
+      <label for="setting-force-transcode" style="font-size: 13px; font-weight: 600; cursor: pointer;" data-i18n>Force Audio Transcoding (MP3/AAC)</label>
     </div>
 
     <div
@@ -73,26 +73,26 @@
       <input type="checkbox" id="setting-search-podcasts"
         style="width: 18px; height: 18px; accent-color: var(--accent);" checked>
       <label for="setting-search-podcasts"
-        style="font-size: 13px; font-weight: 600; cursor: pointer; flex-grow: 1; color: var(--text-primary);" data-i18n="settings.search_podcasts">Search Podcasts in Searchbar</label>
+        style="font-size: 13px; font-weight: 600; cursor: pointer; flex-grow: 1; color: var(--text-primary);" data-i18n>Search Podcasts in Searchbar</label>
     </div>
 
     <div class="input-group">
-      <label for="setting-theme" data-i18n="settings.theme_mode">Theme Mode</label>
+      <label for="setting-theme" data-i18n>Theme Mode</label>
       <select id="setting-theme">
-        <option value="system" selected data-i18n="settings.theme_system">System Theme</option>
-        <option value="dark" data-i18n="settings.theme_dark">Dark Theme</option>
-        <option value="light" data-i18n="settings.theme_light">Light Theme</option>
+        <option value="system" selected data-i18n>System Theme</option>
+        <option value="dark" data-i18n>Dark Theme</option>
+        <option value="light" data-i18n>Light Theme</option>
       </select>
     </div>
 
     <div class="input-group" style="margin-top: 4px;">
-      <label style="font-size: 13px; font-weight: 700;" data-i18n="settings.section_order">Home Page Section Order</label>
-      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;" data-i18n="settings.section_order_desc">Reorder sections on your Home page:</p>
+      <label style="font-size: 13px; font-weight: 700;" data-i18n>Home Page Section Order</label>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;" data-i18n>Reorder sections on your Home page:</p>
       <div id="home-section-order-list" class="section-order-list"></div>
     </div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
-      <button id="btn-save-settings" class="btn btn-primary" style="width: 100%;" data-i18n="settings.save">Save Settings</button>
+      <button id="btn-save-settings" class="btn btn-primary" style="width: 100%;" data-i18n>Save Settings</button>
     </div>
   </div>
 </div>
@@ -106,7 +106,7 @@
 
   <div class="lyrics-view-header">
     <div class="lyrics-track-info">
-      <div id="lyrics-track-title" class="lyrics-header-title" data-i18n="player.lyrics">Lyrics</div>
+      <div id="lyrics-track-title" class="lyrics-header-title" data-i18n>Lyrics</div>
       <div id="lyrics-track-artist" class="lyrics-header-artist"></div>
     </div>
     <button id="btn-lyrics-close" class="btn-icon lyrics-close-btn" title="Close lyrics">
@@ -115,7 +115,7 @@
   </div>
 
   <div id="lyrics-view-body" class="lyrics-view-body">
-    <div class="lyrics-loading" style="color: var(--text-secondary); text-align: center; padding: 20px;" data-i18n="player.loading_lyrics">Loading lyrics...</div>
+    <div class="lyrics-loading" style="color: var(--text-secondary); text-align: center; padding: 20px;" data-i18n>Loading lyrics...</div>
   </div>
 </div>
 
@@ -125,7 +125,7 @@
     <div class="modal-header">
       <h2 class="modal-title">
         <span class="material-symbols-outlined" style="color: var(--accent);">podcasts</span>
-        <span data-i18n="modals.add_podcast">Add Podcast</span>
+        <span data-i18n>Add Podcast</span>
       </h2>
       <button id="btn-add-podcast-close" class="btn-icon" aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
@@ -134,7 +134,7 @@
 
     <form id="add-podcast-form">
       <div class="input-group">
-        <label for="podcast-rss-url" data-i18n="modals.podcast_rss_url">Podcast RSS Feed URL</label>
+        <label for="podcast-rss-url" data-i18n>Podcast RSS Feed URL</label>
         <input type="url" id="podcast-rss-url" placeholder="https://example.com/podcast/rss.xml" required
           style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
       </div>
@@ -143,7 +143,47 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
-        <button type="submit" id="btn-submit-add-podcast" class="btn btn-primary" style="width: 100%;" data-i18n="modals.add_podcast">Add Podcast</button>
+        <button type="submit" id="btn-submit-add-podcast" class="btn btn-primary" style="width: 100%;" data-i18n>Add Podcast</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Create Playlist Modal -->
+<div id="create-playlist-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <span data-i18n>Create Playlist</span>
+      </h2>
+      <button id="btn-create-playlist-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form id="create-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
+      <div class="input-group">
+        <label for="create-playlist-name" data-i18n>Playlist Name</label>
+        <input type="text" id="create-playlist-name" required placeholder="My Awesome Playlist">
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
+        <input type="checkbox" id="create-playlist-public" style="width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;">
+        <label for="create-playlist-public" style="font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-primary);" data-i18n>Visible to all users on this server</label>
+      </div>
+
+      <div class="input-group">
+        <label for="create-playlist-image" data-i18n>Cover Image (Optional)</label>
+        <input type="file" id="create-playlist-image" accept="image/png, image/jpeg, image/webp">
+      </div>
+
+      <div id="create-playlist-error" style="color: var(--danger); font-size: 13px; display: none;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" id="btn-cancel-create-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+        <button type="submit" id="btn-submit-create-playlist" class="btn btn-primary" data-i18n>Create</button>
       </div>
     </form>
   </div>
@@ -155,7 +195,7 @@
     <div class="modal-header">
       <h2 class="modal-title">
         <span class="material-symbols-outlined" style="color: var(--accent);">edit</span>
-        <span data-i18n="modals.edit_playlist">Edit Playlist</span>
+        <span data-i18n>Edit Playlist</span>
       </h2>
       <button id="btn-edit-playlist-close" class="btn-icon" aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
@@ -165,13 +205,13 @@
     <form id="edit-playlist-form">
       <input type="hidden" id="edit-playlist-id">
       <div class="input-group">
-        <label for="edit-playlist-name" data-i18n="modals.playlist_name">Playlist Name</label>
+        <label for="edit-playlist-name" data-i18n>Playlist Name</label>
         <input type="text" id="edit-playlist-name" required
           style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
       </div>
 
       <div class="input-group" style="margin-top: 14px;">
-        <label for="edit-playlist-image" data-i18n="modals.change_cover">Change Cover Image (Optional)</label>
+        <label for="edit-playlist-image" data-i18n>Change Cover Image (Optional)</label>
         <input type="file" id="edit-playlist-image" accept="image/png, image/jpeg, image/webp"
           style="width: 100%; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
       </div>
@@ -180,8 +220,8 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-        <button type="button" id="btn-cancel-edit-playlist" class="btn btn-secondary" data-i18n="modals.cancel">Cancel</button>
-        <button type="submit" id="btn-save-edit-playlist" class="btn btn-primary" data-i18n="modals.save_changes">Save Changes</button>
+        <button type="button" id="btn-cancel-edit-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+        <button type="submit" id="btn-save-edit-playlist" class="btn btn-primary" data-i18n>Save Changes</button>
       </div>
     </form>
   </div>
@@ -193,7 +233,7 @@
     <div class="modal-header">
       <h2 class="modal-title">
         <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
-        <span data-i18n="modals.add_tracks">Add Tracks to Playlist</span>
+        <span data-i18n>Add Tracks to Playlist</span>
       </h2>
       <button id="btn-add-tracks-close" class="btn-icon" aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
@@ -203,18 +243,18 @@
     <input type="hidden" id="add-tracks-playlist-id">
 
     <div style="margin-bottom: 14px;">
-      <input type="text" id="add-tracks-search-input" placeholder="Search tracks by name or artist..." data-i18n-placeholder="modals.search_tracks_placeholder" autocomplete="off"
+      <input type="text" id="add-tracks-search-input" placeholder="Search tracks by name or artist..." data-i18n-placeholder autocomplete="off"
         style="width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
     </div>
 
     <div id="add-tracks-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
-      <div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;" data-i18n="modals.search_library_prompt">Search your library to add tracks...</div>
+      <div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;" data-i18n>Search your library to add tracks...</div>
     </div>
 
     <div id="add-tracks-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-add-tracks" class="btn btn-secondary" data-i18n="modals.close">Close</button>
+      <button type="button" id="btn-cancel-add-tracks" class="btn btn-secondary" data-i18n>Close</button>
     </div>
   </div>
 </div>
@@ -225,7 +265,7 @@
     <div class="modal-header">
       <h2 class="modal-title" style="color: var(--danger);">
         <span class="material-symbols-outlined" style="color: var(--danger);">delete</span>
-        <span data-i18n="modals.delete_playlist">Delete Playlist</span>
+        <span data-i18n>Delete Playlist</span>
       </h2>
       <button id="btn-delete-playlist-close" class="btn-icon" aria-label="Close modal">
         <span class="material-symbols-outlined">close</span>
@@ -234,14 +274,46 @@
 
     <input type="hidden" id="delete-playlist-id">
     <p style="font-size: 14px; color: var(--text-secondary); margin: 12px 0 20px 0;">
-      <span data-i18n="modals.delete_confirm">Are you sure you want to delete</span> <strong id="delete-playlist-name-text" style="color: var(--text-primary);"></strong>? <span data-i18n="modals.delete_warning">This will permanently delete the playlist from Jellyfin.</span>
+      <span data-i18n>Are you sure you want to delete</span> <strong id="delete-playlist-name-text" style="color: var(--text-primary);"></strong>? <span data-i18n>This will permanently delete the playlist from Jellyfin.</span>
     </p>
 
     <div id="delete-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-delete-playlist" class="btn btn-secondary" data-i18n="modals.cancel">Cancel</button>
-      <button type="button" id="btn-confirm-delete-playlist" class="btn btn-danger" style="background: var(--danger); color: white; border: none;" data-i18n="modals.delete">Delete</button>
+      <button type="button" id="btn-cancel-delete-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+      <button type="button" id="btn-confirm-delete-playlist" class="btn btn-danger" style="background: var(--danger); color: white; border: none;" data-i18n>Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Select Playlist Modal (Add track/album to playlist) -->
+<div id="select-playlist-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card" style="max-width: 440px; width: 90%;">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <span data-i18n>Add to Playlist</span>
+      </h2>
+      <button id="btn-select-playlist-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <button id="btn-select-playlist-create-new" class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px;">
+        <span class="material-symbols-outlined" style="color: var(--accent);">add</span>
+        <span data-i18n>Create New Playlist</span>
+      </button>
+    </div>
+
+    <div id="select-playlist-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+      <div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;" data-i18n>Loading playlists...</div>
+    </div>
+
+    <div id="select-playlist-status" style="font-size: 13px; text-align: center; display: none; margin-bottom: 8px;"></div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button type="button" id="btn-cancel-select-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
     </div>
   </div>
 </div>
