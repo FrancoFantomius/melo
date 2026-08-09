@@ -83,9 +83,13 @@ export function initViews() {
       const query = e.target.value;
       if (searchDebounce) clearTimeout(searchDebounce);
       searchDebounce = setTimeout(() => {
-        if (query.trim().length > 0) {
-          window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(query.trim())}`);
-          renderSearchView(query.trim());
+        const trimmed = query.trim();
+        if (trimmed.length > 0) {
+          window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(trimmed)}`);
+          renderSearchView(trimmed);
+        } else {
+          window.history.replaceState(null, '', 'search.html');
+          renderSearchView('');
         }
       }, 300);
     });

@@ -30,15 +30,15 @@ export default defineConfig({
     handlebars({
       partialDirectory: path.resolve(__dirname, 'templates'),
       context(pagePath) {
-        if (pagePath.endsWith('search.html')) return { isSearch: true, title: 'Search Music & Podcasts - Melo', description: 'Instant search across artists, albums, tracks, and RSS podcasts on your Jellyfin server.' };
-        if (pagePath.endsWith('albums.html')) return { isAlbums: true, title: 'Browse Music Albums - Melo', description: 'Browse and stream music albums from your self-hosted Jellyfin media server.' };
-        if (pagePath.endsWith('artists.html')) return { isArtists: true, title: 'Explore Artists - Melo', description: 'Discover artist discographies and stream top tracks on Melo music player.' };
-        if (pagePath.endsWith('playlists.html')) return { isPlaylists: true, title: 'Your Playlists - Melo', description: 'Manage and stream customized music playlists powered by Jellyfin.' };
-        if (pagePath.endsWith('podcasts.html')) return { isPodcasts: true, title: 'Podcasts & RSS Reader - Melo', description: 'Add, search, and stream RSS podcast feeds directly inside Melo PWA.' };
-        if (pagePath.endsWith('login.html')) return { isLogin: true, title: 'Sign In to Jellyfin Server - Melo', description: 'Connect your self-hosted Jellyfin server to stream your music library.' };
-        if (pagePath.endsWith('terms.html')) return { isTerms: true, title: 'Terms of Service - Melo', description: 'Terms of Service and Content Liability Disclaimer for Melo Music Player.' };
-        if (pagePath.endsWith('privacy.html')) return { isPrivacy: true, title: 'Privacy Policy - Melo', description: 'Privacy Policy for Melo Progressive Web Application.' };
-        return { isHome: true, title: 'Melo - Jellyfin Music Player PWA', description: 'Melo is a lightweight Progressive Web App music player powered by Jellyfin backend. Stream music, podcasts, and playlists anywhere.' };
+        if (pagePath.endsWith('search.html')) return { isSearch: true };
+        if (pagePath.endsWith('albums.html')) return { isAlbums: true };
+        if (pagePath.endsWith('artists.html')) return { isArtists: true };
+        if (pagePath.endsWith('playlists.html')) return { isPlaylists: true };
+        if (pagePath.endsWith('podcasts.html')) return { isPodcasts: true };
+        if (pagePath.endsWith('login.html')) return { isLogin: true };
+        if (pagePath.endsWith('terms.html')) return { isTerms: true };
+        if (pagePath.endsWith('privacy.html')) return { isPrivacy: true };
+        return { isHome: true };
       }
     }),
     {

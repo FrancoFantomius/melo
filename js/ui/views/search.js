@@ -32,6 +32,8 @@ export function clearRecentSearches() {
   localStorage.removeItem('melo_recent_searches');
 }
 
+let latestSearchQuery = '';
+
 export async function renderSearchView(container, query) {
   if (typeof container === 'string') {
     query = container;
@@ -40,83 +42,74 @@ export async function renderSearchView(container, query) {
   if (!container) return;
 
   query = query || '';
+  latestSearchQuery = query;
+
   if (query) {
     addRecentSearch(query);
   }
 
-  const session = getSession();
-  const recentSearches = getRecentSearches();
+  let searchInput = container.querySelector('#search-page-input');
+  let resultsContainer = container.querySelector('#search-page-results-container');
+  let btnClear = container.querySelector('#btn-clear-search-input');
 
-  let html = `
-    <div class="view-section search-view-section">
-      <!-- Search Bar at the top of the Search page with space from borders -->
-      <div class="search-page-bar-container">
-        <div class="search-page-bar">
-          <span class="material-symbols-outlined search-page-icon">search</span>
-          <input type="text" id="search-page-input" class="search-page-input" placeholder="${getTranslation('header.search_placeholder', 'Search artists, tracks, albums, podcasts...')}" value="${query.replace(/"/g, '&quot;')}" autocomplete="off" data-i18n-placeholder="header.search_placeholder">
-          ${query ? `<button id="btn-clear-search-input" class="search-page-clear-btn" title="Clear search"><span class="material-symbols-outlined">close</span></button>` : ''}
+  if (!searchInput || !resultsContainer) {
+    container.innerHTML = `
+      <div class="view-section search-view-section">
+        <div class="search-page-bar-container">
+          <div class="search-page-bar">
+            <span class="material-symbols-outlined search-page-icon">search</span>
+            <input type="text" id="search-page-input" class="search-page-input" placeholder="${getTranslation('header.search_placeholder', 'Search artists, tracks, albums, podcasts...')}" value="${query.replace(/"/g, '&quot;')}" autocomplete="off" data-i18n-placeholder="header.search_placeholder">
+            <button id="btn-clear-search-input" class="search-page-clear-btn" title="Clear search" style="${query ? 'display: flex;' : 'display: none;'}"><span class="material-symbols-outlined">close</span></button>
+          </div>
         </div>
+        <div id="search-page-results-container"></div>
       </div>
-  `;
+    `;
+    bindSearchPageControls(container);
+    searchInput = container.querySelector('#search-page-input');
+    resultsContainer = container.querySelector('#search-page-results-container');
+    btnClear = container.querySelector('#btn-clear-search-input');
+  } else {
+    if (document.activeElement !== searchInput && searchInput.value !== query) {
+      searchInput.value = query;
+    }
+    if (btnClear) {
+      btnClear.style.display = query ? 'flex' : 'none';
+    }
+  }
 
   if (!query) {
-    html += `
-      <div class="recent-searches-section">
-        <div class="recent-searches-header">
-          <h2 class="section-title" style="font-size: 20px;" data-i18n="search.recent_searches">${getTranslation('search.recent_searches', 'Recent Searches')}</h2>
-          ${recentSearches.length > 0 ? `<button id="btn-clear-all-recent" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-weight: 600;" data-i18n="search.clear_all">${getTranslation('search.clear_all', 'Clear all')}</button>` : ''}
-        </div>
-        ${recentSearches.length > 0 ? `
-          <div class="recent-searches-list">
-            ${recentSearches.map(term => `
-              <div class="recent-search-item" data-query="${encodeURIComponent(term)}">
-                <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted);">history</span>
-                <span class="recent-search-text">${term}</span>
-                <button class="btn-remove-recent" data-term="${encodeURIComponent(term)}" title="Remove from history">
-                  <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        ` : `
-          <div style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;" data-i18n="search.no_recent">${getTranslation('search.no_recent', 'No recent searches. Search for artists, songs, or podcasts above!')}</div>
-        `}
-      </div>
-    </div>
-    `;
-    container.innerHTML = html;
-    bindSearchPageControls(container, '');
+    renderRecentSearches(resultsContainer);
     return;
   }
 
-  html += `
-      <h2 class="section-title"><span data-i18n="search.results_for">${getTranslation('search.results_for', 'Search Results for')}</span> "${query}"</h2>
+  resultsContainer.innerHTML = `
+    <h2 class="section-title"><span data-i18n="search.results_for">${getTranslation('search.results_for', 'Search Results for')}</span> "${query.replace(/</g, '&lt;').replace(/>/g, '&gt;')}"</h2>
 
-      <div id="search-artists-section" style="display: none; margin-bottom: 24px;">
-        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="search.artists_and_albums">${getTranslation('search.artists_and_albums', 'Artists & Albums')}</h3>
-        <div id="search-media-grid" class="cards-grid"></div>
-      </div>
+    <div id="search-artists-section" style="display: none; margin-bottom: 24px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="search.artists_and_albums">${getTranslation('search.artists_and_albums', 'Artists & Albums')}</h3>
+      <div id="search-media-grid" class="cards-grid"></div>
+    </div>
 
-      <div id="search-tracks-section" style="margin-bottom: 24px;">
-        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="common.tracks">${getTranslation('common.tracks', 'Tracks')}</h3>
-        <div id="search-results-list" class="tracks-list">
-          <div style="color: var(--text-muted);" data-i18n="search.searching_library">${getTranslation('search.searching_library', 'Searching Jellyfin library...')}</div>
-        </div>
+    <div id="search-tracks-section" style="margin-bottom: 24px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="common.tracks">${getTranslation('common.tracks', 'Tracks')}</h3>
+      <div id="search-results-list" class="tracks-list">
+        <div style="color: var(--text-muted);" data-i18n="search.searching_library">${getTranslation('search.searching_library', 'Searching Jellyfin library...')}</div>
       </div>
+    </div>
 
-      <div id="search-podcasts-section" style="display: none; margin-bottom: 24px;">
-        <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="nav.podcasts">${getTranslation('nav.podcasts', 'Podcasts')}</h3>
-        <div id="search-podcasts-grid" class="cards-grid"></div>
-      </div>
+    <div id="search-podcasts-section" style="display: none; margin-bottom: 24px;">
+      <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 12px;" data-i18n="nav.podcasts">${getTranslation('nav.podcasts', 'Podcasts')}</h3>
+      <div id="search-podcasts-grid" class="cards-grid"></div>
     </div>
   `;
 
-  container.innerHTML = html;
-  bindSearchPageControls(container, query);
+  const session = getSession();
 
   // Search Podcasts if enabled (default: true)
   if (session.searchPodcasts !== false) {
     searchPodcastDirectory(query, 6).then(podcasts => {
+      if (latestSearchQuery !== query) return;
       const podcastsSection = document.getElementById('search-podcasts-section');
       const podcastsGrid = document.getElementById('search-podcasts-grid');
       if (podcastsSection && podcastsGrid && podcasts && podcasts.length > 0) {
@@ -145,14 +138,15 @@ export async function renderSearchView(container, query) {
   }
 
   const updateSearchResults = (res) => {
-    const resultsContainer = document.getElementById('search-results-list');
+    if (latestSearchQuery !== query) return;
+    const searchResultsList = document.getElementById('search-results-list');
     const mediaGrid = document.getElementById('search-media-grid');
     const mediaSection = document.getElementById('search-artists-section');
     const tracksSection = document.getElementById('search-tracks-section');
 
     if (res && res.Items) {
       if (res.Items.length === 0) {
-        if (resultsContainer) resultsContainer.innerHTML = `<div style="color: var(--text-secondary);">No items matched "${query}".</div>`;
+        if (searchResultsList) searchResultsList.innerHTML = `<div style="color: var(--text-secondary);">No items matched "${query}".</div>`;
         if (mediaSection) mediaSection.style.display = 'none';
         return;
       }
@@ -180,19 +174,19 @@ export async function renderSearchView(container, query) {
         mediaSection.style.display = 'none';
       }
 
-      if (resultsContainer) {
+      if (searchResultsList) {
         if (tracks.length === 0) {
           if (mediaItems.length > 0 && tracksSection) {
             tracksSection.style.display = 'none';
           } else {
-            resultsContainer.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="search.no_tracks">${getTranslation('search.no_tracks', 'No matching tracks found.')}</div>`;
+            searchResultsList.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="search.no_tracks">${getTranslation('search.no_tracks', 'No matching tracks found.')}</div>`;
           }
         } else {
           if (tracksSection) tracksSection.style.display = 'block';
           registerTracksFavoriteStatus(tracks);
-          resultsContainer.innerHTML = tracks.map((track, idx) => renderTrackRowHTML(track, idx)).join('');
-          bindTrackRows(resultsContainer, tracks);
-          bindArtistLinks(resultsContainer);
+          searchResultsList.innerHTML = tracks.map((track, idx) => renderTrackRowHTML(track, idx)).join('');
+          bindTrackRows(searchResultsList, tracks);
+          bindArtistLinks(searchResultsList);
         }
       }
     }
@@ -200,32 +194,69 @@ export async function renderSearchView(container, query) {
 
   try {
     const res = await searchJellyfinCached(query, updateSearchResults);
-    updateSearchResults(res);
+    if (latestSearchQuery === query) {
+      updateSearchResults(res);
+    }
   } catch (err) {
-    const resultsContainer = document.getElementById('search-results-list');
-    if (resultsContainer) {
-      resultsContainer.innerHTML = `<div style="color: var(--danger);">Search failed: ${err.message}</div>`;
+    if (latestSearchQuery === query) {
+      const searchResultsList = document.getElementById('search-results-list');
+      if (searchResultsList) {
+        searchResultsList.innerHTML = `<div style="color: var(--danger);">Search failed: ${err.message}</div>`;
+      }
     }
   }
 }
 
-function bindSearchPageControls(container, currentQuery) {
+function renderRecentSearches(resultsContainer) {
+  const recentSearches = getRecentSearches();
+  const html = `
+    <div class="recent-searches-section">
+      <div class="recent-searches-header">
+        <h2 class="section-title" style="font-size: 20px;" data-i18n="search.recent_searches">${getTranslation('search.recent_searches', 'Recent Searches')}</h2>
+        ${recentSearches.length > 0 ? `<button id="btn-clear-all-recent" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-weight: 600;" data-i18n="search.clear_all">${getTranslation('search.clear_all', 'Clear all')}</button>` : ''}
+      </div>
+      ${recentSearches.length > 0 ? `
+        <div class="recent-searches-list">
+          ${recentSearches.map(term => `
+            <div class="recent-search-item" data-query="${encodeURIComponent(term)}">
+              <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted);">history</span>
+              <span class="recent-search-text">${term}</span>
+              <button class="btn-remove-recent" data-term="${encodeURIComponent(term)}" title="Remove from history">
+                <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      ` : `
+        <div style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;" data-i18n="search.no_recent">${getTranslation('search.no_recent', 'No recent searches. Search for artists, songs, or podcasts above!')}</div>
+      `}
+    </div>
+  `;
+  resultsContainer.innerHTML = html;
+  bindRecentSearchesControls(resultsContainer);
+}
+
+function bindSearchPageControls(container) {
   const searchInput = container.querySelector('#search-page-input');
   const btnClear = container.querySelector('#btn-clear-search-input');
-  const btnClearAllRecent = container.querySelector('#btn-clear-all-recent');
 
   let debounceTimer = null;
 
   searchInput?.addEventListener('input', (e) => {
     const newQuery = e.target.value;
+    if (btnClear) btnClear.style.display = newQuery ? 'flex' : 'none';
+
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       const globalSearchInput = document.getElementById('global-search-input');
-      if (globalSearchInput) globalSearchInput.value = newQuery;
+      if (globalSearchInput && document.activeElement !== globalSearchInput) {
+        globalSearchInput.value = newQuery;
+      }
 
-      if (newQuery.trim().length > 0) {
-        window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(newQuery.trim())}`);
-        renderSearchView(container, newQuery.trim());
+      const trimmed = newQuery.trim();
+      if (trimmed.length > 0) {
+        window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(trimmed)}`);
+        renderSearchView(container, trimmed);
       } else {
         window.history.replaceState(null, '', 'search.html');
         renderSearchView(container, '');
@@ -234,30 +265,52 @@ function bindSearchPageControls(container, currentQuery) {
   });
 
   btnClear?.addEventListener('click', () => {
+    if (searchInput) {
+      searchInput.value = '';
+      searchInput.focus();
+    }
+    const globalSearchInput = document.getElementById('global-search-input');
+    if (globalSearchInput) globalSearchInput.value = '';
+    if (btnClear) btnClear.style.display = 'none';
+
     window.history.replaceState(null, '', 'search.html');
     renderSearchView(container, '');
   });
+}
+
+function bindRecentSearchesControls(resultsContainer) {
+  const btnClearAllRecent = resultsContainer.querySelector('#btn-clear-all-recent');
 
   btnClearAllRecent?.addEventListener('click', () => {
     clearRecentSearches();
+    const container = document.getElementById('view-container');
     renderSearchView(container, '');
   });
 
-  container.querySelectorAll('.recent-search-item').forEach(item => {
+  resultsContainer.querySelectorAll('.recent-search-item').forEach(item => {
     item.addEventListener('click', (e) => {
       if (e.target.closest('.btn-remove-recent')) return;
       const term = decodeURIComponent(item.getAttribute('data-query'));
+      const container = document.getElementById('view-container');
+      const searchInput = container?.querySelector('#search-page-input');
+      if (searchInput) searchInput.value = term;
+      const globalSearchInput = document.getElementById('global-search-input');
+      if (globalSearchInput) globalSearchInput.value = term;
       window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(term)}`);
       renderSearchView(container, term);
     });
   });
 
-  container.querySelectorAll('.btn-remove-recent').forEach(btn => {
+  resultsContainer.querySelectorAll('.btn-remove-recent').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const term = decodeURIComponent(btn.getAttribute('data-term'));
       removeRecentSearch(term);
+      const container = document.getElementById('view-container');
+      const searchInput = container?.querySelector('#search-page-input');
+      const currentQuery = searchInput ? searchInput.value.trim() : '';
       renderSearchView(container, currentQuery);
     });
   });
 }
+
