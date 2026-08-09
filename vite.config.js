@@ -46,14 +46,17 @@ export default defineConfig({
       buildStart() {
         const pkg = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
         
-        // 1. Sync package.json version to manifest.json
-        if (fs.existsSync('manifest.json')) {
-          try {
-            const manifest = JSON.parse(fs.readFileSync('manifest.json', 'utf-8'));
-            manifest.version = pkg.version;
-            fs.writeFileSync('manifest.json', JSON.stringify(manifest, null, 2), 'utf-8');
-          } catch (e) {
-            console.warn('[Build] Failed to update manifest.json version:', e);
+        // 1. Sync package.json version to manifest.json files
+        const manifestPaths = ['manifest.json', 'public/manifest.json'];
+        for (const mPath of manifestPaths) {
+          if (fs.existsSync(mPath)) {
+            try {
+              const manifest = JSON.parse(fs.readFileSync(mPath, 'utf-8'));
+              manifest.version = pkg.version;
+              fs.writeFileSync(mPath, JSON.stringify(manifest, null, 2), 'utf-8');
+            } catch (e) {
+              console.warn(`[Build] Failed to update ${mPath} version:`, e);
+            }
           }
         }
 

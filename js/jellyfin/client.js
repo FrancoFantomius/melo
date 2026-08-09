@@ -1,15 +1,77 @@
 import { getSession, saveSession } from './session.js';
 import { fetchWithCache, clearApiCache } from './cache.js';
+import pkg from '../../package.json';
+
+export const APP_VERSION = pkg.version || '0.5.1';
 
 function getAuthHeader() {
   const session = getSession();
   const tokenStr = session.accessToken ? `, Token="${session.accessToken}"` : '';
-  return `MediaBrowser Client="Melo PWA", Device="Web Browser", DeviceId="${session.deviceId}", Version="1.0.0"${tokenStr}`;
+  return `MediaBrowser Client="Melo PWA", Device="Web Browser", DeviceId="${session.deviceId}", Version="${APP_VERSION}"${tokenStr}`;
 }
 
 export function cleanUrl(url) {
   if (!url) return '';
-  return url.trim().replace(/\/+$/, '');
+  let cleaned = url.trim().replace(/\/+$/, '');
+  if (!/^https?:\/\//i.test(cleaned)) {
+    cleaned = 'https://' + cleaned;
+  }
+  return cleaned;
+}
+
+export async function reportCapabilities() {
+  const session = getSession();
+  if (!session.serverUrl || !session.accessToken) return;
+
+  let iconUrl = '';
+  let appUrl = '';
+  try {
+    const origin = window.location.origin;
+    const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+    iconUrl = `${origin}${path}img/icons/icon.svg`;
+    appUrl = `${origin}${path}`;
+  } catch (e) {
+    iconUrl = './img/icons/icon.svg';
+  }
+
+  const capabilities = {
+    PlayableMediaTypes: ['Audio'],
+    SupportedCommands: [
+      'Play',
+      'Pause',
+      'Stop',
+      'Seek',
+      'NextTrack',
+      'PreviousTrack',
+      'PlayState'
+    ],
+    SupportsMediaControl: true,
+    SupportsSync: false,
+    SupportsPersistentIdentifier: true,
+    IconUrl: iconUrl,
+    AppStoreUrl: appUrl,
+    MessageFormat: 'Json'
+  };
+
+  const authHeader = getAuthHeader();
+  const options = {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Emby-Authorization': authHeader,
+      'Authorization': authHeader
+    },
+    body: JSON.stringify(capabilities)
+  };
+
+  try {
+    const res = await fetch(`${session.serverUrl}/Sessions/Capabilities/Full`, options);
+    if (!res.ok) {
+      await fetch(`${session.serverUrl}/Sessions/Capabilities`, options);
+    }
+  } catch (err) {
+    console.warn('[Jellyfin] Failed to report client capabilities:', err);
+  }
 }
 
 export async function authenticateServer(serverUrl, username, password) {
@@ -17,7 +79,7 @@ export async function authenticateServer(serverUrl, username, password) {
   const authUrl = `${cleanServer}/Users/AuthenticateByName`;
 
   const session = getSession();
-  const authHeader = `MediaBrowser Client="Melo PWA", Device="Web Browser", DeviceId="${session.deviceId}", Version="1.0.0"`;
+  const authHeader = `MediaBrowser Client="Melo PWA", Device="Web Browser", DeviceId="${session.deviceId}", Version="${APP_VERSION}"`;
 
   const response = await fetch(authUrl, {
     method: 'POST',
@@ -52,6 +114,8 @@ export async function authenticateServer(serverUrl, username, password) {
     userPrimaryImageTag: userPrimaryImageTag,
     isLoggedIn: true
   });
+
+  await reportCapabilities();
 
   return data;
 }

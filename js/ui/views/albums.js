@@ -7,6 +7,8 @@ import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { openPlaylist } from './playlists.js';
 import { openEditPlaylistModal, openAddTracksModal, openDeletePlaylistModal } from '../modals.js';
 
+import { getTranslation } from '../../i18n.js';
+
 export function openAlbum(albumId, albumObj = null) {
   if (!albumId) return;
   if (albumId === 'liked-songs' || albumObj?.Type === 'LikedSongs' || albumObj?.Type === 'Playlist') {
@@ -24,9 +26,9 @@ export function openAlbum(albumId, albumObj = null) {
 export async function renderAlbumsView(container) {
   container.innerHTML = `
     <div class="view-section">
-      <h2 class="section-title">Music Albums</h2>
+      <h2 class="section-title" data-i18n="common.albums">${getTranslation('common.albums', 'Music Albums')}</h2>
       <div id="albums-grid" class="cards-grid">
-        <div style="color: var(--text-muted);">Loading albums...</div>
+        <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading albums...')}</div>
       </div>
     </div>
   `;
@@ -35,7 +37,7 @@ export async function renderAlbumsView(container) {
     const grid = document.getElementById('albums-grid');
     if (grid && res) {
       if (!res.Items || res.Items.length === 0) {
-        grid.innerHTML = '<div style="color: var(--text-secondary);">No albums found.</div>';
+        grid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="common.no_results">${getTranslation('common.no_results', 'No albums found.')}</div>`;
       } else {
         grid.innerHTML = res.Items.map(album => renderAlbumCardHTML(album)).join('');
         bindAlbumCards(grid);
@@ -49,7 +51,7 @@ export async function renderAlbumsView(container) {
   } catch (err) {
     const grid = document.getElementById('albums-grid');
     if (!grid || !grid.querySelector('.media-card')) {
-      container.innerHTML = `<div style="color: var(--danger);">Failed to load albums: ${err.message}</div>`;
+      container.innerHTML = `<div style="color: var(--danger);">${getTranslation('common.error', 'Failed to load albums')}: ${err.message}</div>`;
     }
   }
 }
@@ -64,7 +66,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
   if (isLikedSongs) {
     album = {
       Id: 'liked-songs',
-      Name: 'Liked Songs',
+      Name: getTranslation('albums.liked_songs', 'Liked Songs'),
       Type: 'Playlist',
       IsLikedSongs: true
     };
@@ -77,8 +79,8 @@ export async function renderAlbumDetailView(container, albumOrId) {
 
   const initialArtistsInfo = isLikedSongs ? [] : getAlbumArtistsInfo(album);
   const initialArtistHTML = isLikedSongs
-    ? 'Your favorite tracks'
-    : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : 'Unknown Artist'));
+    ? getTranslation('albums.favorite_tracks', 'Your favorite tracks')
+    : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : getTranslation('artists.unknown_artist', 'Unknown Artist')));
 
   const coverHTML = isLikedSongs
     ? `<div id="album-detail-cover" class="album-cover-lg" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);">
@@ -91,13 +93,13 @@ export async function renderAlbumDetailView(container, albumOrId) {
       <div class="album-detail-banner">
         ${coverHTML}
         <div class="album-info-meta">
-          <span id="album-detail-type" class="album-detail-type">${isPlaylist ? 'Playlist' : (album.Type || 'Album')}</span>
-          <h1 id="album-detail-title" class="album-detail-title">${album.Name || (isLikedSongs ? 'Liked Songs' : (isPlaylist ? 'Playlist' : 'Album'))}</h1>
+          <span id="album-detail-type" class="album-detail-type">${isPlaylist ? getTranslation('nav.playlists', 'Playlist') : (album.Type || getTranslation('common.albums', 'Album'))}</span>
+          <h1 id="album-detail-title" class="album-detail-title">${album.Name || (isLikedSongs ? getTranslation('albums.liked_songs', 'Liked Songs') : (isPlaylist ? getTranslation('nav.playlists', 'Playlist') : getTranslation('common.albums', 'Album')))}</h1>
           <span id="album-detail-artist" class="album-detail-artist">${initialArtistHTML}</span>
           <div class="album-detail-actions">
             <button id="btn-play-album-all" class="btn btn-primary" title="Play All">
               <span class="material-symbols-outlined">play_arrow</span>
-              <span>Play All</span>
+              <span data-i18n="albums.play_all">${getTranslation('albums.play_all', 'Play All')}</span>
             </button>
             <button id="btn-shuffle-album-all" class="btn btn-secondary" title="Random Play" aria-label="Random Play">
               <span class="material-symbols-outlined">shuffle</span>
@@ -107,16 +109,16 @@ export async function renderAlbumDetailView(container, albumOrId) {
             <div class="playlist-manage-actions">
               <button id="btn-add-playlist-tracks" class="btn btn-secondary" title="Add Tracks">
                 <span class="material-symbols-outlined">playlist_add</span>
-                <span>Add Tracks</span>
+                <span data-i18n="modals.add_tracks">${getTranslation('modals.add_tracks', 'Add Tracks')}</span>
               </button>
               ${!isLikedSongs ? `
                 <button id="btn-edit-playlist" class="btn btn-secondary" title="Edit Playlist">
                   <span class="material-symbols-outlined">edit</span>
-                  <span>Edit</span>
+                  <span data-i18n="albums.edit">${getTranslation('albums.edit', 'Edit')}</span>
                 </button>
                 <button id="btn-delete-playlist" class="btn btn-secondary" title="Delete Playlist">
                   <span class="material-symbols-outlined">delete</span>
-                  <span>Delete</span>
+                  <span data-i18n="modals.delete">${getTranslation('modals.delete', 'Delete')}</span>
                 </button>
               ` : ''}
             </div>
@@ -124,10 +126,10 @@ export async function renderAlbumDetailView(container, albumOrId) {
         </div>
       </div>
 
-      <h2 class="section-title" style="margin-top: 24px;">Tracks</h2>
+      <h2 class="section-title" style="margin-top: 24px;" data-i18n="common.tracks">${getTranslation('common.tracks', 'Tracks')}</h2>
 
       <div id="album-songs-list" class="tracks-list" style="margin-top: 16px;">
-        <div style="color: var(--text-muted);">Loading tracks...</div>
+        <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading tracks...')}</div>
       </div>
     </div>
   `;

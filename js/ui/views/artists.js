@@ -4,6 +4,7 @@ import { playTrack } from '../../player/audio.js';
 import { switchView } from '../views.js';
 import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTML, bindTrackRows, bindArtistLinks } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
+import { getTranslation } from '../../i18n.js';
 
 export function openArtist(artistIdOrName, artistObj = null) {
   if (!artistIdOrName) return;
@@ -18,9 +19,9 @@ export function openArtist(artistIdOrName, artistObj = null) {
 export async function renderArtistsView(container) {
   container.innerHTML = `
     <div class="view-section">
-      <h2 class="section-title">Artists</h2>
+      <h2 class="section-title" data-i18n="nav.artists">${getTranslation('nav.artists', 'Artists')}</h2>
       <div id="artists-grid" class="cards-grid">
-        <div style="color: var(--text-muted);">Loading artists...</div>
+        <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading artists...')}</div>
       </div>
     </div>
   `;
@@ -29,13 +30,13 @@ export async function renderArtistsView(container) {
     const grid = document.getElementById('artists-grid');
     if (grid && res) {
       if (!res.Items || res.Items.length === 0) {
-        grid.innerHTML = '<div style="color: var(--text-secondary);">No artists found.</div>';
+        grid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="artists.no_artists">${getTranslation('artists.no_artists', 'No artists found.')}</div>`;
       } else {
         grid.innerHTML = res.Items.map(artist => `
           <div class="media-card" data-artist-id="${artist.Id}">
             <img src="${getArtworkUrl(artist, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
             <div class="card-title" style="text-align: center;">${artist.Name}</div>
-            <div class="card-subtitle" style="text-align: center;">Artist</div>
+            <div class="card-subtitle" style="text-align: center;" data-i18n="artists.artist">${getTranslation('artists.artist', 'Artist')}</div>
           </div>
         `).join('');
         bindArtistCards(grid);
@@ -49,7 +50,7 @@ export async function renderArtistsView(container) {
   } catch (err) {
     const grid = document.getElementById('artists-grid');
     if (!grid || !grid.querySelector('.media-card')) {
-      container.innerHTML = `<div style="color: var(--danger);">Failed to load artists: ${err.message}</div>`;
+      container.innerHTML = `<div style="color: var(--danger);">${getTranslation('common.error', 'Failed to load artists')}: ${err.message}</div>`;
     }
   }
 }
@@ -64,12 +65,12 @@ export async function renderArtistDetailView(container, artistOrId) {
       <div class="album-detail-banner">
         <img id="artist-detail-cover" src="${getArtworkUrl(artist, 'Primary', 400)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="album-cover-lg" style="border-radius: 50%;" alt="${artist.Name || 'Artist'}">
         <div class="album-info-meta">
-          <span class="album-detail-type">Artist</span>
-          <h1 id="artist-detail-name" class="album-detail-title">${artist.Name || 'Loading artist...'}</h1>
+          <span class="album-detail-type" data-i18n="artists.artist">${getTranslation('artists.artist', 'Artist')}</span>
+          <h1 id="artist-detail-name" class="album-detail-title">${artist.Name || getTranslation('common.loading', 'Loading artist...')}</h1>
           <div class="album-detail-actions">
             <button id="btn-play-artist-all" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
               <span class="material-symbols-outlined">play_arrow</span>
-              <span>Play All</span>
+              <span data-i18n="albums.play_all">${getTranslation('albums.play_all', 'Play All')}</span>
             </button>
             <button id="btn-shuffle-artist-all" class="btn btn-secondary" title="Random Play" aria-label="Random Play">
               <span class="material-symbols-outlined">shuffle</span>
@@ -79,19 +80,19 @@ export async function renderArtistDetailView(container, artistOrId) {
       </div>
 
       <div style="margin-top: 24px;">
-        <h2 class="section-title" style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Albums</h2>
+        <h2 class="section-title" style="font-size: 20px; font-weight: 700; margin-bottom: 16px;" data-i18n="nav.albums">${getTranslation('nav.albums', 'Albums')}</h2>
         <div id="artist-albums-grid" class="cards-grid">
-          <div style="color: var(--text-muted);">Loading albums...</div>
+          <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading albums...')}</div>
         </div>
         <div id="artist-albums-load-more" style="display: none; text-align: center; margin-top: 16px;">
-          <button id="btn-artist-albums-load-more" class="btn btn-secondary">Load More</button>
+          <button id="btn-artist-albums-load-more" class="btn btn-secondary" data-i18n="common.load_more">${getTranslation('common.load_more', 'Load More')}</button>
         </div>
       </div>
 
       <div style="margin-top: 32px;">
-        <h2 class="section-title" style="font-size: 20px; font-weight: 700; margin-bottom: 16px;">Popular Tracks</h2>
+        <h2 class="section-title" style="font-size: 20px; font-weight: 700; margin-bottom: 16px;" data-i18n="artists.popular_tracks">${getTranslation('artists.popular_tracks', 'Popular Tracks')}</h2>
         <div id="artist-songs-list" class="tracks-list">
-          <div style="color: var(--text-muted);">Loading tracks...</div>
+          <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading tracks...')}</div>
         </div>
       </div>
     </div>
@@ -129,7 +130,7 @@ export async function renderArtistDetailView(container, artistOrId) {
 
     if (grid && res) {
       if (!res.Items || res.Items.length === 0) {
-        grid.innerHTML = '<div style="color: var(--text-secondary);">No albums found for this artist.</div>';
+        grid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="artists.no_albums">${getTranslation('artists.no_albums', 'No albums found for this artist.')}</div>`;
         if (loadMoreContainer) loadMoreContainer.style.display = 'none';
       } else {
         const isMobile = window.innerWidth <= 768;
@@ -174,7 +175,7 @@ export async function renderArtistDetailView(container, artistOrId) {
 
     if (songsList && res) {
       if (!res.Items || res.Items.length === 0) {
-        songsList.innerHTML = '<div style="color: var(--text-secondary);">No tracks found for this artist.</div>';
+        songsList.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="artists.no_tracks">${getTranslation('artists.no_tracks', 'No tracks found for this artist.')}</div>`;
         if (btnPlayAll) btnPlayAll.style.display = 'none';
         if (btnShuffleAll) btnShuffleAll.style.display = 'none';
       } else {

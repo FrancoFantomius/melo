@@ -7,11 +7,21 @@ import { switchView } from '../views.js';
 import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTML, bindTrackRows } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 
+import { getTranslation } from '../../i18n.js';
+
 export async function renderHomeView(container) {
   const session = getSession();
   const userOrder = session.homeSectionOrder || ['playlists', 'songs', 'artists', 'podcasts', 'albums'];
 
-  const pillLabels = {
+  const pillKeyMap = {
+    playlists: 'nav.playlists',
+    songs: 'pills.songs',
+    artists: 'nav.artists',
+    podcasts: 'nav.podcasts',
+    albums: 'nav.albums'
+  };
+
+  const pillDefaultText = {
     playlists: 'Playlists',
     songs: 'Songs',
     artists: 'Artists',
@@ -19,15 +29,19 @@ export async function renderHomeView(container) {
     albums: 'Albums'
   };
 
-  const pillsHTML = `<button class="category-pill active" data-category="all">All</button>` +
-    userOrder.map(cat => `<button class="category-pill" data-category="${cat}">${pillLabels[cat] || cat}</button>`).join('');
+  const pillsHTML = `<button class="category-pill active" data-category="all" data-i18n="pills.all">${getTranslation('pills.all', 'All')}</button>` +
+    userOrder.map(cat => {
+      const key = pillKeyMap[cat] || `pills.${cat}`;
+      const defaultText = pillDefaultText[cat] || cat;
+      return `<button class="category-pill" data-category="${cat}" data-i18n="${key}">${getTranslation(key, defaultText)}</button>`;
+    }).join('');
 
   const sectionHTMLMap = {
     playlists: `
       <!-- Playlists Section -->
       <section id="home-playlists-section" class="home-section" data-category="playlists">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
-          <h3 style="font-size: 20px; font-weight: 700;">Playlists</h3>
+          <h3 style="font-size: 20px; font-weight: 700;" data-i18n="nav.playlists">${getTranslation('nav.playlists', 'Playlists')}</h3>
           <div style="display: flex; gap: 8px;">
             <button id="carousel-prev-playlists" class="carousel-nav-btn" title="Previous">
               <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
@@ -38,7 +52,7 @@ export async function renderHomeView(container) {
           </div>
         </div>
         <div id="home-playlists" class="cards-carousel">
-          <div style="color: var(--text-muted);">Loading playlists...</div>
+          <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading playlists...')}</div>
         </div>
       </section>
     `,
@@ -46,7 +60,7 @@ export async function renderHomeView(container) {
       <!-- Recommended Songs / Tracks Section -->
       <section id="home-tracks-section" class="home-section" data-category="songs">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
-          <h3 style="font-size: 20px; font-weight: 700;">Recommended Songs</h3>
+          <h3 style="font-size: 20px; font-weight: 700;" data-i18n="pills.recommended_songs">${getTranslation('pills.recommended_songs', 'Recommended Songs')}</h3>
           <div style="display: flex; gap: 8px;">
             <button id="carousel-prev-songs" class="carousel-nav-btn" title="Previous">
               <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
@@ -57,7 +71,7 @@ export async function renderHomeView(container) {
           </div>
         </div>
         <div id="home-tracks" class="tracks-grid-2col">
-          <div style="color: var(--text-muted); grid-column: 1/-1;">Loading songs...</div>
+          <div style="color: var(--text-muted); grid-column: 1/-1;" data-i18n="common.loading">${getTranslation('common.loading', 'Loading songs...')}</div>
         </div>
       </section>
     `,
@@ -65,7 +79,7 @@ export async function renderHomeView(container) {
       <!-- Artists Section -->
       <section id="home-artists-section" class="home-section" data-category="artists">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
-          <h3 style="font-size: 20px; font-weight: 700;">Artists</h3>
+          <h3 style="font-size: 20px; font-weight: 700;" data-i18n="nav.artists">${getTranslation('nav.artists', 'Artists')}</h3>
           <div style="display: flex; gap: 8px;">
             <button id="carousel-prev-artists" class="carousel-nav-btn" title="Previous">
               <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
@@ -76,7 +90,7 @@ export async function renderHomeView(container) {
           </div>
         </div>
         <div id="home-artists" class="cards-carousel">
-          <div style="color: var(--text-muted);">Loading artists...</div>
+          <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading artists...')}</div>
         </div>
       </section>
     `,
@@ -84,10 +98,10 @@ export async function renderHomeView(container) {
       <!-- Podcasts Section -->
       <section id="home-podcasts-section" class="home-section" data-category="podcasts">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
-          <h3 style="font-size: 20px; font-weight: 700;">Podcasts</h3>
+          <h3 style="font-size: 20px; font-weight: 700;" data-i18n="nav.podcasts">${getTranslation('nav.podcasts', 'Podcasts')}</h3>
         </div>
         <div id="home-podcasts" class="cards-grid">
-          <div style="color: var(--text-muted);">Loading podcasts...</div>
+          <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading podcasts...')}</div>
         </div>
       </section>
     `,
@@ -95,10 +109,10 @@ export async function renderHomeView(container) {
       <!-- Albums Section -->
       <section id="home-albums-section" class="home-section" data-category="albums">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
-          <h3 style="font-size: 20px; font-weight: 700;">Albums</h3>
+          <h3 style="font-size: 20px; font-weight: 700;" data-i18n="nav.albums">${getTranslation('nav.albums', 'Albums')}</h3>
         </div>
         <div id="home-albums" class="cards-grid">
-          <div style="color: var(--text-muted);">Loading albums...</div>
+          <div style="color: var(--text-muted);" data-i18n="common.loading">${getTranslation('common.loading', 'Loading albums...')}</div>
         </div>
       </section>
     `
@@ -220,11 +234,11 @@ export async function renderHomeView(container) {
       if (!feedUrls || feedUrls.length === 0) {
         podcastsGrid.innerHTML = `
           <div style="grid-column: 1/-1; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
-            <div style="font-weight: 600; color: var(--text-primary);">No podcasts subscribed yet</div>
-            <div style="font-size: 13px; color: var(--text-secondary);">Discover popular podcasts or add an RSS feed URL to get started.</div>
+            <div style="font-weight: 600; color: var(--text-primary);" data-i18n="podcasts.no_subscribed">${getTranslation('podcasts.no_subscribed', 'No podcasts subscribed yet')}</div>
+            <div style="font-size: 13px; color: var(--text-secondary);" data-i18n="podcasts.no_subscribed">${getTranslation('podcasts.no_subscribed', 'Discover popular podcasts or add an RSS feed URL to get started.')}</div>
             <button id="btn-home-discover-podcasts" class="btn-primary" style="margin-top: 8px;">
               <span class="material-symbols-outlined">explore</span>
-              <span>Discover Podcasts</span>
+              <span data-i18n="pills.discover_podcasts">${getTranslation('pills.discover_podcasts', 'Discover Podcasts')}</span>
             </button>
           </div>
         `;
@@ -244,7 +258,7 @@ export async function renderHomeView(container) {
 
       const renderFeedsGrid = (items) => {
         if (!items || items.length === 0) {
-          podcastsGrid.innerHTML = '<div style="color: var(--text-secondary);">No podcast data available.</div>';
+          podcastsGrid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="podcasts.no_episodes">${getTranslation('podcasts.no_episodes', 'No podcast data available.')}</div>`;
           return;
         }
         podcastsGrid.innerHTML = items.map(feed => `
@@ -253,7 +267,7 @@ export async function renderHomeView(container) {
             <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
               <div class="card-title" title="${feed.title}">${feed.title}</div>
               <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.author || 'Podcast'}</div>
-              <div style="font-size: 11px; color: var(--accent); margin-top: 2px;">${feed.episodeCount || 0} episodes</div>
+              <div style="font-size: 11px; color: var(--accent); margin-top: 2px;">${feed.episodeCount || 0} ${getTranslation('common.episodes', 'episodes')}</div>
             </div>
           </div>
         `).join('');
@@ -289,7 +303,7 @@ export async function renderHomeView(container) {
     } catch (err) {
       console.warn('[Home] Failed to load podcasts:', err);
       if (podcastsGrid) {
-        podcastsGrid.innerHTML = '<div style="color: var(--text-secondary);">Could not load podcasts.</div>';
+        podcastsGrid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="common.error">${getTranslation('common.error', 'Could not load podcasts.')}</div>`;
       }
     }
   };
@@ -298,7 +312,7 @@ export async function renderHomeView(container) {
     const tracksContainer = document.getElementById('home-tracks');
     if (tracksContainer && songsRes) {
       if (!songsRes.Items || songsRes.Items.length === 0) {
-        tracksContainer.innerHTML = '<div style="color: var(--text-secondary); grid-column: 1/-1;">No tracks found.</div>';
+        tracksContainer.innerHTML = `<div style="color: var(--text-secondary); grid-column: 1/-1;" data-i18n="common.no_results">${getTranslation('common.no_results', 'No tracks found.')}</div>`;
       } else {
         registerTracksFavoriteStatus(songsRes.Items);
         const items = songsRes.Items.slice(0, 10);
@@ -312,13 +326,13 @@ export async function renderHomeView(container) {
     const artistsGrid = document.getElementById('home-artists');
     if (artistsGrid && artistsRes) {
       if (!artistsRes.Items || artistsRes.Items.length === 0) {
-        artistsGrid.innerHTML = '<div style="color: var(--text-secondary);">No artists found.</div>';
+        artistsGrid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n="artists.no_artists">${getTranslation('artists.no_artists', 'No artists found.')}</div>`;
       } else {
         artistsGrid.innerHTML = artistsRes.Items.map(artist => `
           <div class="media-card" data-artist-id="${artist.Id}">
             <img src="${getArtworkUrl(artist, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
             <div class="card-title" style="text-align: center;">${artist.Name}</div>
-            <div class="card-subtitle" style="text-align: center;">Artist</div>
+            <div class="card-subtitle" style="text-align: center;" data-i18n="artists.artist">${getTranslation('artists.artist', 'Artist')}</div>
           </div>
         `).join('');
         bindArtistCards(artistsGrid);

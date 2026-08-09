@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melo-v0.5.0';
+const CACHE_NAME = 'melo-v0.5.1';
 const IMAGE_CACHE_NAME = 'jellyfin-images-v1';
 
 const ASSETS_TO_CACHE = [
@@ -62,15 +62,19 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
 
+  // Ignore non-GET requests and unsupported schemes (e.g., chrome-extension://, moz-extension://, blob:, data:)
+  if (event.request.method !== 'GET') return;
+  if (!url.startsWith('http://') && !url.startsWith('https://')) return;
+
   // 1. Handle Jellyfin Artwork Images with Stale-While-Revalidate
-  const isImageRequest = event.request.method === 'GET' && (url.includes('/Images/') || url.includes('/Images'));
+  const isImageRequest = url.includes('/Images/') || url.includes('/Images');
   if (isImageRequest) {
     event.respondWith(
       caches.open(IMAGE_CACHE_NAME).then((cache) => {
         return cache.match(event.request).then((cachedResponse) => {
           const fetchPromise = fetch(event.request).then((networkResponse) => {
             if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
-              cache.put(event.request, networkResponse.clone());
+              cache.put(event.request, networkResponse.clone()).catch(() => {});
             }
             return networkResponse;
           }).catch((err) => {
@@ -99,8 +103,7 @@ self.addEventListener('fetch', (event) => {
     url.includes('/System/') ||
     url.includes('/Artists') ||
     url.includes('/Albums') ||
-    url.includes('/Playlists') ||
-    event.request.method !== 'GET'
+    url.includes('/Playlists')
   ) {
     return;
   }
@@ -113,7 +116,7 @@ self.addEventListener('fetch', (event) => {
         fetch(event.request)
           .then((networkResponse) => {
             if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
+              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse).catch(() => {}));
             }
           })
           .catch(() => {/* Ignore network errors during background update */});
@@ -126,7 +129,7 @@ self.addEventListener('fetch', (event) => {
         }
 
         const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache).catch(() => {}));
         return networkResponse;
       }).catch(async () => {
         // Offline HTML navigation fallback

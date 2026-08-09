@@ -11,7 +11,7 @@
     <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
       <img src="./img/icons/icon.svg" style="width: 72px; height: 72px;" alt="Melo Logo">
       <h1 style="font-size: 26px; font-weight: 800; letter-spacing: -0.5px;" data-i18n="login.title">Sign in to Jellyfin</h1>
-      <p style="font-size: 13px; color: var(--text-secondary);">
+      <p style="font-size: 13px; color: var(--text-secondary);" data-i18n="login.subtitle">
         Connect your self-hosted Jellyfin media server to stream your music collection anywhere.
       </p>
     </div>
@@ -19,17 +19,17 @@
     <form id="login-form" style="display: flex; flex-direction: column; gap: 18px;">
       <div class="input-group">
         <label for="sync-server-url" data-i18n="login.server_url">Jellyfin Server URL</label>
-        <input type="url" id="sync-server-url" placeholder="https://jellyfin.example.com" data-i18n-placeholder="login.server_url_placeholder" required>
+        <input type="url" id="sync-server-url" name="serverUrl" autocomplete="url" placeholder="https://jellyfin.example.com" data-i18n-placeholder="login.server_url_placeholder" required>
       </div>
 
       <div class="input-group">
         <label for="sync-username" data-i18n="login.username">Username</label>
-        <input type="text" id="sync-username" placeholder="Enter username" required>
+        <input type="text" id="sync-username" name="username" autocomplete="username" placeholder="Enter username" data-i18n-placeholder="login.username_placeholder" required>
       </div>
 
       <div class="input-group">
         <label for="sync-password" data-i18n="login.password">Password</label>
-        <input type="password" id="sync-password" placeholder="Enter password">
+        <input type="password" id="sync-password" name="password" autocomplete="current-password" placeholder="Enter password" data-i18n-placeholder="login.password_placeholder">
       </div>
 
       <div id="sync-settings-status" style="font-size: 13px; font-weight: 600; text-align: center; min-height: 20px;">

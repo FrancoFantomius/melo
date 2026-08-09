@@ -9,6 +9,7 @@ import { initViews } from './ui/views.js';
 import { initPlayerUI } from './ui/player.js';
 import { requireAuth } from './auth-guard.js';
 import { initCacheDB } from './jellyfin/cache.js';
+import { reportCapabilities } from './jellyfin/client.js';
 import { initI18n } from './i18n.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,5 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 6. Initialize Audio Player & Bind Player UI Controls
   initPlayerUI();
 
-  // 7. Initial view rendering is handled by initViews() and handleUrlRouting()
+  // 7. Report client capabilities & device icon to Jellyfin
+  reportCapabilities();
 });

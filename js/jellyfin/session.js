@@ -1,18 +1,25 @@
 const SESSION_STORAGE_KEY = 'jellyfin_session_settings';
+const DEVICE_ID_KEY = 'melo_device_id';
 
-function generateDeviceId() {
-  return 'pwa-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+function getOrCreateDeviceId() {
+  let deviceId = localStorage.getItem(DEVICE_ID_KEY);
+  if (!deviceId) {
+    deviceId = 'pwa-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    localStorage.setItem(DEVICE_ID_KEY, deviceId);
+  }
+  return deviceId;
 }
 
 export function getSession() {
+  const stableDeviceId = getOrCreateDeviceId();
   const raw = localStorage.getItem(SESSION_STORAGE_KEY);
   if (!raw) {
-    return {
+    const defaultSession = {
       serverUrl: '',
       username: '',
       accessToken: '',
       userId: '',
-      deviceId: generateDeviceId(),
+      deviceId: stableDeviceId,
       qualityWifi: 'Direct',     // Options: 'Direct', '320000', '256000', '128000', '64000'
       qualityMobile: '128000',  // Options: 'Direct', '320000', '256000', '128000', '64000'
       forceTranscode: false,
@@ -20,11 +27,13 @@ export function getSession() {
       homeSectionOrder: ['playlists', 'songs', 'artists', 'podcasts', 'albums'],
       isLoggedIn: false
     };
+    saveSession(defaultSession);
+    return defaultSession;
   }
 
   try {
     const data = JSON.parse(raw);
-    if (!data.deviceId) data.deviceId = generateDeviceId();
+    if (!data.deviceId) data.deviceId = stableDeviceId;
     if (typeof data.searchPodcasts === 'undefined') data.searchPodcasts = true;
     if (!data.homeSectionOrder || !Array.isArray(data.homeSectionOrder)) {
       data.homeSectionOrder = ['playlists', 'songs', 'artists', 'podcasts', 'albums'];
@@ -36,7 +45,7 @@ export function getSession() {
       username: '',
       accessToken: '',
       userId: '',
-      deviceId: generateDeviceId(),
+      deviceId: stableDeviceId,
       qualityWifi: 'Direct',
       qualityMobile: '128000',
       forceTranscode: false,
@@ -45,7 +54,6 @@ export function getSession() {
       isLoggedIn: false
     };
   }
-
 }
 
 export function saveSession(sessionData) {
