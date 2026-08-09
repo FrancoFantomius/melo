@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#121212" />
+  <rect width="464" height="464" x="24" y="24" rx="112" fill="#181818" stroke="rgba(245,158,11,0.3)" stroke-width="4"/>
+  <circle cx="256" cy="256" r="160" fill="url(#amberGlow)" filter="url(#shadow)"/>
+  <!-- Music Note inside Jellyfin Icon -->
+  <path d="M 216 160 L 320 136 V 288 C 308 280 292 276 276 276 C 240 276 216 296 216 324 C 216 352 240 372 276 372 C 312 372 336 348 336 312 V 180 L 216 208 V 160 Z" fill="#121212"/>
+</svg>

@@ -1,0 +1,534 @@
+/* Content Main View Area */
+.main-content {
+  grid-area: content;
+  overflow-y: auto;
+  padding: 28px 32px;
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, var(--bg-primary) 280px);
+}
+
+.view-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* Category Filter Pills / Pillows */
+.category-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.category-pill {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  user-select: none;
+}
+
+.category-pill:hover,
+.category-pill.active {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--accent);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+
+
+/* Cards Grid */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+/* Cards Carousel */
+.cards-carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  padding-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}
+
+.cards-carousel::-webkit-scrollbar {
+  height: 6px;
+}
+
+.cards-carousel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.cards-carousel::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.cards-carousel .media-card {
+  flex: 0 0 170px;
+  width: 170px;
+  scroll-snap-align: start;
+}
+
+.carousel-nav-btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+}
+
+.carousel-nav-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+
+.media-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: pointer;
+  transition: all var(--transition-speed);
+  position: relative;
+}
+
+.media-card:hover {
+  background: var(--bg-tertiary);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card);
+}
+
+.card-thumb {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+  background-color: var(--bg-tertiary);
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-play-btn {
+  position: absolute;
+  bottom: 60px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--accent-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), var(--shadow-glow);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all var(--transition-speed);
+}
+
+.media-card:hover .card-play-btn {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Tracks Table */
+.tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tracks-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(5, auto);
+  gap: 4px 16px;
+}
+
+@media (max-width: 900px) {
+  .tracks-grid-2col {
+    grid-template-columns: 1fr;
+    grid-auto-flow: row;
+    grid-template-rows: none;
+  }
+}
+
+
+/* Album & Playlist Detail Banner */
+.album-detail-banner {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border-color);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.album-cover-lg {
+  width: 180px;
+  height: 180px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  box-shadow: var(--shadow-card);
+  flex-shrink: 0;
+}
+
+.album-info-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.album-detail-type {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.album-detail-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.2;
+}
+
+.album-detail-artist {
+  font-size: 14px;
+  color: var(--text-secondary);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.album-detail-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.playlist-manage-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.playlist-manage-actions .btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  gap: 5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-radius: 20px;
+}
+
+.playlist-manage-actions .btn .material-symbols-outlined {
+  font-size: 16px;
+}
+
+@media (max-width: 768px) {
+  .album-detail-banner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding-bottom: 20px;
+  }
+
+  .album-cover-lg {
+    width: 130px !important;
+    height: 130px !important;
+    margin: 0 auto;
+  }
+
+  .album-info-meta {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .album-detail-title {
+    font-size: 20px;
+    line-height: 1.25;
+    text-align: center;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
+
+  .album-detail-artist {
+    font-size: 13px;
+    text-align: center;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    width: 100%;
+  }
+
+  .album-detail-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .album-detail-actions .btn-primary {
+    width: 100%;
+    max-width: 220px;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+
+  .playlist-manage-actions {
+    justify-content: center;
+    width: 100%;
+    gap: 6px;
+    flex-wrap: nowrap;
+    box-sizing: border-box;
+    padding: 0 4px;
+  }
+
+  .playlist-manage-actions .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+    gap: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .playlist-manage-actions .btn .material-symbols-outlined {
+    font-size: 15px;
+  }
+}
+
+.track-row {
+  display: grid;
+  grid-template-columns: 36px 48px 2fr 1.5fr 36px 60px 36px;
+  align-items: center;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-speed);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-track-like {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all var(--transition-speed);
+}
+
+.btn-track-like:hover {
+  color: #f97316;
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.btn-track-like.liked {
+  color: #f97316;
+}
+
+.btn-track-like.liked .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.track-row:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.track-row.playing {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.track-num {
+  color: var(--text-muted);
+}
+
+.track-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.track-cover {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+/* Search View Top Search Bar */
+.search-page-bar-container {
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.search-page-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-speed);
+}
+
+.search-page-bar:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+  background: var(--bg-hover);
+}
+
+.search-page-icon {
+  color: var(--text-secondary);
+  font-size: 22px;
+}
+
+.search-page-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.search-page-clear-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color var(--transition-speed);
+}
+
+.search-page-clear-btn:hover {
+  color: var(--text-primary);
+}
+
+/* Recent Searches Styling */
+.recent-searches-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.recent-searches-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.recent-searches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.recent-search-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition-speed), border-color var(--transition-speed);
+}
+
+.recent-search-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent);
+}
+
+.recent-search-text {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.btn-remove-recent {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: color var(--transition-speed);
+}
+
+.btn-remove-recent:hover {
+  color: var(--danger);
+}
+

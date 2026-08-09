@@ -1,0 +1,157 @@
+/* Reset & Global Base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Styled Scrollbars (Visible by default across the app) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--radius-full);
+  transition: background var(--transition-speed);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--accent);
+}
+
+/* Material Symbols Styling */
+.material-symbols-outlined {
+  font-family: var(--font-icon);
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  transition: font-variation-settings var(--transition-speed), color var(--transition-speed), transform var(--transition-speed);
+}
+
+/* Material Symbols Filled state for selected, active, pressed & hovered elements */
+.material-symbols-outlined.fill,
+.material-symbols-outlined.filled,
+.filled,
+.nav-item.active a .material-symbols-outlined,
+.nav-item a:hover .material-symbols-outlined,
+.nav-item.active .material-symbols-outlined,
+.btn-icon.active,
+.btn-icon.active .material-symbols-outlined,
+.btn-icon:active .material-symbols-outlined,
+.btn-icon[aria-selected="true"] .material-symbols-outlined,
+.btn-icon[aria-pressed="true"] .material-symbols-outlined,
+.btn.active .material-symbols-outlined,
+.dropdown-btn.active .material-symbols-outlined,
+.quality-badge.active .material-symbols-outlined,
+.media-card:hover .card-play-btn .material-symbols-outlined,
+.active > .material-symbols-outlined,
+.active .material-symbols-outlined,
+[data-active="true"] .material-symbols-outlined,
+.track-row.playing .material-symbols-outlined,
+#player-btn-play .material-symbols-outlined,
+#player-btn-volume .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.search-box:focus-within .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  color: var(--accent);
+}
+
+/* Buttons & Controls */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all var(--transition-speed);
+}
+
+.btn-primary {
+  background-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 700;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.03);
+}
+
+.btn-secondary {
+  background-color: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-hover);
+}
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-speed);
+}
+
+.btn-icon:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-tertiary);
+}
+
+.btn-icon.active {
+  color: var(--accent);
+}
+
+.btn-icon.active:hover {
+  color: var(--accent);
+  background-color: var(--bg-tertiary);
+}

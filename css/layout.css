@@ -1,0 +1,26 @@
+/* App Layout Grid */
+#app-layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: var(--header-height) 1fr var(--player-height);
+  grid-template-areas:
+    "header header"
+    "sidebar content"
+    "player player";
+  height: 100vh;
+  width: 100vw;
+  background-color: var(--bg-primary);
+  transition: grid-template-columns 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#app-layout.sidebar-collapsed {
+  grid-template-columns: 0px 1fr;
+}
+
+#app-layout.sidebar-collapsed .main-sidebar {
+  opacity: 0;
+  visibility: hidden;
+  padding-left: 0;
+  padding-right: 0;
+  pointer-events: none;
+}

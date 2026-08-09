@@ -1,0 +1,79 @@
+<header class="main-header">
+  <div class="header-left">
+    <div class="header-brand-area">
+      <button id="btn-toggle-sidebar" class="btn-icon" title="Toggle Sidebar" aria-label="Toggle Sidebar" data-i18n-title="header.toggle_sidebar">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+
+      <a href="./index.html" data-view="home" class="logo-area" style="text-decoration: none;">
+        <img src="./img/icons/icon.svg" alt="App Logo" class="app-logo">
+        <span class="app-title">Melo</span>
+      </a>
+    </div>
+
+    <div class="search-container">
+      <div class="search-box">
+        <input type="text" id="global-search-input" placeholder="Search artists, albums, tracks..." data-i18n-placeholder="header.search_placeholder" autocomplete="off">
+        <button id="btn-search-submit" class="search-icon-btn" title="Search" aria-label="Submit Search">
+          <span class="material-symbols-outlined">search</span>
+        </button>
+      </div>
+      <div id="search-dropdown-results" class="search-dropdown" style="display: none;"></div>
+    </div>
+  </div>
+
+  <div class="header-right">
+    <!-- Theme Toggle Button -->
+    <button id="btn-theme-toggle" class="btn-icon" title="Toggle Light/Dark Theme" aria-label="Toggle Light/Dark Theme" data-i18n-title="header.toggle_theme">
+      <span class="material-symbols-outlined" id="theme-toggle-icon">dark_mode</span>
+    </button>
+
+    <!-- Settings Button -->
+    <button id="btn-settings-open" class="btn-icon" title="Settings" aria-label="Open Settings" data-i18n-title="header.settings">
+      <span class="material-symbols-outlined">settings</span>
+    </button>
+
+    <!-- Sign In Button (Logged Out state) -->
+    <button id="btn-sync-login" class="btn btn-primary">
+      <span data-i18n="header.sign_in">Sign in</span>
+    </button>
+
+    <!-- Profile Button (Logged In state) -->
+    <button id="btn-sync-profile" class="profile-btn" title="Profile" data-i18n-title="header.profile" style="display: none;">
+      <img id="header-profile-img" class="profile-avatar-img" src="" alt="Avatar" style="display: none;"
+        onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';">
+      <div id="header-profile-letter" class="profile-avatar-letter" style="display: none;">J</div>
+    </button>
+
+    <!-- Account Dropdown Menu -->
+    <div id="account-dropdown" class="account-dropdown" style="display: none;">
+      <div class="dropdown-avatar-container">
+        <img id="dropdown-profile-img" class="profile-avatar-img" src="" alt="Avatar" style="display: none;"
+          onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-block';">
+        <span id="dropdown-profile-icon" class="material-symbols-outlined"
+          style="font-size: 36px; color: var(--accent);">account_circle</span>
+      </div>
+      <div id="dropdown-profile-username" class="dropdown-username">Jellyfin User</div>
+      <div id="account-dropdown-email" class="account-dropdown-email">http://server.example.com</div>
+
+      <div class="dropdown-actions">
+        <button id="btn-dropdown-settings" class="dropdown-btn">
+          <span class="material-symbols-outlined">settings</span>
+          <span data-i18n="header.settings">Settings</span>
+        </button>
+        <a id="btn-dropdown-terms" href="./terms.html" class="dropdown-btn" style="text-decoration: none; color: inherit;">
+          <span class="material-symbols-outlined">gavel</span>
+          <span data-i18n="header.terms">Terms of Service</span>
+        </a>
+        <a id="btn-dropdown-privacy" href="./privacy.html" class="dropdown-btn" style="text-decoration: none; color: inherit;">
+          <span class="material-symbols-outlined">policy</span>
+          <span data-i18n="header.privacy">Privacy Policy</span>
+        </a>
+        <button id="btn-dropdown-signout" class="dropdown-btn" style="color: var(--danger);">
+          <span class="material-symbols-outlined">logout</span>
+          <span data-i18n="header.sign_out">Sign out</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>

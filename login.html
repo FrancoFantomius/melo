@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> head }}
+
+<body
+  style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background-color: var(--bg-primary);">
+
+  <div
+    style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); width: 90%; max-width: 440px; padding: 36px; box-shadow: var(--shadow-modal); display: flex; flex-direction: column; gap: 24px;">
+
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center;">
+      <img src="./img/icons/icon.svg" style="width: 72px; height: 72px;" alt="Melo Logo">
+      <h1 style="font-size: 26px; font-weight: 800; letter-spacing: -0.5px;" data-i18n="login.title">Sign in to Jellyfin</h1>
+      <p style="font-size: 13px; color: var(--text-secondary);">
+        Connect your self-hosted Jellyfin media server to stream your music collection anywhere.
+      </p>
+    </div>
+
+    <form id="login-form" style="display: flex; flex-direction: column; gap: 18px;">
+      <div class="input-group">
+        <label for="sync-server-url" data-i18n="login.server_url">Jellyfin Server URL</label>
+        <input type="url" id="sync-server-url" placeholder="https://jellyfin.example.com" data-i18n-placeholder="login.server_url_placeholder" required>
+      </div>
+
+      <div class="input-group">
+        <label for="sync-username" data-i18n="login.username">Username</label>
+        <input type="text" id="sync-username" placeholder="Enter username" required>
+      </div>
+
+      <div class="input-group">
+        <label for="sync-password" data-i18n="login.password">Password</label>
+        <input type="password" id="sync-password" placeholder="Enter password">
+      </div>
+
+      <div id="sync-settings-status" style="font-size: 13px; font-weight: 600; text-align: center; min-height: 20px;">
+      </div>
+
+      <button type="submit" id="btn-login-submit" class="btn btn-primary"
+        style="width: 100%; padding: 12px; font-size: 15px; margin-top: 6px;">
+        <span class="material-symbols-outlined">login</span>
+        <span data-i18n="login.submit">Sign in</span>
+      </button>
+    </form>
+
+    <div style="display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 16px;">
+      <a href="./terms.html" style="color: var(--text-secondary); text-decoration: none; font-weight: 500;" data-i18n="header.terms">Terms of Service</a>
+      <span>•</span>
+      <a href="./privacy.html" style="color: var(--text-secondary); text-decoration: none; font-weight: 500;" data-i18n="header.privacy">Privacy Policy</a>
+    </div>
+
+  </div>
+
+  <script type="module" src="./js/login.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<footer class="main-player">
+  <div class="player-left">
+    <img id="player-track-cover" src="./img/icons/icon.svg" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="player-cover" alt="Cover">
+    <div class="player-track-details">
+      <div id="player-track-title" class="player-track-title">No track selected</div>
+      <div id="player-track-artist" class="player-track-artist">Select a song to start playing</div>
+    </div>
+    <button id="player-btn-like" class="btn-icon btn-like" title="Like" style="display: none; margin-left: 4px;">
+      <span class="material-symbols-outlined">favorite_border</span>
+    </button>
+  </div>
+
+  <div class="player-center">
+    <div class="player-controls">
+      <button id="player-btn-shuffle" class="btn-icon" title="Shuffle">
+        <span class="material-symbols-outlined">shuffle</span>
+      </button>
+      <button id="player-btn-skip-back" class="btn-icon btn-skip" title="Rewind 15 seconds" style="display: none;">
+        <span class="material-symbols-outlined">replay_10</span>
+      </button>
+      <button id="player-btn-prev" class="btn-icon" title="Previous Track">
+        <span class="material-symbols-outlined">skip_previous</span>
+      </button>
+      <button id="player-btn-play" class="btn-icon" title="Play/Pause">
+        <span class="material-symbols-outlined">play_circle</span>
+      </button>
+      <button id="player-btn-next" class="btn-icon" title="Next Track">
+        <span class="material-symbols-outlined">skip_next</span>
+      </button>
+      <button id="player-btn-skip-forward" class="btn-icon btn-skip" title="Fast-forward 30 seconds" style="display: none;">
+        <span class="material-symbols-outlined">forward_30</span>
+      </button>
+      <button id="player-btn-repeat" class="btn-icon" title="Repeat">
+        <span class="material-symbols-outlined">repeat</span>
+      </button>
+    </div>
+
+    <div class="player-progress-area">
+      <span id="player-current-time" class="time-stamp">0:00</span>
+      <input type="range" id="player-progress" min="0" max="100" value="0">
+      <span id="player-total-time" class="time-stamp">0:00</span>
+    </div>
+  </div>
+
+  <div class="player-right">
+    <button id="player-speed-badge" class="player-speed-badge" title="Playback Speed" style="display: none;">1.0x</button>
+    <button id="player-quality-badge" class="quality-badge" title="Click to toggle quality / force transcode">DIRECT</button>
+    <button id="player-btn-lyrics" class="btn-icon" title="Lyrics" style="display: none;">
+      <span class="material-symbols-outlined">lyrics</span>
+    </button>
+    <button id="player-btn-queue" class="btn-icon" title="Queue">
+      <span class="material-symbols-outlined">queue_music</span>
+    </button>
+    <button id="player-btn-volume" class="btn-icon" title="Mute/Unmute">
+      <span class="material-symbols-outlined fill">volume_up</span>
+    </button>
+    <input type="range" id="player-volume" min="0" max="1" step="0.01" value="0.8" style="width: 80px;">
+  </div>
+</footer>
+
+<!-- Full Page Mobile Player Overlay -->
+<div id="expanded-mobile-player" class="expanded-mobile-player">
+  <!-- Top Bar with Close/Minimize Chevron -->
+  <div class="emp-top-bar">
+    <button id="emp-btn-close" class="btn-icon" title="Minimize Player" aria-label="Minimize Player">
+      <span class="material-symbols-outlined" style="font-size: 32px;">expand_more</span>
+    </button>
+    <div class="emp-top-title">NOW PLAYING</div>
+    <div style="width: 40px;"></div>
+  </div>
+
+  <!-- Top Center: Song Cover Image -->
+  <div class="emp-cover-container">
+    <img id="emp-cover" src="./img/icons/icon.svg" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="emp-cover-img" alt="Cover">
+  </div>
+
+  <!-- Middle: Song Details & Playback Controls -->
+  <div class="emp-middle-content">
+    <div class="emp-track-details">
+      <div id="emp-title" class="emp-track-title">No track selected</div>
+      <div id="emp-artist" class="emp-track-artist">Select a song to start playing</div>
+    </div>
+
+    <!-- Primary Playback Controls -->
+    <div class="emp-controls">
+      <button id="emp-btn-shuffle" class="btn-icon emp-icon-btn" title="Shuffle">
+        <span class="material-symbols-outlined">shuffle</span>
+      </button>
+      <button id="emp-btn-prev" class="btn-icon emp-icon-btn" title="Previous Track">
+        <span class="material-symbols-outlined">skip_previous</span>
+      </button>
+      <button id="emp-btn-play" class="btn-icon emp-play-btn" title="Play/Pause">
+        <span class="material-symbols-outlined">play_circle</span>
+      </button>
+      <button id="emp-btn-next" class="btn-icon emp-icon-btn" title="Next Track">
+        <span class="material-symbols-outlined">skip_next</span>
+      </button>
+      <button id="emp-btn-repeat" class="btn-icon emp-icon-btn" title="Repeat">
+        <span class="material-symbols-outlined">repeat</span>
+      </button>
+    </div>
+
+    <!-- Secondary Action Icons (Like, Lyrics, Queue) -->
+    <div class="emp-secondary-actions">
+      <button id="emp-btn-like" class="btn-icon btn-like" title="Like">
+        <span class="material-symbols-outlined">favorite_border</span>
+      </button>
+      <button id="emp-btn-lyrics" class="btn-icon" title="Lyrics" style="display: none;">
+        <span class="material-symbols-outlined">lyrics</span>
+      </button>
+      <button id="emp-btn-queue" class="btn-icon" title="Queue">
+        <span class="material-symbols-outlined">queue_music</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Bottom: Timebar / Progress Slider -->
+  <div class="emp-bottom-area">
+    <div class="emp-progress-area">
+      <input type="range" id="emp-progress" min="0" max="100" value="0">
+      <div class="emp-timestamps">
+        <span id="emp-current-time" class="time-stamp">0:00</span>
+        <span id="emp-total-time" class="time-stamp">0:00</span>
+      </div>
+    </div>
+  </div>
+</div>
+

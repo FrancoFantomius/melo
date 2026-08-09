@@ -1,0 +1,269 @@
+/* Desktop View Rules */
+@media (min-width: 769px) {
+  .mobile-bottom-nav {
+    display: none !important;
+  }
+}
+
+/* Mobile View Rules */
+@media (max-width: 768px) {
+  #app-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--bg-primary);
+  }
+
+  /* Hide sidebar on mobile */
+  .main-sidebar {
+    display: none !important;
+  }
+
+  /* Topbar (Header) visibility logic:
+     Hidden by default on mobile, visible only on Home page */
+  .main-header {
+    display: none !important;
+  }
+
+  body[data-page="home"] .main-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    padding: 8px 16px;
+    flex-shrink: 0;
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  body[data-page="home"] .main-header #btn-toggle-sidebar,
+  body[data-page="home"] .main-header .search-container {
+    display: none !important;
+  }
+
+  body[data-page="home"] .main-header .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+  }
+
+  body[data-page="home"] .account-dropdown {
+    top: 56px;
+    right: 12px;
+    z-index: 1000;
+  }
+
+  /* Main scroll area */
+  .main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 12px 24px 12px !important;
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .view-section {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Two-column grid on mobile for playlists and cards */
+  .cards-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .media-card {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 10px !important;
+    box-sizing: border-box !important;
+  }
+
+  .media-card .card-thumb {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+  }
+
+  .media-card .card-title,
+  .media-card .card-subtitle {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Hide play hover buttons on media cards on mobile */
+  .card-play-btn {
+    display: none !important;
+  }
+
+  /* Simplified Track Row Layout on Mobile */
+  .track-row {
+    display: grid !important;
+    grid-template-columns: 44px minmax(0, 1fr) !important;
+    gap: 10px !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hide track index, album name, like button, duration, and play icon on mobile */
+  .track-row > .track-num,
+  .track-row > div:nth-child(4),
+  .track-row > div:nth-child(5),
+  .track-row > div:nth-child(6),
+  .track-row > div:nth-child(7) {
+    display: none !important;
+  }
+
+  /* Two-column horizontal swipable tracks grid on mobile home index */
+  .tracks-grid-2col {
+    display: grid !important;
+    grid-template-columns: repeat(2, 280px) !important;
+    grid-auto-flow: column !important;
+    grid-template-rows: repeat(5, auto) !important;
+    gap: 8px 12px !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 10px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .tracks-grid-2col .track-row {
+    scroll-snap-align: start !important;
+    width: 280px !important;
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  /* Player on mobile: sits directly upon (above) the bottom bar */
+  .main-player {
+    flex-shrink: 0;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    z-index: 90;
+  }
+
+  .player-left {
+    flex: 1;
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .player-cover {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+  }
+
+  .player-track-details {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .player-track-title {
+    font-size: 13px;
+  }
+
+  .player-track-artist {
+    font-size: 11px;
+  }
+
+  .player-center {
+    display: flex;
+    align-items: center;
+  }
+
+  .player-controls {
+    gap: 4px;
+  }
+
+  #player-btn-shuffle,
+  #player-btn-repeat,
+  #player-btn-skip-back,
+  #player-btn-skip-forward,
+  .player-progress-area,
+  .player-right {
+    display: none !important;
+  }
+
+  #player-btn-play {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+  }
+
+  #player-btn-play .material-symbols-outlined {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    line-height: 36px;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-around;
+    height: 60px;
+    flex-shrink: 0;
+    background-color: var(--bg-tertiary);
+    border-top: 1px solid var(--border-color);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    color: var(--text-secondary);
+    text-decoration: none;
+    gap: 2px;
+    transition: color var(--transition-speed);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-nav-item .material-symbols-outlined {
+    font-size: 24px;
+  }
+
+  .mobile-nav-label {
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .mobile-nav-item:hover,
+  .mobile-nav-item.active {
+    color: var(--accent);
+  }
+
+  .mobile-nav-item.active .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+

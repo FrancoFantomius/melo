@@ -1,0 +1,75 @@
+:root {
+  /* Fonts */
+  --font-main: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-icon: 'Material Symbols Outlined Variable', 'Material Symbols Outlined', sans-serif;
+
+  /* Layout Dimensions */
+  --header-height: 64px;
+  --sidebar-width: 240px;
+  --player-height: 90px;
+
+  /* Radii & Timings */
+  --transition-speed: 0.2s;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  /* Theme: Dark Mode */
+  --bg-primary: #121212;
+  --bg-secondary: #000000;
+  --bg-tertiary: #181818;
+  --bg-hover: #282828;
+  --bg-search: rgba(255, 255, 255, 0.1);
+  --bg-modal: rgba(18, 18, 18, 0.96);
+  --bg-glass: rgba(18, 18, 18, 0.85);
+  --text-primary: #ffffff;
+  --text-secondary: #b3b3b3;
+  --text-muted: #6a6a6a;
+  --border-color: rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.8);
+  --shadow-glow: 0 0 20px rgba(245, 158, 11, 0.35);
+
+  --scrollbar-thumb: rgba(255, 255, 255, 0.35);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.6);
+  --scrollbar-track: rgba(255, 255, 255, 0.06);
+
+  /* Amber Accent Palette */
+  --accent: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-active: #d97706;
+  --accent-bg-glow: rgba(245, 158, 11, 0.15);
+  --accent-text: #000000;
+  --danger: #f15e6c;
+  --danger-hover: #e91429;
+  --success: #10b981;
+}
+
+/* Theme: Light Mode Override */
+.light-theme {
+  --bg-primary: #f6f6f6;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eaeaea;
+  --bg-hover: #dedede;
+  --bg-search: rgba(0, 0, 0, 0.06);
+  --bg-modal: rgba(255, 255, 255, 0.98);
+  --bg-glass: rgba(255, 255, 255, 0.85);
+  --text-primary: #121212;
+  --text-secondary: #5e5e5e;
+  --text-muted: #8e8e8e;
+  --border-color: rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.15);
+  --shadow-glow: 0 0 16px rgba(217, 119, 6, 0.25);
+
+  --scrollbar-thumb: rgba(0, 0, 0, 0.35);
+  --scrollbar-thumb-hover: rgba(0, 0, 0, 0.6);
+  --scrollbar-track: rgba(0, 0, 0, 0.08);
+
+  --accent: #d97706;
+  --accent-hover: #b45309;
+  --accent-active: #92400e;
+  --accent-bg-glow: rgba(217, 119, 6, 0.12);
+  --accent-text: #ffffff;
+}

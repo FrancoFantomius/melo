@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> head }}
+
+<body style="background-color: var(--bg-primary); color: var(--text-primary); min-height: 100vh; height: auto !important; overflow-y: auto !important; user-select: text !important; padding: 24px 16px; font-family: var(--font-main);">
+
+  <div style="max-width: 760px; margin: 0 auto; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px 32px; box-shadow: var(--shadow-card);">
+    
+    <div style="display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 28px;">
+      <img src="./img/icons/icon.svg" style="width: 40px; height: 40px;" alt="Melo Logo">
+      <h1 style="font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.5px;">Privacy Policy</h1>
+    </div>
+
+    <!-- Anti-Piracy & User Liability Notice Banner -->
+    <div style="background-color: rgba(245, 158, 11, 0.1); border: 1px solid var(--accent); border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 28px;">
+      <h3 style="margin: 0 0 8px 0; color: var(--accent); font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        <span class="material-symbols-outlined" style="font-size: 20px;">gavel</span>
+        Anti-Piracy & Content Responsibility
+      </h3>
+      <p style="margin: 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+        <strong>Melo strictly prohibits illegal streaming and piracy of copyrighted media.</strong>
+        Melo operates purely as a front-end client interface. We do not provide, collect, index, or store media files. The user is entirely responsible for the audio content stored on their Jellyfin server or accessed via podcast subscriptions.
+      </p>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 24px; line-height: 1.6; font-size: 14px; color: var(--text-secondary);">
+      <section>
+        <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">1. Information We Do Not Collect</h2>
+        <p>Melo does not harvest, sell, or collect personal data, listening habits, login credentials, or server URLs. We do not run third-party tracking scripts, analytics tools, or advertising networks.</p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">2. Server Communication & Connection</h2>
+        <p>When you log in to your self-hosted Jellyfin server through Melo, authentication requests and API calls are sent directly from your browser to your designated Jellyfin server endpoint. No credentials or server tokens are ever routed through external third-party servers managed by Melo.</p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">3. Local Data Storage</h2>
+        <p>Melo utilizes your web browser's <code>localStorage</code> and <code>IndexedDB</code> to save your user preferences (such as light/dark theme preference, sidebar state, server URL, authentication tokens, and cached podcast data). This data remains strictly stored on your local device and can be cleared at any time through your browser settings or by signing out.</p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">4. External Podcast Feeds</h2>
+        <p>If you choose to subscribe to or search for podcasts within Melo, direct HTTPS requests are made to public podcast feed URLs and iTunes Search APIs to retrieve show artwork and audio enclosures. These third-party services operate under their respective privacy policies.</p>
+      </section>
+
+      <section>
+        <h2 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px;">5. User Liability</h2>
+        <p>Users are solely liable for ensuring that all content accessed through their self-hosted server or external audio streams complies with relevant copyright laws and licensing requirements in their jurisdiction.</p>
+      </section>
+    </div>
+
+    <div style="margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <a href="./terms.html" style="color: var(--accent); text-decoration: none; font-size: 13px; font-weight: 600;">← View Terms of Service</a>
+      <a href="./index.html" style="display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px; background-color: var(--accent); color: #000; border-radius: var(--radius-full); text-decoration: none; font-size: 14px; font-weight: 700;">
+        <span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+        <span>Go back to App</span>
+      </a>
+    </div>
+
+  </div>
+
+  <script type="module" src="./js/privacy.js"></script>
+</body>
+</html>
