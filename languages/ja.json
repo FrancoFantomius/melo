@@ -62,7 +62,7 @@
   "Privacy Policy": "プライバシーポリシー",
   "Sign out": "サインアウト",
   "Profile": "プロフィール",
-  "App & Audio Settings": "アプリとオーディオの設定",
+  "App Settings": "アプリ設定",
   "Language": "言語",
   "Auto (Browser Default)": "自動 (ブラウザの標準)",
   "WiFi Streaming Quality": "WiFi ストリーミング画質",
@@ -160,5 +160,10 @@
   "track": "曲",
   "to": "へ",
   "playlist": "プレイリスト",
-  "Failed to add to playlist": "プレイリストへの追加に失敗しました"
+  "Failed to add to playlist": "プレイリストへの追加に失敗しました",
+  "Add": "追加",
+  "Discover Daily": "デイリーディスカバリー",
+  "20 fresh picks updated every day": "毎日更新される20曲の厳選トラック",
+  "Playlist • 20 fresh picks": "プレイリスト • 20曲の厳選トラック",
+  "64 kbps (Low Bandwidth)": "64 kbps（低帯域幅）"
 }

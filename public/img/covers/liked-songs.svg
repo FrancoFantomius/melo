@@ -11,7 +11,5 @@
     </filter>
   </defs>
   <rect width="512" height="512" rx="64" fill="url(#bg)"/>
-  <circle cx="136" cy="104" r="104" fill="#fff7ed" opacity="0.16"/>
-  <circle cx="430" cy="398" r="142" fill="#7c2d12" opacity="0.12"/>
   <path filter="url(#shadow)" fill="#ffffff" d="M256 381c-8 0-15-3-21-9l-93-89c-42-40-46-103-9-143 34-37 90-39 123-8 33-31 89-29 123 8 37 40 33 103-9 143l-93 89c-6 6-13 9-21 9Z"/>
 </svg>

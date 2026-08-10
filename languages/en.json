@@ -62,7 +62,7 @@
   "Privacy Policy": "Privacy Policy",
   "Sign out": "Sign out",
   "Profile": "Profile",
-  "App & Audio Settings": "App & Audio Settings",
+  "App Settings": "App Settings",
   "Language": "Language",
   "Auto (Browser Default)": "Auto (Browser Default)",
   "WiFi Streaming Quality": "WiFi Streaming Quality",
@@ -160,5 +160,9 @@
   "track": "track",
   "to": "to",
   "playlist": "playlist",
-  "Failed to add to playlist": "Failed to add to playlist"
+  "Failed to add to playlist": "Failed to add to playlist",
+  "Add": "Add",
+  "Discover Daily": "Discover Daily",
+  "20 fresh picks updated every day": "20 fresh picks updated every day",
+  "Playlist • 20 fresh picks": "Playlist • 20 fresh picks"
 }

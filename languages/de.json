@@ -62,7 +62,7 @@
   "Privacy Policy": "Datenschutzrichtlinie",
   "Sign out": "Abmelden",
   "Profile": "Profil",
-  "App & Audio Settings": "App- & Audio-Einstellungen",
+  "App Settings": "App-Einstellungen",
   "Language": "Sprache",
   "Auto (Browser Default)": "Auto (Browser-Standard)",
   "WiFi Streaming Quality": "WLAN-Streaming-Qualität",
@@ -160,5 +160,9 @@
   "track": "Titel",
   "to": "zu",
   "playlist": "Wiedergabeliste",
-  "Failed to add to playlist": "Fehler beim Hinzufügen"
+  "Failed to add to playlist": "Fehler beim Hinzufügen",
+  "Add": "Hinzufügen",
+  "Discover Daily": "Tägliche Entdeckungen",
+  "20 fresh picks updated every day": "20 neue Empfehlungen, täglich aktualisiert",
+  "Playlist • 20 fresh picks": "Wiedergabeliste • 20 Empfehlungen"
 }

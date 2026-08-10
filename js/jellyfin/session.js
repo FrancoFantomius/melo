@@ -27,7 +27,7 @@ export function getSession() {
       homeSectionOrder: ['playlists', 'songs', 'artists', 'podcasts', 'albums'],
       isLoggedIn: false
     };
-    saveSession(defaultSession);
+    localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(defaultSession));
     return defaultSession;
   }
 

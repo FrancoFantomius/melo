@@ -62,7 +62,7 @@
   "Privacy Policy": "Política de Privacidade",
   "Sign out": "Terminar sessão",
   "Profile": "Perfil",
-  "App & Audio Settings": "Definições da Aplicação e Áudio",
+  "App Settings": "Configurações do Aplicativo",
   "Language": "Idioma",
   "Auto (Browser Default)": "Auto (Padrão do navegador)",
   "WiFi Streaming Quality": "Qualidade de Streaming WiFi",
@@ -160,5 +160,10 @@
   "track": "faixa",
   "to": "a",
   "playlist": "lista",
-  "Failed to add to playlist": "Falha ao adicionar à lista"
+  "Failed to add to playlist": "Falha ao adicionar à lista",
+  "Add": "Adicionar",
+  "Discover Daily": "Descobertas Diárias",
+  "20 fresh picks updated every day": "20 faixas selecionadas atualizadas todos os dias",
+  "Playlist • 20 fresh picks": "Lista • 20 faixas selecionadas",
+  "No podcast episodes found. Subscribe to podcast feeds to see the latest episodes here!": "Nenhum episódio de podcast encontrado. Inscreva-se em feeds de podcasts para ver os episódios mais recentes aqui!"
 }

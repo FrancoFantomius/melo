@@ -62,7 +62,7 @@
   "Privacy Policy": "隐私政策",
   "Sign out": "退出登录",
   "Profile": "个人资料",
-  "App & Audio Settings": "应用与音频设置",
+  "App Settings": "应用设置",
   "Language": "语言",
   "Auto (Browser Default)": "自动 (浏览器默认)",
   "WiFi Streaming Quality": "WiFi 串流画质",
@@ -160,5 +160,9 @@
   "track": "首曲目",
   "to": "到",
   "playlist": "播放列表",
-  "Failed to add to playlist": "添加到播放列表失败"
+  "Failed to add to playlist": "添加到播放列表失败",
+  "Add": "添加",
+  "Discover Daily": "每日发现",
+  "20 fresh picks updated every day": "每天更新 20 首精选歌曲",
+  "Playlist • 20 fresh picks": "播放列表 • 20 首精选"
 }

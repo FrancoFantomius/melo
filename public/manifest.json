@@ -1,8 +1,8 @@
 {
   "name": "Melo",
   "short_name": "Melo",
-  "version": "0.5.3",
-  "description": "Melo - Progressive Web App Music Player powered by Jellyfin",
+  "version": "0.6.0",
+  "description": "Melo - A Music Player powered by Jellyfin",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0e1117",

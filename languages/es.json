@@ -62,7 +62,7 @@
   "Privacy Policy": "Política de Privacidad",
   "Sign out": "Cerrar sesión",
   "Profile": "Perfil",
-  "App & Audio Settings": "Ajustes de la Aplicación y Audio",
+  "App Settings": "Ajustes de la aplicación",
   "Language": "Idioma",
   "Auto (Browser Default)": "Auto (Predeterminado del navegador)",
   "WiFi Streaming Quality": "Calidad de Streaming en WiFi",
@@ -160,5 +160,9 @@
   "track": "canción",
   "to": "a",
   "playlist": "lista de reproducción",
-  "Failed to add to playlist": "Error al añadir a la lista"
+  "Failed to add to playlist": "Error al añadir a la lista",
+  "Add": "Añadir",
+  "Discover Daily": "Descubrimientos Diarios",
+  "20 fresh picks updated every day": "20 selecciones nuevas actualizadas cada día",
+  "Playlist • 20 fresh picks": "Lista de reproducción • 20 selecciones"
 }
