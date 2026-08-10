@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Liked Songs cover</title>
+  <desc id="desc">Warm orange gradient cover with a white heart.</desc>
+  <defs>
+    <linearGradient id="bg" x1="80" y1="64" x2="432" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff7e5f"/>
+      <stop offset="1" stop-color="#feb47b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#9a3412" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="64" fill="url(#bg)"/>
+  <circle cx="136" cy="104" r="104" fill="#fff7ed" opacity="0.16"/>
+  <circle cx="430" cy="398" r="142" fill="#7c2d12" opacity="0.12"/>
+  <path filter="url(#shadow)" fill="#ffffff" d="M256 381c-8 0-15-3-21-9l-93-89c-42-40-46-103-9-143 34-37 90-39 123-8 33-31 89-29 123 8 37 40 33 103-9 143l-93 89c-6 6-13 9-21 9Z"/>
+</svg>

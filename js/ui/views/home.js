@@ -7,7 +7,7 @@ import { switchView } from '../views.js';
 import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTML, bindTrackRows } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
-import { DISCOVER_DAILY_PLAYLIST, buildHomeRecommendations } from '../../recommendations.js';
+import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, buildHomeRecommendations } from '../../recommendations.js';
 
 export async function renderHomeView(container) {
   const session = getSession();
@@ -209,7 +209,7 @@ export async function renderHomeView(container) {
   const updatePlaylistsUI = (playlistsRes) => {
     const playlistsGrid = document.getElementById('home-playlists');
     if (playlistsGrid && playlistsRes) {
-      const likedCard = { Id: 'liked-songs', Name: 'Liked Songs', Type: 'LikedSongs' };
+      const likedCard = { ...LIKED_SONGS_PLAYLIST, Name: 'Liked Songs' };
       const items = [likedCard, DISCOVER_DAILY_PLAYLIST, ...(playlistsRes.Items || [])];
       playlistsGrid.innerHTML = items.map(playlist => renderAlbumCardHTML(playlist, 'Playlist')).join('');
       bindAlbumCards(playlistsGrid);

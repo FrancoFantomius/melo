@@ -9,11 +9,20 @@ export const HOME_LIMITS = {
   discoverDailyTracks: 20
 };
 
+export const LIKED_SONGS_PLAYLIST = {
+  Id: 'liked-songs',
+  Name: 'Liked Songs',
+  Type: 'LikedSongs',
+  IsLikedSongs: true,
+  CoverUrl: './img/covers/liked-songs.svg'
+};
+
 export const DISCOVER_DAILY_PLAYLIST = {
   Id: 'discover-daily',
   Name: 'Discover Daily',
   Type: 'DiscoverDaily',
-  IsDiscoverDaily: true
+  IsDiscoverDaily: true,
+  CoverUrl: './img/covers/discover-daily.svg'
 };
 
 function getItemDateMs(item, keys) {

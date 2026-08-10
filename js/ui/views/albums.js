@@ -7,7 +7,7 @@ import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { openPlaylist } from './playlists.js';
 import { openEditPlaylistModal, openAddTracksModal, openDeletePlaylistModal, openSelectPlaylistModal } from '../modals.js';
 import { getTranslation } from '../../i18n.js';
-import { DISCOVER_DAILY_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
+import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
 
 export function openAlbum(albumId, albumObj = null) {
   if (!albumId) return;
@@ -66,10 +66,9 @@ export async function renderAlbumDetailView(container, albumOrId) {
 
   if (isLikedSongs) {
     album = {
-      Id: 'liked-songs',
+      ...LIKED_SONGS_PLAYLIST,
       Name: getTranslation('Liked Songs'),
-      Type: 'Playlist',
-      IsLikedSongs: true
+      Type: 'Playlist'
     };
   } else if (isDiscoverDaily) {
     album = {
@@ -91,13 +90,9 @@ export async function renderAlbumDetailView(container, albumOrId) {
       : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : getTranslation('Unknown Artist'))));
 
   const coverHTML = isLikedSongs
-    ? `<div id="album-detail-cover" class="album-cover-lg" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);">
-         <span class="material-symbols-outlined" style="font-size: 80px; color: #ffffff; font-variation-settings: 'FILL' 1;">favorite</span>
-       </div>`
+    ? `<img id="album-detail-cover" src="${LIKED_SONGS_PLAYLIST.CoverUrl}" class="album-cover-lg" alt="Liked Songs">`
     : (isDiscoverDaily
-      ? `<div id="album-detail-cover" class="album-cover-lg" style="background: radial-gradient(circle at 28% 25%, #fef3c7 0, #f59e0b 25%, #8b5cf6 64%, #1d4ed8 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);">
-           <span class="material-symbols-outlined" style="font-size: 80px; color: #ffffff; font-variation-settings: 'FILL' 1;">explore</span>
-         </div>`
+      ? `<img id="album-detail-cover" src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" class="album-cover-lg" alt="Discover Daily">`
       : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="album-cover-lg" alt="${album.Name || (isPlaylist ? 'Playlist' : 'Album')}">`);
 
   container.innerHTML = `

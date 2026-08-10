@@ -6,7 +6,7 @@ import { openAlbum } from './albums.js';
 import { openPlaylist } from './playlists.js';
 import { isTrackLiked, toggleTrackLiked, registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
-import { DISCOVER_DAILY_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
+import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
 import { openSelectPlaylistModal } from '../modals.js';
 
 export function getAlbumArtistsInfo(item) {
@@ -67,9 +67,7 @@ export function renderAlbumCardHTML(item, typeLabel = 'Album') {
   if (item.Id === DISCOVER_DAILY_PLAYLIST.Id || item.Type === DISCOVER_DAILY_PLAYLIST.Type) {
     return `
       <div class="media-card discover-daily-card" data-album-id="discover-daily" data-type="DiscoverDaily">
-        <div class="card-thumb discover-daily-thumb" style="background: radial-gradient(circle at 28% 25%, #fef3c7 0, #f59e0b 25%, #8b5cf6 64%, #1d4ed8 100%); display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; border-radius: var(--radius-sm); box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);">
-          <span class="material-symbols-outlined" style="font-size: 56px; color: #ffffff; font-variation-settings: 'FILL' 1;">explore</span>
-        </div>
+        <img src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" class="card-thumb discover-daily-thumb" alt="Discover Daily">
         <div class="card-title" data-i18n>Discover Daily</div>
         <div class="card-subtitle" data-i18n>Playlist • 20 fresh picks</div>
         <div class="card-play-btn" title="Play">
@@ -81,9 +79,7 @@ export function renderAlbumCardHTML(item, typeLabel = 'Album') {
   if (item.Id === 'liked-songs' || item.Type === 'LikedSongs') {
     return `
       <div class="media-card liked-songs-card" data-album-id="liked-songs" data-type="LikedSongs">
-        <div class="card-thumb liked-songs-thumb" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1/1; border-radius: var(--radius-sm); box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);">
-          <span class="material-symbols-outlined" style="font-size: 56px; color: #ffffff; font-variation-settings: 'FILL' 1;">favorite</span>
-        </div>
+        <img src="${LIKED_SONGS_PLAYLIST.CoverUrl}" class="card-thumb liked-songs-thumb" alt="Liked Songs">
         <div class="card-title" data-i18n>Liked Songs</div>
         <div class="card-subtitle" data-i18n>Playlist • Favorite Songs</div>
         <div class="card-play-btn" title="Play">

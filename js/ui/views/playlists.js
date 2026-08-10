@@ -4,7 +4,7 @@ import { switchView } from '../views.js';
 import { renderAlbumDetailView } from './albums.js';
 import { getTranslation } from '../../i18n.js';
 import { openCreatePlaylistModal } from '../modals.js';
-import { DISCOVER_DAILY_PLAYLIST } from '../../recommendations.js';
+import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST } from '../../recommendations.js';
 
 export function openPlaylist(playlistId, playlistObj = null) {
   if (!playlistId) return;
@@ -58,7 +58,7 @@ export async function renderPlaylistsView(container) {
   const updatePlaylistsGrid = (res) => {
     const grid = document.getElementById('playlists-grid');
     if (grid && res) {
-      const likedCard = { Id: 'liked-songs', Name: getTranslation('Liked Songs'), Type: 'LikedSongs' };
+      const likedCard = { ...LIKED_SONGS_PLAYLIST, Name: getTranslation('Liked Songs') };
       const items = [likedCard, { ...DISCOVER_DAILY_PLAYLIST, Name: getTranslation('Discover Daily') }, ...(res.Items || [])];
       grid.innerHTML = items.map(playlist => renderAlbumCardHTML(playlist, 'Playlist')).join('');
       bindAlbumCards(grid);
@@ -70,7 +70,7 @@ export async function renderPlaylistsView(container) {
     updatePlaylistsGrid(res);
   } catch (err) {
     const grid = document.getElementById('playlists-grid');
-    const likedCard = { Id: 'liked-songs', Name: getTranslation('Liked Songs'), Type: 'LikedSongs' };
+    const likedCard = { ...LIKED_SONGS_PLAYLIST, Name: getTranslation('Liked Songs') };
     if (grid) {
       grid.innerHTML = [likedCard, { ...DISCOVER_DAILY_PLAYLIST, Name: getTranslation('Discover Daily') }].map(playlist => renderAlbumCardHTML(playlist, 'Playlist')).join('');
       bindAlbumCards(grid);
