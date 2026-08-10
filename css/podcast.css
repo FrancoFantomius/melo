@@ -297,6 +297,18 @@
   color: var(--text-muted);
 }
 
+.episode-meta-bar .btn-track-download {
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  border: 1px solid transparent;
+}
+
+.episode-meta-bar .btn-track-download:hover {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.3);
+  color: var(--accent);
+}
+
 .episode-badge {
   background: var(--bg-hover);
   color: var(--text-secondary);

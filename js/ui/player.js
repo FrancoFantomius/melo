@@ -4,6 +4,7 @@ import { toggleQueueDrawer, renderQueueDrawerList, toggleLyricsModal, updateLyri
 import { getArtworkUrl, getItemCached } from '../jellyfin/client.js';
 import { getSession, saveSession } from '../jellyfin/session.js';
 import { isTrackLiked, toggleTrackLiked } from '../player/likes.js';
+import { toggleTrackDownload, refreshDownloadButton } from './downloads.js';
 
 export function initPlayerUI() {
   const btnPlay = document.getElementById('player-btn-play');
@@ -18,6 +19,7 @@ export function initPlayerUI() {
   const btnLyrics = document.getElementById('player-btn-lyrics');
   const btnLike = document.getElementById('player-btn-like');
   const btnAddPlaylist = document.getElementById('player-btn-add-playlist');
+  const btnDownload = document.getElementById('player-btn-download');
   const btnVolume = document.getElementById('player-btn-volume');
   const qualityBadge = document.getElementById('player-quality-badge');
   const progressSlider = document.getElementById('player-progress');
@@ -36,6 +38,7 @@ export function initPlayerUI() {
   const empBtnRepeat = document.getElementById('emp-btn-repeat');
   const empBtnLike = document.getElementById('emp-btn-like');
   const empBtnAddPlaylist = document.getElementById('emp-btn-add-playlist');
+  const empBtnDownload = document.getElementById('emp-btn-download');
   const empBtnLyrics = document.getElementById('emp-btn-lyrics');
   const empBtnQueue = document.getElementById('emp-btn-queue');
   const empProgressSlider = document.getElementById('emp-progress');
@@ -69,6 +72,43 @@ export function initPlayerUI() {
       btn.style.display = showBtn ? 'flex' : 'none';
     });
   };
+
+  const updateDownloadButton = async (track) => {
+    const trackId = track && (track.Id || track.id);
+    [btnDownload, empBtnDownload].forEach(btn => {
+      if (!btn) return;
+      if (trackId) {
+        btn.style.display = 'flex';
+        btn.setAttribute('data-track-id', trackId);
+      } else {
+        btn.style.display = 'none';
+        btn.removeAttribute('data-track-id');
+      }
+    });
+    if (trackId) {
+      await refreshDownloadButton(btnDownload);
+      await refreshDownloadButton(empBtnDownload);
+    }
+  };
+
+  const handleDownloadClick = async (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (currentPlayingTrack) {
+      await toggleTrackDownload(currentPlayingTrack, e.currentTarget);
+    }
+  };
+
+  btnDownload?.addEventListener('click', handleDownloadClick);
+  empBtnDownload?.addEventListener('click', handleDownloadClick);
+
+  window.addEventListener('melo-download-changed', (e) => {
+    const { trackId } = e.detail || {};
+    const currentId = currentPlayingTrack && (currentPlayingTrack.Id || currentPlayingTrack.id);
+    if (trackId && currentId && String(trackId) === String(currentId)) {
+      updateDownloadButton(currentPlayingTrack);
+    }
+  });
 
   [btnAddPlaylist, empBtnAddPlaylist].forEach(btn => {
     btn?.addEventListener('click', (e) => {
@@ -124,6 +164,7 @@ export function initPlayerUI() {
     currentPlayingTrack = track;
     updateLikeButton(track);
     updateAddPlaylistButton(track);
+    updateDownloadButton(track);
 
     const coverEl = document.getElementById('player-track-cover');
     const titleEl = document.getElementById('player-track-title');

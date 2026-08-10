@@ -81,6 +81,7 @@
   "Home Page Section Order": "首页版块顺序",
   "Reorder sections on your Home page:": "调整首页版块显示顺序：",
   "Save Settings": "保存设置",
+  "View Project on GitHub": "在 GitHub 上查看项目",
   "Play Queue": "播放队列",
   "Close Queue": "关闭队列",
   "Now Playing": "正在播放",
@@ -164,5 +165,12 @@
   "Add": "添加",
   "Discover Daily": "每日发现",
   "20 fresh picks updated every day": "每天更新 20 首精选歌曲",
-  "Playlist • 20 fresh picks": "播放列表 • 20 首精选"
+  "Playlist • 20 fresh picks": "播放列表 • 20 首精选",
+  "Downloads": "下载",
+  "Download": "下载",
+  "Downloading...": "下载中...",
+  "Remove Download": "移除下载",
+  "Downloaded tracks are available for offline listening.": "已下载的曲目可离线收听。",
+  "No downloads yet.": "还没有下载。",
+  "Tap the download icon on any track to save it for offline listening.": "点击任意曲目的下载图标即可保存并离线收听。"
 }

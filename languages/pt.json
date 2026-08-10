@@ -81,6 +81,7 @@
   "Home Page Section Order": "Ordem das Secções da Página Inicial",
   "Reorder sections on your Home page:": "Reordenar secções na página inicial:",
   "Save Settings": "Guardar Definições",
+  "View Project on GitHub": "Ver Projeto no GitHub",
   "Play Queue": "Fila de Reprodução",
   "Close Queue": "Fechar Fila",
   "Now Playing": "A Reproduzir",
@@ -165,5 +166,12 @@
   "Discover Daily": "Descobertas Diárias",
   "20 fresh picks updated every day": "20 faixas selecionadas atualizadas todos os dias",
   "Playlist • 20 fresh picks": "Lista • 20 faixas selecionadas",
-  "No podcast episodes found. Subscribe to podcast feeds to see the latest episodes here!": "Nenhum episódio de podcast encontrado. Inscreva-se em feeds de podcasts para ver os episódios mais recentes aqui!"
+  "No podcast episodes found. Subscribe to podcast feeds to see the latest episodes here!": "Nenhum episódio de podcast encontrado. Inscreva-se em feeds de podcasts para ver os episódios mais recentes aqui!",
+  "Downloads": "Downloads",
+  "Download": "Baixar",
+  "Downloading...": "Baixando...",
+  "Remove Download": "Remover download",
+  "Downloaded tracks are available for offline listening.": "As faixas baixadas estão disponíveis para ouvir offline.",
+  "No downloads yet.": "Nenhum download ainda.",
+  "Tap the download icon on any track to save it for offline listening.": "Toque no ícone de download em qualquer faixa para salvá-la para ouvir offline."
 }

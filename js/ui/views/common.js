@@ -5,9 +5,17 @@ import { openArtist } from './artists.js';
 import { openAlbum } from './albums.js';
 import { openPlaylist } from './playlists.js';
 import { isTrackLiked, toggleTrackLiked, registerTracksFavoriteStatus } from '../../player/likes.js';
+import { refreshDownloadButton, toggleTrackDownload } from '../downloads.js';
 import { getTranslation } from '../../i18n.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
 import { openSelectPlaylistModal } from '../modals.js';
+
+export function formatItemType(type) {
+  if (type === 'MusicAlbum' || type === 'Album') return 'Album';
+  if (type === 'MusicArtist' || type === 'Artist') return 'Artist';
+  if (type === 'Audio') return 'Track';
+  return type || '';
+}
 
 export function getAlbumArtistsInfo(item) {
   if (!item) return [];
@@ -88,7 +96,7 @@ export function renderAlbumCardHTML(item, typeLabel = 'Album') {
       </div>
     `;
   }
-  const subtitle = item.AlbumArtist || item.Artists?.join(', ') || ((typeLabel === 'Playlist' || item.Type === 'Playlist') ? '' : typeLabel);
+  const subtitle = item.AlbumArtist || item.Artists?.join(', ') || ((typeLabel === 'Playlist' || item.Type === 'Playlist') ? '' : formatItemType(typeLabel));
   return `
     <div class="media-card" data-album-id="${item.Id}" data-type="${item.Type || typeLabel}">
       <img src="${getArtworkUrl(item, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" alt="${item.Name}">
@@ -109,9 +117,10 @@ export function renderTrackRowHTML(track, index) {
   const secs = durationSec % 60;
   const timeStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   const isLiked = isTrackLiked(track.Id);
+  const trackKey = track.Id || track.id;
 
   return `
-    <div class="track-row" data-track-id="${track.Id}" data-index="${index}">
+    <div class="track-row" data-track-id="${trackKey}" data-index="${index}">
       <span class="track-num">${index + 1}</span>
       <div class="track-info">
         <img src="${getArtworkUrl(track, 'Primary', 100)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="track-cover" alt="Cover">
@@ -122,13 +131,18 @@ export function renderTrackRowHTML(track, index) {
       </div>
       <div style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.Album || ''}</div>
       <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${track.Id}" title="${isLiked ? 'Unlike' : 'Like'}">
+        <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${trackKey}" title="${isLiked ? 'Unlike' : 'Like'}">
           <span class="material-symbols-outlined" style="font-size: 18px;">${isLiked ? 'favorite' : 'favorite_border'}</span>
         </button>
       </div>
       <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-add-playlist" data-track-id="${track.Id}" title="Add to Playlist">
+        <button class="btn-track-add-playlist" data-track-id="${trackKey}" title="Add to Playlist">
           <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
+        </button>
+      </div>
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <button class="btn-track-download" data-track-id="${trackKey}" title="Download">
+          <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
         </button>
       </div>
       <div style="color: var(--text-muted); font-size: 12px; text-align: right;">${timeStr}</div>
@@ -192,8 +206,8 @@ export function bindAlbumCards(container) {
 export function bindTrackRows(container, tracks) {
   container.querySelectorAll('.track-row').forEach(row => {
     row.addEventListener('click', (e) => {
-      // Ignore click if user clicked directly on artist link, like button, or add playlist button
-      if (e.target.closest('.artist-link') || e.target.closest('.btn-track-like') || e.target.closest('.btn-track-add-playlist')) {
+      // Ignore click if user clicked directly on artist link, like button, add playlist, or download button
+      if (e.target.closest('.artist-link') || e.target.closest('.btn-track-like') || e.target.closest('.btn-track-add-playlist') || e.target.closest('.btn-track-download')) {
         return;
       }
       const index = parseInt(row.getAttribute('data-index'), 10);
@@ -207,7 +221,7 @@ export function bindTrackRows(container, tracks) {
         e.stopPropagation();
         e.preventDefault();
         const trackId = likeBtn.getAttribute('data-track-id');
-        const trackObj = tracks.find(t => String(t.Id) === String(trackId)) || { Id: trackId };
+        const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
         await toggleTrackLiked(trackObj);
       });
     }
@@ -218,10 +232,26 @@ export function bindTrackRows(container, tracks) {
         e.stopPropagation();
         e.preventDefault();
         const trackId = addPlaylistBtn.getAttribute('data-track-id');
-        const trackObj = tracks.find(t => String(t.Id) === String(trackId)) || { Id: trackId };
+        const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
         openSelectPlaylistModal(trackObj);
       });
     }
+
+    const downloadBtn = row.querySelector('.btn-track-download');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const trackId = downloadBtn.getAttribute('data-track-id');
+        const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
+        await toggleTrackDownload(trackObj, downloadBtn);
+      });
+    }
+  });
+
+  // Refresh download button states after rows are rendered
+  container.querySelectorAll('.btn-track-download').forEach(btn => {
+    refreshDownloadButton(btn);
   });
 }
 
@@ -236,6 +266,32 @@ if (typeof window !== 'undefined' && !window.__melo_likes_row_listener_bound) {
       btn.title = isLiked ? 'Unlike' : 'Like';
       const icon = btn.querySelector('.material-symbols-outlined');
       if (icon) icon.textContent = isLiked ? 'favorite' : 'favorite_border';
+    });
+  });
+}
+
+// Global listener to keep all download buttons in sync when download state changes
+if (typeof window !== 'undefined' && !window.__melo_download_row_listener_bound) {
+  window.__melo_download_row_listener_bound = true;
+  window.addEventListener('melo-download-changed', (e) => {
+    const { trackId, downloaded } = e.detail || {};
+    if (!trackId) return;
+    document.querySelectorAll(`.btn-track-download[data-track-id="${trackId}"]`).forEach(btn => {
+      if (btn.classList.contains('downloading')) return;
+      if (downloaded) {
+        btn.classList.add('downloaded');
+        btn.classList.remove('downloading');
+        btn.title = 'Remove Download';
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = 'download_done';
+        btn.style.setProperty('--download-progress', '100%');
+      } else {
+        btn.classList.remove('downloaded', 'downloading');
+        btn.title = 'Download';
+        const icon = btn.querySelector('.material-symbols-outlined');
+        if (icon) icon.textContent = 'download';
+        btn.style.setProperty('--download-progress', '0%');
+      }
     });
   });
 }

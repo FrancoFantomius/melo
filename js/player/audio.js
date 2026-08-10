@@ -1,5 +1,6 @@
 import { getSession } from '../jellyfin/session.js';
 import { getAudioStreamUrl, getArtworkUrl, reportPlaybackStart, reportPlaybackProgress, reportPlaybackStopped } from '../jellyfin/client.js';
+import { isTrackDownloaded, getDownloadedBlobUrl } from '../jellyfin/offline.js';
 import { getCurrentTrack, nextTrack, prevTrack, toggleShuffle, toggleRepeat, getQueueState, restoreQueueState, setCurrentTrack, setCurrentIndex } from './queue.js';
 import { getEpisodeState, saveEpisodeProgress, getSavedPlaybackSpeed, savePlaybackSpeed } from '../podcasts/storage.js';
 import { cleanAudioUrl } from '../podcasts/rss.js';
@@ -97,7 +98,25 @@ export function resolveCurrentBitrate() {
   return currentBitrateMode;
 }
 
-export function playTrack(trackOverride = null) {
+export async function resolveStreamUrl(track, startTimeTicks = 0) {
+  const key = track ? (track.Id || track.id) : null;
+  if (key && await isTrackDownloaded(key)) {
+    const blobUrl = await getDownloadedBlobUrl(key);
+    if (blobUrl) return blobUrl;
+  }
+  if (track.isPodcastEpisode || track.enclosureUrl) {
+    return cleanAudioUrl(track.enclosureUrl);
+  }
+  const bitrate = resolveCurrentBitrate();
+  const session = getSession();
+  return getAudioStreamUrl(track.Id, {
+    maxStreamingBitrate: bitrate,
+    forceTranscode: session.forceTranscode,
+    startTimeTicks
+  });
+}
+
+export async function playTrack(trackOverride = null) {
   if (trackOverride) {
     setCurrentTrack(trackOverride);
   }
@@ -112,19 +131,14 @@ export function playTrack(trackOverride = null) {
   let startPositionSec = 0;
 
   if (track.isPodcastEpisode || track.enclosureUrl) {
-    streamUrl = cleanAudioUrl(track.enclosureUrl);
     const epState = getEpisodeState(track.id);
     if (epState && epState.position > 5 && !epState.isPlayed) {
       startPositionSec = epState.position;
     }
-  } else {
-    const bitrate = resolveCurrentBitrate();
-    const session = getSession();
-    streamUrl = getAudioStreamUrl(track.Id, {
-      maxStreamingBitrate: bitrate,
-      forceTranscode: session.forceTranscode
-    });
   }
+
+  streamUrl = await resolveStreamUrl(track, 0);
+  if (!streamUrl) return;
 
   if (audio.src === streamUrl) {
     if (startPositionSec > 0) {
@@ -177,7 +191,9 @@ export function togglePlayPause() {
   }
 
   if (audio.paused) {
-    audio.play();
+    audio.play().catch((err) => {
+      console.warn('[Audio Engine] Play interrupted:', err);
+    });
   } else {
     audio.pause();
   }
@@ -197,11 +213,20 @@ export function playPrevTrack() {
   }
 }
 
-export function seekTo(seconds) {
+export async function seekTo(seconds) {
   if (!isFinite(seconds) || seconds < 0) return;
 
   const track = getCurrentTrack();
   if (!track) return;
+
+  // Downloaded tracks are stored as a full local blob, so seeking is always native.
+  const trackKey = track.Id || track.id;
+  if (trackKey && await isTrackDownloaded(trackKey)) {
+    audio.currentTime = Math.max(0, seconds);
+    reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
+    notifyUI();
+    return;
+  }
 
   let totalDuration = 0;
   if (track.RunTimeTicks) {
@@ -283,7 +308,7 @@ export function savePlayerState() {
   }
 }
 
-export function restorePlayerState() {
+export async function restorePlayerState() {
   try {
     const raw = localStorage.getItem('melo_player_state');
     if (!raw) return null;
@@ -302,18 +327,42 @@ export function restorePlayerState() {
       const track = getCurrentTrack();
       if (track) {
         const savedPos = state.position || 0;
-        seekOffset = savedPos;
-        const bitrate = resolveCurrentBitrate();
-        const session = getSession();
-        const startTicks = Math.floor(savedPos * 10000000);
+        const trackKey = track.Id || track.id;
+        const downloaded = trackKey && await isTrackDownloaded(trackKey);
 
-        const streamUrl = getAudioStreamUrl(track.Id, {
-          maxStreamingBitrate: bitrate,
-          forceTranscode: session.forceTranscode,
-          startTimeTicks: startTicks
-        });
+        if (downloaded) {
+          const blobUrl = await getDownloadedBlobUrl(trackKey);
+          if (blobUrl) {
+            seekOffset = 0;
+            audio.src = blobUrl;
+            if (savedPos > 0) audio.currentTime = savedPos;
+          } else {
+            seekOffset = savedPos;
+            const bitrate = resolveCurrentBitrate();
+            const session = getSession();
+            const startTicks = Math.floor(savedPos * 10000000);
+            audio.src = getAudioStreamUrl(track.Id, {
+              maxStreamingBitrate: bitrate,
+              forceTranscode: session.forceTranscode,
+              startTimeTicks: startTicks
+            });
+          }
+        } else {
+          seekOffset = savedPos;
+          const bitrate = resolveCurrentBitrate();
+          const session = getSession();
+          const startTicks = Math.floor(savedPos * 10000000);
 
-        audio.src = streamUrl;
+          const streamUrl = (track.isPodcastEpisode || track.enclosureUrl)
+            ? cleanAudioUrl(track.enclosureUrl)
+            : getAudioStreamUrl(track.Id, {
+                maxStreamingBitrate: bitrate,
+                forceTranscode: session.forceTranscode,
+                startTimeTicks: startTicks
+              });
+
+          audio.src = streamUrl;
+        }
         setupMediaSessionMetadata(track);
         notifyUI();
         return state;

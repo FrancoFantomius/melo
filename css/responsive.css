@@ -118,7 +118,7 @@
   /* Simplified Track Row Layout on Mobile */
   .track-row {
     display: grid !important;
-    grid-template-columns: 44px minmax(0, 1fr) 32px 32px !important;
+    grid-template-columns: 44px minmax(0, 1fr) 32px 32px 32px !important;
     gap: 8px !important;
     align-items: center !important;
     padding: 8px 10px !important;
@@ -129,8 +129,8 @@
   /* Hide track index, album name, duration, and play icon on mobile */
   .track-row > .track-num,
   .track-row > div:nth-child(4),
-  .track-row > div:nth-child(7),
-  .track-row > div:nth-child(8) {
+  .track-row > div:nth-child(8),
+  .track-row > div:nth-child(9) {
     display: none !important;
   }
 
@@ -208,6 +208,8 @@
   #player-btn-repeat,
   #player-btn-skip-back,
   #player-btn-skip-forward,
+  #player-btn-download,
+  #player-btn-add-playlist,
   .player-progress-area,
   .player-right {
     display: none !important;

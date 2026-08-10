@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melo-v0.6.0';
+const CACHE_NAME = 'melo-v0.6.1';
 const IMAGE_CACHE_NAME = 'jellyfin-images-v1';
 
 const ASSETS_TO_CACHE = [
@@ -105,6 +105,13 @@ self.addEventListener('fetch', (event) => {
     url.includes('/Albums') ||
     url.includes('/Playlists')
   ) {
+    return;
+  }
+
+  // 2b. Bypass all cross-origin requests (Jellyfin API, iTunes discovery directory, RSS feeds, remote artwork).
+  //     These are dynamic API calls that differ by query string; caching them breaks them (e.g. ignoreSearch
+  //     matches every iTunes search to the same cached response).
+  if (new URL(url).origin !== self.location.origin) {
     return;
   }
 

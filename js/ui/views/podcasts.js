@@ -7,6 +7,7 @@ import { setQueue } from '../../player/queue.js';
 import { playTrack } from '../../player/audio.js';
 import { switchView } from '../views.js';
 import { getTranslation } from '../../i18n.js';
+import { toggleTrackDownload, refreshDownloadButton } from '../downloads.js';
 
 let podcastFormListenerBound = false;
 
@@ -403,6 +404,11 @@ export function renderLatestEpisodesGrid(container, feeds) {
         </div>
         <div style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ep.pubDate || ''}</div>
         <div style="color: var(--text-muted); font-size: 12px; text-align: right;">${ep.durationFormatted || ''}</div>
+        <div style="display: flex; justify-content: center; align-items: center;">
+          <button class="btn-track-download" data-track-id="${ep.id}" title="Download" aria-label="Download">
+            <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+          </button>
+        </div>
         <div style="text-align: right; color: var(--text-muted); display: flex; align-items: center; justify-content: flex-end;">
           <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
         </div>
@@ -411,7 +417,8 @@ export function renderLatestEpisodesGrid(container, feeds) {
   }).join('');
 
   container.querySelectorAll('.podcast-track-row').forEach(row => {
-    row.addEventListener('click', () => {
+    row.addEventListener('click', (e) => {
+      if (e.target.closest('.btn-track-download')) return;
       const idx = parseInt(row.getAttribute('data-index'), 10);
       const ep = latestTop[idx];
       if (ep) {
@@ -419,6 +426,16 @@ export function renderLatestEpisodesGrid(container, feeds) {
         playTrack(ep);
       }
     });
+  });
+
+  container.querySelectorAll('.podcast-track-row .btn-track-download').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-track-id');
+      const ep = latestTop.find(x => String(x.id) === String(id)) || { id };
+      toggleTrackDownload(ep, btn);
+    });
+    refreshDownloadButton(btn);
   });
 }
 
@@ -454,7 +471,11 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
               ${ep.pubDate ? `<span>• ${ep.pubDate}</span>` : ''}
               ${ep.durationFormatted ? `<span>• ${ep.durationFormatted}</span>` : ''}
               ${badgeHtml}
-              <button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" style="background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; margin-left: auto; flex-shrink: 0;" data-i18n>Show Notes</button>
+              <button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" style="background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" data-i18n>Show Notes</button>
+              <button class="btn-track-download" data-track-id="${ep.id}" title="Download" aria-label="Download" style="gap: 4px; margin-left: auto;">
+                <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+                <span data-i18n>Download</span>
+              </button>
               <button class="btn-toggle-played" data-id="${ep.id}" style="background: none; border: none; color: var(--text-muted); cursor: pointer; flex-shrink: 0;" title="Toggle Played State">
                 <span class="material-symbols-outlined" style="font-size: 18px;">${state.isPlayed ? 'check_circle' : 'radio_button_unchecked'}</span>
               </button>
@@ -514,6 +535,16 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
       markEpisodePlayed(id, !state.isPlayed);
       renderEpisodeListHtml(container, episodes, is2Col);
     });
+  });
+
+  container.querySelectorAll('.btn-track-download').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-track-id');
+      const ep = episodes.find(x => String(x.id) === String(id)) || { id };
+      toggleTrackDownload(ep, btn);
+    });
+    refreshDownloadButton(btn);
   });
 }
 
@@ -615,6 +646,8 @@ export async function renderPodcastDetailView(container, viewData) {
           </div>
         </div>
 
+        <div id="podcast-year-pills" class="category-pills" style="margin-bottom: 16px;"></div>
+
         <div id="podcast-episodes-container"></div>
       </div>
     `;
@@ -640,6 +673,7 @@ export async function renderPodcastDetailView(container, viewData) {
     if (epContainer && feed.episodes) {
       let currentSortMode = 'newest';
       let currentSearchQuery = '';
+      let currentYearFilter = '';
 
       const sortLabels = {
         'newest': getTranslation('Newest First'),
@@ -654,6 +688,9 @@ export async function renderPodcastDetailView(container, viewData) {
         let list = feed.episodes;
         if (currentSearchQuery) {
           list = list.filter(ep => ep.title.toLowerCase().includes(currentSearchQuery) || ep.description.toLowerCase().includes(currentSearchQuery));
+        }
+        if (currentYearFilter) {
+          list = list.filter(ep => ep.pubDateRaw && String(new Date(ep.pubDateRaw).getFullYear()) === currentYearFilter);
         }
 
         list = [...list];
@@ -676,6 +713,32 @@ export async function renderPodcastDetailView(container, viewData) {
 
         renderEpisodeListHtml(epContainer, list);
       };
+
+      const yearPillsContainer = document.getElementById('podcast-year-pills');
+      if (yearPillsContainer) {
+        const years = [...new Set((feed.episodes || [])
+          .map(ep => ep.pubDateRaw ? new Date(ep.pubDateRaw).getFullYear() : null)
+          .filter(Boolean))]
+          .sort((a, b) => b - a);
+
+        yearPillsContainer.innerHTML = `
+          <button class="category-pill ${!currentYearFilter ? 'active' : ''}" data-year="">${getTranslation('All')}</button>
+          ${years.map(year => `
+            <button class="category-pill ${currentYearFilter === String(year) ? 'active' : ''}" data-year="${year}">${year}</button>
+          `).join('')}
+        `;
+
+        yearPillsContainer.querySelectorAll('.category-pill').forEach(pill => {
+          pill.addEventListener('click', () => {
+            const year = pill.getAttribute('data-year');
+            currentYearFilter = currentYearFilter === year ? '' : year;
+            yearPillsContainer.querySelectorAll('.category-pill').forEach(p => {
+              p.classList.toggle('active', p.getAttribute('data-year') === currentYearFilter);
+            });
+            updateEpisodesList();
+          });
+        });
+      }
 
       // Initial render
       updateEpisodesList();

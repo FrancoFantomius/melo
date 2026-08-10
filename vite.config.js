@@ -20,6 +20,7 @@ export default defineConfig({
         artists: path.resolve(__dirname, 'artists.html'),
         playlists: path.resolve(__dirname, 'playlists.html'),
         podcasts: path.resolve(__dirname, 'podcasts.html'),
+        downloads: path.resolve(__dirname, 'downloads.html'),
         search: path.resolve(__dirname, 'search.html'),
         terms: path.resolve(__dirname, 'terms.html'),
         privacy: path.resolve(__dirname, 'privacy.html')
@@ -35,6 +36,7 @@ export default defineConfig({
         if (pagePath.endsWith('artists.html')) return { isArtists: true };
         if (pagePath.endsWith('playlists.html')) return { isPlaylists: true };
         if (pagePath.endsWith('podcasts.html')) return { isPodcasts: true };
+        if (pagePath.endsWith('downloads.html')) return { isDownloads: true };
         if (pagePath.endsWith('login.html')) return { isLogin: true };
         if (pagePath.endsWith('terms.html')) return { isTerms: true };
         if (pagePath.endsWith('privacy.html')) return { isPrivacy: true };

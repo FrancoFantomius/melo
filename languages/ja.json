@@ -81,6 +81,7 @@
   "Home Page Section Order": "ホーム画面セクション順序",
   "Reorder sections on your Home page:": "ホーム画面のセクション順序を並べ替える:",
   "Save Settings": "設定を保存",
+  "View Project on GitHub": "GitHub でプロジェクトを表示",
   "Play Queue": "再生キュー",
   "Close Queue": "キューを閉じる",
   "Now Playing": "再生中",
@@ -165,5 +166,12 @@
   "Discover Daily": "デイリーディスカバリー",
   "20 fresh picks updated every day": "毎日更新される20曲の厳選トラック",
   "Playlist • 20 fresh picks": "プレイリスト • 20曲の厳選トラック",
-  "64 kbps (Low Bandwidth)": "64 kbps（低帯域幅）"
+  "64 kbps (Low Bandwidth)": "64 kbps（低帯域幅）",
+  "Downloads": "ダウンロード",
+  "Download": "ダウンロード",
+  "Downloading...": "ダウンロード中...",
+  "Remove Download": "ダウンロードを削除",
+  "Downloaded tracks are available for offline listening.": "ダウンロードした曲はオフラインで聴けます。",
+  "No downloads yet.": "まだダウンロードがありません。",
+  "Tap the download icon on any track to save it for offline listening.": "曲のダウンロードアイコンをタップするとオフラインで再生できるよう保存されます。"
 }

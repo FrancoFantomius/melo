@@ -3,6 +3,7 @@ import { getUserImageUrl, searchJellyfinCached, getArtworkUrl } from '../jellyfi
 import { openLoginModal, openSettingsModal } from './modals.js';
 import { searchPodcastDirectory } from '../podcasts/discovery.js';
 import { openPodcastShow, switchView } from './views.js';
+import { formatItemType } from './views/common.js';
 import { toggleTheme, updateThemeUI } from './theme.js';
 import { addRecentSearch } from './views/search.js';
 
@@ -106,7 +107,7 @@ export function initHeader() {
                 <div class="search-dropdown-title">${item.Name}</div>
                 <div class="search-dropdown-subtitle">${subtitle}</div>
               </div>
-              <span class="search-dropdown-type">${typeStr === 'Audio' ? 'Track' : typeStr}</span>
+              <span class="search-dropdown-type">${formatItemType(typeStr)}</span>
             </div>
           `;
         }).join('');

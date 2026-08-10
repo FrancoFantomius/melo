@@ -6,7 +6,9 @@ import { renderArtistsView, renderArtistDetailView, openArtist } from './views/a
 import { renderPlaylistsView, renderPlaylistDetailView, openPlaylist } from './views/playlists.js';
 import { renderPodcastsView, renderPodcastDetailView, openPodcastShow } from './views/podcasts.js';
 import { renderSearchView } from './views/search.js';
+import { renderDownloadsView } from './views/downloads.js';
 import { DISCOVER_DAILY_PLAYLIST } from '../recommendations.js';
+import { applyTranslations } from '../i18n.js';
 
 let currentView = 'home';
 
@@ -17,6 +19,7 @@ export function getPageFromPath() {
   if (path.endsWith('artists.html')) return 'artists';
   if (path.endsWith('playlists.html')) return 'playlists';
   if (path.endsWith('podcasts.html')) return 'podcasts';
+  if (path.endsWith('downloads.html')) return 'downloads';
   if (path.endsWith('login.html')) return 'login';
 
   const currentScript = document.querySelector('script[data-page]');
@@ -147,6 +150,9 @@ export function switchView(viewName, viewData = null) {
     case 'podcasts':
       renderPodcastsView(contentArea, viewData);
       break;
+    case 'downloads':
+      renderDownloadsView(contentArea);
+      break;
     case 'podcast-detail':
       renderPodcastDetailView(contentArea, viewData);
       break;
@@ -165,6 +171,8 @@ export function switchView(viewName, viewData = null) {
     default:
       renderHomeView(contentArea);
   }
+
+  applyTranslations(contentArea);
 }
 
 // Re-export all view functions and helpers for backward compatibility

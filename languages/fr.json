@@ -81,6 +81,7 @@
   "Home Page Section Order": "Ordre des sections de la page d'accueil",
   "Reorder sections on your Home page:": "Réorganiser les sections de votre page d'accueil :",
   "Save Settings": "Enregistrer les paramètres",
+  "View Project on GitHub": "Voir le Projet sur GitHub",
   "Play Queue": "File d'attente",
   "Close Queue": "Fermer la file",
   "Now Playing": "En cours de lecture",
@@ -164,5 +165,12 @@
   "Add": "Ajouter",
   "Discover Daily": "Découvertes Du Jour",
   "20 fresh picks updated every day": "20 pépites mises à jour chaque jour",
-  "Playlist • 20 fresh picks": "Playlist • 20 pépites"
+  "Playlist • 20 fresh picks": "Playlist • 20 pépites",
+  "Downloads": "Téléchargements",
+  "Download": "Télécharger",
+  "Downloading...": "Téléchargement...",
+  "Remove Download": "Supprimer le téléchargement",
+  "Downloaded tracks are available for offline listening.": "Les morceaux téléchargés sont disponibles en écoute hors ligne.",
+  "No downloads yet.": "Aucun téléchargement pour l'instant.",
+  "Tap the download icon on any track to save it for offline listening.": "Touchez l'icône de téléchargement sur un morceau pour le sauvegarder en écoute hors ligne."
 }

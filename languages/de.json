@@ -81,6 +81,7 @@
   "Home Page Section Order": "Reihenfolge der Startseiten-Abschnitte",
   "Reorder sections on your Home page:": "Abschnitte auf Ihrer Startseite neu ordnen:",
   "Save Settings": "Einstellungen speichern",
+  "View Project on GitHub": "Projekt auf GitHub ansehen",
   "Play Queue": "Wiedergabewarteschlange",
   "Close Queue": "Warteschlange schließen",
   "Now Playing": "Aktueller Titel",
@@ -164,5 +165,12 @@
   "Add": "Hinzufügen",
   "Discover Daily": "Tägliche Entdeckungen",
   "20 fresh picks updated every day": "20 neue Empfehlungen, täglich aktualisiert",
-  "Playlist • 20 fresh picks": "Wiedergabeliste • 20 Empfehlungen"
+  "Playlist • 20 fresh picks": "Wiedergabeliste • 20 Empfehlungen",
+  "Downloads": "Downloads",
+  "Download": "Herunterladen",
+  "Downloading...": "Wird heruntergeladen...",
+  "Remove Download": "Download entfernen",
+  "Downloaded tracks are available for offline listening.": "Heruntergeladene Titel sind für die Offline-Wiedergabe verfügbar.",
+  "No downloads yet.": "Noch keine Downloads.",
+  "Tap the download icon on any track to save it for offline listening.": "Tippen Sie auf das Download-Symbol eines Titels, um ihn für die Offline-Wiedergabe zu speichern."
 }

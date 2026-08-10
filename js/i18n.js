@@ -12,6 +12,7 @@ const SUPPORTED_LANGUAGES = {
 let currentLanguageMode = 'auto'; // 'auto' or explicit lang code like 'it', 'en'
 let activeLanguageCode = 'en';    // Resolved code being used ('en', 'it', etc.)
 let translations = {};
+let translationObserver = null;
 
 export function getSupportedLanguages() {
   return SUPPORTED_LANGUAGES;
@@ -72,7 +73,36 @@ export async function setLanguage(langMode) {
   localStorage.setItem('melo_language', currentLanguageMode);
   document.documentElement.lang = activeLanguageCode;
   applyTranslations();
+  startTranslationObserver();
   window.dispatchEvent(new CustomEvent('melo_language_changed', { detail: { mode: currentLanguageMode, lang: activeLanguageCode } }));
+}
+
+// Dynamically rendered views (switchView, async content updates, modals) insert
+// new DOM with data-i18n attributes after the initial page translation. Watch
+// for inserted elements and translate them so SPA navigation keeps working.
+function startTranslationObserver() {
+  if (translationObserver || typeof MutationObserver === 'undefined') {
+    return;
+  }
+  translationObserver = new MutationObserver((mutations) => {
+    const pendingNodes = [];
+    for (const mutation of mutations) {
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          pendingNodes.push(node);
+        }
+      }
+    }
+    if (pendingNodes.length === 0) return;
+    requestAnimationFrame(() => {
+      for (const node of pendingNodes) {
+        if (node.isConnected && (node.querySelector('[data-i18n], [data-i18n-placeholder], [data-i18n-title]') || node.hasAttribute('data-i18n') || node.hasAttribute('data-i18n-placeholder') || node.hasAttribute('data-i18n-title'))) {
+          applyTranslations(node);
+        }
+      }
+    });
+  });
+  translationObserver.observe(document.body, { childList: true, subtree: true });
 }
 
 export function applyTranslations(container = document) {

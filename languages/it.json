@@ -81,6 +81,7 @@
   "Home Page Section Order": "Ordine Sezioni Home Page",
   "Reorder sections on your Home page:": "Riordina le sezioni della tua pagina Home:",
   "Save Settings": "Salva Impostazioni",
+  "View Project on GitHub": "Visualizza Progetto su GitHub",
   "Play Queue": "Coda di Riproduzione",
   "Close Queue": "Chiudi Coda",
   "Now Playing": "In Riproduzione",
@@ -164,5 +165,12 @@
   "Add": "Aggiungi",
   "Discover Daily": "Scoperte del Giorno",
   "20 fresh picks updated every day": "20 brani selezionati aggiornati ogni giorno",
-  "Playlist • 20 fresh picks": "Playlist • 20 brani selezionati"
+  "Playlist • 20 fresh picks": "Playlist • 20 brani selezionati",
+  "Downloads": "Download",
+  "Download": "Scarica",
+  "Downloading...": "Download in corso...",
+  "Remove Download": "Rimuovi download",
+  "Downloaded tracks are available for offline listening.": "I brani scaricati sono disponibili per l'ascolto offline.",
+  "No downloads yet.": "Nessun download ancora.",
+  "Tap the download icon on any track to save it for offline listening.": "Tocca l'icona di download su un brano per salvarlo e ascoltarlo offline."
 }

@@ -2,11 +2,12 @@ import { getAlbumsCached, getItemCached, getSongsCached, getPlaylistItemsCached,
 import { setQueue } from '../../player/queue.js';
 import { playTrack } from '../../player/audio.js';
 import { switchView } from '../views.js';
-import { getAlbumArtistsInfo, renderArtistLinksHTML, bindArtistLinks, renderAlbumCardHTML, bindAlbumCards, renderTrackRowHTML, bindTrackRows } from './common.js';
+import { getAlbumArtistsInfo, renderArtistLinksHTML, bindArtistLinks, renderAlbumCardHTML, bindAlbumCards, renderTrackRowHTML, bindTrackRows, formatItemType } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { openPlaylist } from './playlists.js';
 import { openEditPlaylistModal, openAddTracksModal, openDeletePlaylistModal, openSelectPlaylistModal } from '../modals.js';
 import { getTranslation } from '../../i18n.js';
+import { isTrackDownloaded, downloadTracks, removeDownloads } from '../../jellyfin/offline.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
 
 export function openAlbum(albumId, albumObj = null) {
@@ -100,7 +101,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
       <div class="album-detail-banner">
         ${coverHTML}
         <div class="album-info-meta">
-          <span id="album-detail-type" class="album-detail-type">${isPlaylist ? 'Playlist' : (album.Type || 'Album')}</span>
+          <span id="album-detail-type" class="album-detail-type">${isPlaylist ? 'Playlist' : formatItemType(album.Type) || 'Album'}</span>
           <h1 id="album-detail-title" class="album-detail-title">${album.Name || (isLikedSongs ? 'Liked Songs' : (isPlaylist ? 'Playlist' : 'Album'))}</h1>
           <span id="album-detail-artist" class="album-detail-artist">${initialArtistHTML}</span>
           <div class="album-detail-actions">
@@ -114,6 +115,10 @@ export async function renderAlbumDetailView(container, albumOrId) {
             <button id="btn-add-album-to-playlist" class="btn btn-secondary" title="Add all to playlist" aria-label="Add all to playlist">
               <span class="material-symbols-outlined">playlist_add</span>
               <span data-i18n>Add to Playlist</span>
+            </button>
+            <button id="btn-download-album" class="btn btn-secondary" title="Download" aria-label="Download">
+              <span class="material-symbols-outlined">download</span>
+              <span id="btn-download-album-label" data-i18n>Download</span>
             </button>
           </div>
           ${isPlaylist ? `
@@ -197,7 +202,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
         bindArtistLinks(artistEl);
       }
     }
-    if (typeEl) typeEl.textContent = data.Type || (isPlaylist ? 'Playlist' : 'Album');
+    if (typeEl) typeEl.textContent = formatItemType(data.Type) || (isPlaylist ? 'Playlist' : 'Album');
     if (coverEl && coverEl.tagName === 'IMG') coverEl.src = getArtworkUrl(data, 'Primary', 400);
   };
 
@@ -226,6 +231,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
     if (songsList && songsRes && songsRes.Items) {
       if (songsRes.Items.length === 0) {
         songsList.innerHTML = `<div style="color: var(--text-secondary);">${isLikedSongs ? 'No liked songs yet. Click the heart icon on any track to add it to your Liked Songs!' : (isDiscoverDaily ? 'No songs found for Discover Daily.' : (isPlaylist ? 'No tracks found in this playlist.' : 'No tracks found in this album.'))}</div>`;
+        updateDownloadAllButton([]);
       } else {
         registerTracksFavoriteStatus(songsRes.Items);
         songsList.innerHTML = songsRes.Items.map((track, idx) => renderTrackRowHTML(track, idx)).join('');
@@ -256,9 +262,98 @@ export async function renderAlbumDetailView(container, albumOrId) {
             }
           };
         }
+
+        updateDownloadAllButton(songsRes.Items);
       }
     }
   };
+
+  const btnDownloadAlbum = document.getElementById('btn-download-album');
+  const btnDownloadAlbumLabel = document.getElementById('btn-download-album-label');
+  let currentTracks = [];
+
+  const isAllDownloaded = async (tracks) => {
+    for (const track of tracks || []) {
+      const key = track && (track.Id || track.id);
+      if (!key || !(await isTrackDownloaded(key))) return false;
+    }
+    return true;
+  };
+
+  const updateDownloadAllButton = async (tracks) => {
+    currentTracks = tracks || [];
+    if (!btnDownloadAlbum || !btnDownloadAlbum.isConnected) return;
+
+    if (!currentTracks.length) {
+      btnDownloadAlbum.style.display = 'none';
+      return;
+    }
+    btnDownloadAlbum.style.display = 'inline-flex';
+
+    const allDownloaded = await isAllDownloaded(currentTracks);
+    const icon = btnDownloadAlbum.querySelector('.material-symbols-outlined');
+    if (allDownloaded) {
+      btnDownloadAlbum.classList.add('downloaded');
+      btnDownloadAlbum.title = 'Remove Download';
+      if (icon) icon.textContent = 'download_done';
+      if (btnDownloadAlbumLabel) btnDownloadAlbumLabel.textContent = getTranslation('Remove Download');
+    } else {
+      btnDownloadAlbum.classList.remove('downloaded');
+      btnDownloadAlbum.title = 'Download';
+      if (icon) icon.textContent = 'download';
+      if (btnDownloadAlbumLabel) btnDownloadAlbumLabel.textContent = getTranslation('Download');
+    }
+  };
+
+  if (btnDownloadAlbum) {
+    btnDownloadAlbum.addEventListener('click', async () => {
+      if (!currentTracks.length) return;
+
+      const allDownloaded = await isAllDownloaded(currentTracks);
+
+      if (allDownloaded) {
+        await removeDownloads(currentTracks);
+        await updateDownloadAllButton(currentTracks);
+        return;
+      }
+
+      btnDownloadAlbum.disabled = true;
+      btnDownloadAlbum.classList.add('downloading');
+      const icon = btnDownloadAlbum.querySelector('.material-symbols-outlined');
+      if (icon) icon.textContent = 'downloading';
+      if (btnDownloadAlbumLabel) btnDownloadAlbumLabel.textContent = getTranslation('Downloading...');
+
+      const group = {
+        id: album.Id,
+        name: album.Name || '',
+        type: isPlaylist ? 'Playlist' : 'Album',
+        artworkUrl: isLikedSongs ? LIKED_SONGS_PLAYLIST.CoverUrl
+          : isDiscoverDaily ? DISCOVER_DAILY_PLAYLIST.CoverUrl
+          : getArtworkUrl(album, 'Primary', 300),
+        owner: (isLikedSongs || isDiscoverDaily) ? '' : (album.AlbumArtist || album.Artists?.join(', ') || ''),
+        count: currentTracks.length
+      };
+
+      await downloadTracks(currentTracks, ({ completed, total }) => {
+        if (btnDownloadAlbumLabel && total > 0) {
+          btnDownloadAlbumLabel.textContent = `${getTranslation('Downloading...')} ${completed}/${total}`;
+        }
+      }, group);
+
+      btnDownloadAlbum.disabled = false;
+      btnDownloadAlbum.classList.remove('downloading');
+      await updateDownloadAllButton(currentTracks);
+    });
+  }
+
+  window.addEventListener('melo-download-changed', (e) => {
+    if (!currentTracks.length) return;
+    if (btnDownloadAlbum && btnDownloadAlbum.classList.contains('downloading')) return;
+    const { trackId } = e.detail || {};
+    if (trackId && currentTracks.some(t => String(t.Id || t.id) === String(trackId))) {
+      updateDownloadAllButton(currentTracks);
+    }
+  });
 
   try {
     let songsRes;

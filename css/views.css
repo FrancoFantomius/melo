@@ -366,7 +366,7 @@
 
 .track-row {
   display: grid;
-  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 60px 36px;
+  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 36px 60px 36px;
   align-items: center;
   padding: 10px 16px;
   border-radius: var(--radius-sm);
@@ -375,8 +375,13 @@
   cursor: pointer;
 }
 
+.track-row.downloads-row {
+  grid-template-columns: 36px 48px 2fr 1.5fr auto 44px;
+}
+
 .btn-track-like,
-.btn-track-add-playlist {
+.btn-track-add-playlist,
+.btn-track-download {
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -394,7 +399,8 @@
   background: rgba(249, 115, 22, 0.1);
 }
 
-.btn-track-add-playlist:hover {
+.btn-track-add-playlist:hover,
+.btn-track-download:hover {
   color: var(--accent);
   background: rgba(249, 115, 22, 0.1);
 }
@@ -405,6 +411,54 @@
 
 .btn-track-like.liked .material-symbols-outlined {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.btn-track-download.downloaded {
+  color: var(--accent);
+}
+
+.btn-track-download.downloaded .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.btn-track-download.downloading {
+  color: var(--accent);
+  cursor: progress;
+}
+
+.btn-track-download.downloading .material-symbols-outlined {
+  animation: spin 1s linear infinite;
+}
+
+#player-btn-download.downloaded .material-symbols-outlined,
+#emp-btn-download.downloaded .material-symbols-outlined {
+  color: var(--accent);
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+#player-btn-download.downloading .material-symbols-outlined,
+#emp-btn-download.downloading .material-symbols-outlined {
+  color: var(--accent);
+  animation: spin 1s linear infinite;
+}
+
+#btn-download-album.downloaded {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#btn-download-album.downloaded .material-symbols-outlined,
+#btn-download-album.downloading .material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+#btn-download-album.downloading .material-symbols-outlined {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .track-row:hover {
@@ -431,6 +485,105 @@
   height: 40px;
   border-radius: 4px;
   object-fit: cover;
+}
+
+/* Downloads grouped by album/playlist */
+.downloads-group {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 4px;
+  background: var(--bg-secondary);
+}
+
+.downloads-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: background var(--transition-speed);
+  font-size: 14px;
+}
+
+.downloads-group-header:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.downloads-group-cover-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.downloads-group-cover-wrap .track-cover {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+}
+
+.downloads-group-play {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--accent);
+  color: var(--accent-text);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: scale(0.85);
+  transition: all var(--transition-speed);
+  padding: 0;
+}
+
+.downloads-group-cover-wrap:hover .downloads-group-play {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.downloads-group-title {
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.downloads-group-subtitle {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.downloads-group-chevron {
+  color: var(--text-muted);
+  transition: transform var(--transition-speed);
+  flex-shrink: 0;
+}
+
+.downloads-group.open .downloads-group-chevron {
+  transform: rotate(180deg);
+}
+
+.downloads-group-tracks {
+  display: none;
+  border-top: 1px solid var(--border-color);
+  padding: 4px 0;
+}
+
+.downloads-group.open .downloads-group-tracks {
+  display: block;
+}
+
+.downloads-group-tracks .track-row {
+  grid-template-columns: 36px 48px 2fr 1.5fr auto 44px;
 }
 
 /* Search View Top Search Bar */
