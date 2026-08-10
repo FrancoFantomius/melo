@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melo-v0.5.3';
+const CACHE_NAME = 'melo-v0.6.0';
 const IMAGE_CACHE_NAME = 'jellyfin-images-v1';
 
 const ASSETS_TO_CACHE = [

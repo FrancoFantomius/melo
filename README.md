@@ -1,9 +1,9 @@
 # Melo
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-0.5.0--beta-orange.svg)
+![Version](https://img.shields.io/badge/version-0.6.0--beta-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
-![Vite](https://img.shields.io/badge/vite-v5.4-646CFF.svg)
+![Vite](https://img.shields.io/badge/vite-v8.2-646CFF.svg)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8.svg)
 
 Melo is a lightweight Progressive Web App (PWA) music player built with Vanilla JavaScript and Vite, powered by a Jellyfin media server backend. It supports music streaming, playlist management, album and artist browsing, and podcast subscription via RSS feeds.
@@ -98,32 +98,6 @@ To enable GitHub Pages in your GitHub repository:
 1. Go to repository **Settings** -> **Pages**.
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
 3. Push changes to `main`, and GitHub Actions will automatically deploy the site.
-
----
-
-## Project Structure
-
-```
-├── albums.html        # Albums view entry point
-├── artists.html       # Artists view entry point
-├── css/               # Modular CSS stylesheet design system
-├── img/               # Icons and application graphic assets
-├── index.html         # Main dashboard view entry point
-├── js/                # Client-side JavaScript modules
-│   ├── jellyfin/      # Jellyfin API client and session storage
-│   ├── player/        # Audio engine, playback controller & queue
-│   ├── podcasts/      # Podcast RSS parser & discovery
-│   └── ui/            # Dynamic renderers, modals, & view controllers
-├── login.html         # Jellyfin server login view
-├── manifest.json      # Web App Manifest for PWA support
-├── package.json       # Node.js dependencies & scripts
-├── playlists.html     # Playlists view entry point
-├── podcasts.html      # Podcasts view entry point
-├── search.html        # Search interface entry point
-├── sw.js              # Service Worker offline caching script
-├── templates/         # Handlebars partial HTML layouts
-└── vite.config.js     # Vite bundler configuration
-```
 
 ---
 
