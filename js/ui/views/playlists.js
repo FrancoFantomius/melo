@@ -4,10 +4,12 @@ import { switchView } from '../views.js';
 import { renderAlbumDetailView } from './albums.js';
 import { getTranslation } from '../../i18n.js';
 import { openCreatePlaylistModal } from '../modals.js';
+import { DISCOVER_DAILY_PLAYLIST } from '../../recommendations.js';
 
 export function openPlaylist(playlistId, playlistObj = null) {
   if (!playlistId) return;
   const isLikedSongs = playlistId === 'liked-songs' || playlistObj?.Type === 'LikedSongs';
+  const isDiscoverDaily = playlistId === DISCOVER_DAILY_PLAYLIST.Id || playlistObj?.Type === DISCOVER_DAILY_PLAYLIST.Type;
   const targetUrl = isLikedSongs
     ? 'playlists.html?playlist=liked-songs'
     : `playlists.html?playlist=${encodeURIComponent(playlistId)}`;
@@ -15,13 +17,13 @@ export function openPlaylist(playlistId, playlistObj = null) {
   if (currentSearch !== `?playlist=liked-songs` && currentSearch !== `?playlist=${encodeURIComponent(playlistId)}`) {
     window.history.pushState({ view: 'playlist-detail', playlistId }, '', targetUrl);
   }
-  switchView('playlist-detail', playlistObj || { Id: playlistId, Type: isLikedSongs ? 'LikedSongs' : 'Playlist' });
+  switchView('playlist-detail', playlistObj || { Id: playlistId, Type: isLikedSongs ? 'LikedSongs' : (isDiscoverDaily ? DISCOVER_DAILY_PLAYLIST.Type : 'Playlist') });
 }
 
 export async function renderPlaylistDetailView(container, playlistOrId) {
   let playlistObj = typeof playlistOrId === 'string'
-    ? { Id: playlistOrId, Type: 'Playlist' }
-    : { Type: 'Playlist', ...playlistOrId };
+    ? { Id: playlistOrId, Type: playlistOrId === DISCOVER_DAILY_PLAYLIST.Id ? DISCOVER_DAILY_PLAYLIST.Type : 'Playlist' }
+    : { Type: playlistOrId?.Id === DISCOVER_DAILY_PLAYLIST.Id ? DISCOVER_DAILY_PLAYLIST.Type : 'Playlist', ...playlistOrId };
   return renderAlbumDetailView(container, playlistObj);
 }
 
@@ -57,7 +59,7 @@ export async function renderPlaylistsView(container) {
     const grid = document.getElementById('playlists-grid');
     if (grid && res) {
       const likedCard = { Id: 'liked-songs', Name: getTranslation('Liked Songs'), Type: 'LikedSongs' };
-      const items = [likedCard, ...(res.Items || [])];
+      const items = [likedCard, { ...DISCOVER_DAILY_PLAYLIST, Name: getTranslation('Discover Daily') }, ...(res.Items || [])];
       grid.innerHTML = items.map(playlist => renderAlbumCardHTML(playlist, 'Playlist')).join('');
       bindAlbumCards(grid);
     }
@@ -70,7 +72,7 @@ export async function renderPlaylistsView(container) {
     const grid = document.getElementById('playlists-grid');
     const likedCard = { Id: 'liked-songs', Name: getTranslation('Liked Songs'), Type: 'LikedSongs' };
     if (grid) {
-      grid.innerHTML = renderAlbumCardHTML(likedCard, 'Playlist');
+      grid.innerHTML = [likedCard, { ...DISCOVER_DAILY_PLAYLIST, Name: getTranslation('Discover Daily') }].map(playlist => renderAlbumCardHTML(playlist, 'Playlist')).join('');
       bindAlbumCards(grid);
     } else {
       container.innerHTML = `<div style="color: var(--danger);">${getTranslation('An error occurred')}: ${err.message}</div>`;

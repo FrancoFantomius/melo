@@ -7,6 +7,7 @@ import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { openPlaylist } from './playlists.js';
 import { openEditPlaylistModal, openAddTracksModal, openDeletePlaylistModal, openSelectPlaylistModal } from '../modals.js';
 import { getTranslation } from '../../i18n.js';
+import { DISCOVER_DAILY_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
 
 export function openAlbum(albumId, albumObj = null) {
   if (!albumId) return;
@@ -60,7 +61,8 @@ export async function renderAlbumDetailView(container, albumOrId) {
 
   let album = typeof albumOrId === 'string' ? { Id: albumOrId } : albumOrId;
   const isLikedSongs = album.Id === 'liked-songs' || album.Type === 'LikedSongs';
-  const isPlaylist = isLikedSongs || album.Type === 'Playlist';
+  const isDiscoverDaily = album.Id === DISCOVER_DAILY_PLAYLIST.Id || album.Type === DISCOVER_DAILY_PLAYLIST.Type;
+  const isPlaylist = isLikedSongs || isDiscoverDaily || album.Type === 'Playlist';
 
   if (isLikedSongs) {
     album = {
@@ -69,6 +71,11 @@ export async function renderAlbumDetailView(container, albumOrId) {
       Type: 'Playlist',
       IsLikedSongs: true
     };
+  } else if (isDiscoverDaily) {
+    album = {
+      ...DISCOVER_DAILY_PLAYLIST,
+      Name: getTranslation('Discover Daily')
+    };
   } else if (isPlaylist) {
     album = {
       Type: 'Playlist',
@@ -76,16 +83,22 @@ export async function renderAlbumDetailView(container, albumOrId) {
     };
   }
 
-  const initialArtistsInfo = isLikedSongs ? [] : getAlbumArtistsInfo(album);
+  const initialArtistsInfo = (isLikedSongs || isDiscoverDaily) ? [] : getAlbumArtistsInfo(album);
   const initialArtistHTML = isLikedSongs
     ? getTranslation('Your favorite tracks')
-    : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : getTranslation('Unknown Artist')));
+    : (isDiscoverDaily
+      ? getTranslation('20 fresh picks updated every day')
+      : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : getTranslation('Unknown Artist'))));
 
   const coverHTML = isLikedSongs
     ? `<div id="album-detail-cover" class="album-cover-lg" style="background: linear-gradient(135deg, #ff7e5f, #feb47b); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(249, 115, 22, 0.3);">
          <span class="material-symbols-outlined" style="font-size: 80px; color: #ffffff; font-variation-settings: 'FILL' 1;">favorite</span>
        </div>`
-    : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="album-cover-lg" alt="${album.Name || (isPlaylist ? 'Playlist' : 'Album')}">`;
+    : (isDiscoverDaily
+      ? `<div id="album-detail-cover" class="album-cover-lg" style="background: radial-gradient(circle at 28% 25%, #fef3c7 0, #f59e0b 25%, #8b5cf6 64%, #1d4ed8 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);">
+           <span class="material-symbols-outlined" style="font-size: 80px; color: #ffffff; font-variation-settings: 'FILL' 1;">explore</span>
+         </div>`
+      : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="album-cover-lg" alt="${album.Name || (isPlaylist ? 'Playlist' : 'Album')}">`);
 
   container.innerHTML = `
     <div class="view-section">
@@ -137,7 +150,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
     </div>
   `;
 
-  if (!isLikedSongs && initialArtistsInfo.length > 0) {
+  if (!isLikedSongs && !isDiscoverDaily && initialArtistsInfo.length > 0) {
     bindArtistLinks(container);
   }
 
@@ -170,7 +183,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
   }
 
   const renderHeader = (data) => {
-    if (isLikedSongs) return;
+    if (isLikedSongs || isDiscoverDaily) return;
     const titleEl = document.getElementById('album-detail-title');
     const artistEl = document.getElementById('album-detail-artist');
     const typeEl = document.getElementById('album-detail-type');
@@ -193,8 +206,8 @@ export async function renderAlbumDetailView(container, albumOrId) {
     if (coverEl && coverEl.tagName === 'IMG') coverEl.src = getArtworkUrl(data, 'Primary', 400);
   };
 
-  // If album metadata is incomplete or loaded from URL, fetch via getItemCached (skip for liked-songs)
-  if (!isLikedSongs) {
+  // If album metadata is incomplete or loaded from URL, fetch via getItemCached (skip for virtual playlists)
+  if (!isLikedSongs && !isDiscoverDaily) {
     try {
       const fetchedItem = await getItemCached(album.Id, (revalidated) => {
         if (revalidated) {
@@ -217,7 +230,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
 
     if (songsList && songsRes && songsRes.Items) {
       if (songsRes.Items.length === 0) {
-        songsList.innerHTML = `<div style="color: var(--text-secondary);">${isLikedSongs ? 'No liked songs yet. Click the heart icon on any track to add it to your Liked Songs!' : (isPlaylist ? 'No tracks found in this playlist.' : 'No tracks found in this album.')}</div>`;
+        songsList.innerHTML = `<div style="color: var(--text-secondary);">${isLikedSongs ? 'No liked songs yet. Click the heart icon on any track to add it to your Liked Songs!' : (isDiscoverDaily ? 'No songs found for Discover Daily.' : (isPlaylist ? 'No tracks found in this playlist.' : 'No tracks found in this album.'))}</div>`;
       } else {
         registerTracksFavoriteStatus(songsRes.Items);
         songsList.innerHTML = songsRes.Items.map((track, idx) => renderTrackRowHTML(track, idx)).join('');
@@ -256,6 +269,10 @@ export async function renderAlbumDetailView(container, albumOrId) {
     let songsRes;
     if (isLikedSongs) {
       songsRes = await getFavoriteSongsCached({}, updateSongsList);
+    } else if (isDiscoverDaily) {
+      const updateDiscoverDaily = (res) => updateSongsList({ ...res, Items: getRecommendedTracks(res?.Items || [], HOME_LIMITS.discoverDailyTracks, 'discoverTrack') });
+      const res = await getSongsCached({ limit: 250, sortBy: 'DatePlayed,PlayCount,SortName', sortOrder: 'Descending' }, updateDiscoverDaily);
+      songsRes = { ...res, Items: getRecommendedTracks(res?.Items || [], HOME_LIMITS.discoverDailyTracks, 'discoverTrack') };
     } else {
       songsRes = (album.Type === 'Playlist' || isPlaylist)
         ? await getPlaylistItemsCached(album.Id, updateSongsList)

@@ -6,6 +6,7 @@ import { renderArtistsView, renderArtistDetailView, openArtist } from './views/a
 import { renderPlaylistsView, renderPlaylistDetailView, openPlaylist } from './views/playlists.js';
 import { renderPodcastsView, renderPodcastDetailView, openPodcastShow } from './views/podcasts.js';
 import { renderSearchView } from './views/search.js';
+import { DISCOVER_DAILY_PLAYLIST } from '../recommendations.js';
 
 let currentView = 'home';
 
@@ -44,7 +45,7 @@ export function handleUrlRouting() {
   } else if (podcastParam) {
     switchView('podcast-detail', { feedUrl: podcastParam });
   } else if (playlistParam) {
-    switchView('playlist-detail', { Id: playlistParam, Type: playlistParam === 'liked-songs' ? 'LikedSongs' : 'Playlist' });
+    switchView('playlist-detail', { Id: playlistParam, Type: playlistParam === 'liked-songs' ? 'LikedSongs' : (playlistParam === DISCOVER_DAILY_PLAYLIST.Id ? DISCOVER_DAILY_PLAYLIST.Type : 'Playlist') });
   } else if (albumId) {
     switchView('album-detail', { Id: albumId, Type: 'MusicAlbum' });
   } else if (artistParam) {

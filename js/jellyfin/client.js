@@ -171,7 +171,7 @@ export async function getMusicLibraries() {
   return (data.Items || []).filter(item => item.CollectionType === 'music');
 }
 
-export async function getAlbums({ limit = 50, startIndex = 0, parentId, artistId, sortBy = 'SortName' } = {}) {
+export async function getAlbums({ limit = 50, startIndex = 0, parentId, artistId, sortBy = 'SortName', sortOrder = 'Ascending' } = {}) {
   const session = getSession();
   const params = {
     IncludeItemTypes: 'MusicAlbum',
@@ -179,27 +179,27 @@ export async function getAlbums({ limit = 50, startIndex = 0, parentId, artistId
     Limit: limit,
     StartIndex: startIndex,
     SortBy: sortBy,
-    SortOrder: 'Ascending',
-    Fields: 'PrimaryImageAspectRatio,PrimaryImageTag,ImageTags,BasicSyncInfo,AlbumArtists,ArtistItems'
+    SortOrder: sortOrder,
+    Fields: 'PrimaryImageAspectRatio,PrimaryImageTag,ImageTags,BasicSyncInfo,AlbumArtists,ArtistItems,DateCreated,DateLastMediaAdded,UserData'
   };
   if (parentId) params.ParentId = parentId;
   if (artistId) params.ArtistIds = artistId;
   return await jellyfinFetch(`/Users/${session.userId}/Items`, params);
 }
 
-export async function getArtists({ limit = 50, startIndex = 0 } = {}) {
+export async function getArtists({ limit = 50, startIndex = 0, sortBy = 'SortName', sortOrder = 'Ascending' } = {}) {
   const session = getSession();
   return await jellyfinFetch(`/Artists`, {
     UserId: session.userId,
     Limit: limit,
     StartIndex: startIndex,
-    SortBy: 'SortName',
-    SortOrder: 'Ascending',
-    Fields: 'PrimaryImageTag,ImageTags'
+    SortBy: sortBy,
+    SortOrder: sortOrder,
+    Fields: 'PrimaryImageTag,ImageTags,DateCreated,UserData'
   });
 }
 
-export async function getSongs({ limit = 100, startIndex = 0, albumId, artistId, isFavorite, sortBy = 'ParentIndexNumber,IndexNumber,SortName' } = {}) {
+export async function getSongs({ limit = 100, startIndex = 0, albumId, artistId, isFavorite, sortBy = 'ParentIndexNumber,IndexNumber,SortName', sortOrder = 'Ascending' } = {}) {
   const session = getSession();
   const params = {
     IncludeItemTypes: 'Audio',
@@ -207,7 +207,7 @@ export async function getSongs({ limit = 100, startIndex = 0, albumId, artistId,
     Limit: limit,
     StartIndex: startIndex,
     SortBy: sortBy,
-    SortOrder: 'Ascending',
+    SortOrder: sortOrder,
     Fields: 'PrimaryImageAspectRatio,PrimaryImageTag,ImageTags,AlbumPrimaryImageTag,AlbumId,AudioInfo,MediaSources,Chapters,HasLyrics,UserData'
   };
   if (albumId) params.ParentId = albumId;
@@ -221,7 +221,7 @@ export async function getPlaylists() {
   return await jellyfinFetch(`/Users/${session.userId}/Items`, {
     IncludeItemTypes: 'Playlist',
     Recursive: true,
-    Fields: 'PrimaryImageTag,ImageTags'
+    Fields: 'PrimaryImageTag,ImageTags,DateCreated,DateLastMediaAdded,UserData'
   });
 }
 

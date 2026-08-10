@@ -7,6 +7,7 @@ import { switchView } from '../views.js';
 import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTML, bindTrackRows } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
+import { DISCOVER_DAILY_PLAYLIST, buildHomeRecommendations } from '../../recommendations.js';
 
 export async function renderHomeView(container) {
   const session = getSession();
@@ -209,7 +210,7 @@ export async function renderHomeView(container) {
     const playlistsGrid = document.getElementById('home-playlists');
     if (playlistsGrid && playlistsRes) {
       const likedCard = { Id: 'liked-songs', Name: 'Liked Songs', Type: 'LikedSongs' };
-      const items = [likedCard, ...(playlistsRes.Items || [])];
+      const items = [likedCard, DISCOVER_DAILY_PLAYLIST, ...(playlistsRes.Items || [])];
       playlistsGrid.innerHTML = items.map(playlist => renderAlbumCardHTML(playlist, 'Playlist')).join('');
       bindAlbumCards(playlistsGrid);
     }
@@ -304,7 +305,7 @@ export async function renderHomeView(container) {
         tracksContainer.innerHTML = `<div style="color: var(--text-secondary); grid-column: 1/-1;" data-i18n>No results found</div>`;
       } else {
         registerTracksFavoriteStatus(songsRes.Items);
-        const items = songsRes.Items.slice(0, 10);
+        const items = songsRes.Items;
         tracksContainer.innerHTML = items.map((track, idx) => renderTrackRowHTML(track, idx)).join('');
         bindTrackRows(tracksContainer, items);
       }
@@ -331,19 +332,24 @@ export async function renderHomeView(container) {
 
   // Fetch all sections asynchronously
   try {
-    const albumsRes = await getAlbumsCached({ limit: 12 }, updateAlbumsUI);
-    updateAlbumsUI(albumsRes);
+    const renderRecommendedSections = ({ albumsRes, artistsRes, playlistsRes, songsRes }) => {
+      const recommendations = buildHomeRecommendations({ albumsRes, artistsRes, playlistsRes, songsRes });
+      updateAlbumsUI(recommendations.albums);
+      updatePlaylistsUI(recommendations.playlists);
+      updateSongsUI(recommendations.songs);
+      updateArtistsUI(recommendations.artists);
+    };
 
-    const playlistsRes = await getPlaylistsCached(updatePlaylistsUI);
-    updatePlaylistsUI(playlistsRes);
+    const [albumsRes, playlistsRes, songsRes, artistsRes] = await Promise.all([
+      getAlbumsCached({ limit: 60, sortBy: 'DateCreated', sortOrder: 'Descending' }, res => updateAlbumsUI(buildHomeRecommendations({ albumsRes: res }).albums)),
+      getPlaylistsCached(res => updatePlaylistsUI(buildHomeRecommendations({ playlistsRes: res }).playlists)),
+      getSongsCached({ limit: 120, sortBy: 'DatePlayed,PlayCount,SortName', sortOrder: 'Descending' }, res => updateSongsUI(buildHomeRecommendations({ songsRes: res }).songs)),
+      getArtistsCached({ limit: 100 }, res => updateArtistsUI(buildHomeRecommendations({ artistsRes: res }).artists))
+    ]);
+
+    renderRecommendedSections({ albumsRes, artistsRes, playlistsRes, songsRes });
 
     updatePodcastsUI();
-
-    const songsRes = await getSongsCached({ limit: 10 }, updateSongsUI);
-    updateSongsUI(songsRes);
-
-    const artistsRes = await getArtistsCached({ limit: 30 }, updateArtistsUI);
-    updateArtistsUI(artistsRes);
 
   } catch (err) {
     const albumsGrid = document.getElementById('home-albums');
