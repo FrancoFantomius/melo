@@ -21,12 +21,10 @@ export async function reportCapabilities() {
     PlayableMediaTypes: ['Audio'],
     SupportedCommands: [
       'Play',
-      'Pause',
-      'Stop',
-      'Seek',
-      'NextTrack',
-      'PreviousTrack',
-      'PlayState'
+      'PlayState',
+      'PlayNext',
+      'SetRepeatMode',
+      'SetShuffleQueue'
     ],
     SupportsMediaControl: true,
     SupportsSync: false,

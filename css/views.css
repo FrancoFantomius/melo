@@ -12,6 +12,10 @@
   gap: 24px;
 }
 
+.album-detail-section {
+  gap: 12px;
+}
+
 .section-title {
   font-size: 24px;
   font-weight: 800;
@@ -332,14 +336,23 @@
   .album-detail-actions {
     justify-content: center;
     width: 100%;
+    flex-wrap: nowrap;
   }
 
   .album-detail-actions .btn-primary {
-    width: 100%;
-    max-width: 220px;
+    flex-shrink: 1;
+    min-width: 0;
     justify-content: center;
-    padding: 12px 20px;
-    font-size: 15px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .album-detail-actions .btn-secondary > span:not(.material-symbols-outlined) {
+    display: none;
+  }
+
+  .album-detail-actions .btn-secondary .material-symbols-outlined {
+    font-size: 20px;
   }
 
   .playlist-manage-actions {
@@ -362,11 +375,25 @@
   .playlist-manage-actions .btn .material-symbols-outlined {
     font-size: 15px;
   }
+
+  #album-tracks-toolbar {
+    background: transparent;
+    border: none;
+    padding-left: 0;
+  }
+
+  #btn-tracks-select-all {
+    padding: 8px;
+  }
+
+  #btn-tracks-select-all .material-symbols-outlined {
+    font-size: 24px;
+  }
 }
 
 .track-row {
   display: grid;
-  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 36px 60px 36px;
+  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 60px 36px;
   align-items: center;
   padding: 10px 16px;
   border-radius: var(--radius-sm);
@@ -380,7 +407,6 @@
 }
 
 .btn-track-like,
-.btn-track-add-playlist,
 .btn-track-download {
   background: transparent;
   border: none;
@@ -399,7 +425,6 @@
   background: rgba(249, 115, 22, 0.1);
 }
 
-.btn-track-add-playlist:hover,
 .btn-track-download:hover {
   color: var(--accent);
   background: rgba(249, 115, 22, 0.1);
@@ -470,14 +495,97 @@
   font-weight: 700;
 }
 
+.track-row.selected {
+  background-color: rgba(249, 115, 22, 0.12);
+}
+
+.track-row.selected .track-cover {
+  visibility: hidden;
+}
+
+.track-row.selected .track-info::before {
+  content: '✓';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 40px;
+  text-align: center;
+  z-index: 2;
+}
+
+.tracks-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  visibility: hidden;
+}
+
+.tracks-toolbar.visible {
+  visibility: visible;
+}
+
+.tracks-toolbar .tracks-toolbar-icon-btn {
+  padding: 3px;
+}
+
+.tracks-toolbar .tracks-toolbar-icon-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.tracks-toolbar-icon-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background var(--transition-speed), color var(--transition-speed);
+  flex-shrink: 0;
+}
+
+.tracks-toolbar-icon-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.tracks-toolbar-count {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .track-num {
   color: var(--text-muted);
 }
 
 .track-info {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 12px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 }
 
 .track-cover {

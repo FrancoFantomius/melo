@@ -3,7 +3,7 @@ const MIN_DATE_MS = Date.parse('1970-01-01T00:00:00Z');
 
 export const HOME_LIMITS = {
   albums: 12,
-  artists: 30,
+  artists: 10,
   playlists: 12,
   tracks: 10,
   discoverDailyTracks: 20
@@ -66,7 +66,7 @@ function stableHash(input = '') {
   return (hash >>> 0) / 4294967295;
 }
 
-function getHomeScore(item, type, now = Date.now()) {
+function getHomeScore(item, type, now = Date.now(), seed = null) {
   const weights = {
     album: { favorite: 0.25, recency: 0.45, plays: 0.2, completion: 0, discovery: 0.1 },
     artist: { favorite: 0.3, recency: 0.3, plays: 0.25, completion: 0, discovery: 0.15 },
@@ -75,7 +75,8 @@ function getHomeScore(item, type, now = Date.now()) {
     discoverTrack: { favorite: 0.12, recency: 0.15, plays: -0.15, completion: -0.08, discovery: 0.96 }
   }[type];
 
-  const hashInput = `${item?.Id || item?.Name || ''}:${new Date(now).toISOString().slice(0, 10)}`;
+  const seedKey = seed !== null && seed !== undefined ? seed : new Date(now).toISOString().slice(0, 10);
+  const hashInput = `${item?.Id || item?.Name || ''}:${seedKey}`;
   return (
     weights.favorite * getFavoriteScore(item) +
     weights.recency * getRecencyScore(item, now) +
@@ -85,10 +86,10 @@ function getHomeScore(item, type, now = Date.now()) {
   );
 }
 
-export function pickDiverseItems(items = [], { type, limit, groupBy }) {
+export function pickDiverseItems(items = [], { type, limit, groupBy, seed } = {}) {
   const now = Date.now();
   const ranked = [...items]
-    .map(item => ({ item, score: getHomeScore(item, type, now) }))
+    .map(item => ({ item, score: getHomeScore(item, type, now, seed) }))
     .sort((a, b) => b.score - a.score || String(a.item.Name || '').localeCompare(String(b.item.Name || '')));
 
   const selected = [];
@@ -113,10 +114,11 @@ export function pickDiverseItems(items = [], { type, limit, groupBy }) {
   return selected;
 }
 
-export function getRecommendedTracks(songs = [], limit = HOME_LIMITS.tracks, type = 'track') {
+export function getRecommendedTracks(songs = [], limit = HOME_LIMITS.tracks, type = 'track', seed = null) {
   return pickDiverseItems(songs, {
     type,
     limit,
+    seed,
     groupBy: song => song.AlbumArtist || song.Artists?.[0] || song.AlbumId || song.Id
   });
 }
