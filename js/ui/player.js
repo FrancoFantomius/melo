@@ -1,106 +1,95 @@
 import { initAudioPlayer, togglePlayPause, playNextTrack, playPrevTrack, seekTo, setVolume, toggleMute, playTrack, savePlayerState, notifyUI, setPlaybackSpeed, getPlaybackSpeed, skipSeconds } from '../player/audio.js';
 import { toggleShuffle, toggleRepeat } from '../player/queue.js';
 import { toggleQueueDrawer, renderQueueDrawerList, toggleLyricsModal, updateLyricsSync, saveSettingsFromModal, openSelectPlaylistModal } from './modals.js';
-import { getArtworkUrl, getItemCached } from '../jellyfin/client.js';
+import { getArtworkUrl } from '../jellyfin/client.js';
 import { getSession, saveSession } from '../jellyfin/session.js';
 import { isTrackLiked, toggleTrackLiked } from '../player/likes.js';
 import { toggleTrackDownload, refreshDownloadButton } from './downloads.js';
 
-export function initPlayerUI() {
-  const btnPlay = document.getElementById('player-btn-play');
-  const btnPrev = document.getElementById('player-btn-prev');
-  const btnNext = document.getElementById('player-btn-next');
-  const btnSkipBack = document.getElementById('player-btn-skip-back');
-  const btnSkipForward = document.getElementById('player-btn-skip-forward');
-  const speedBadge = document.getElementById('player-speed-badge');
-  const btnShuffle = document.getElementById('player-btn-shuffle');
-  const btnRepeat = document.getElementById('player-btn-repeat');
-  const btnQueue = document.getElementById('player-btn-queue');
-  const btnLyrics = document.getElementById('player-btn-lyrics');
-  const btnLike = document.getElementById('player-btn-like');
-  const btnAddPlaylist = document.getElementById('player-btn-add-playlist');
-  const btnDownload = document.getElementById('player-btn-download');
-  const btnVolume = document.getElementById('player-btn-volume');
-  const qualityBadge = document.getElementById('player-quality-badge');
-  const progressSlider = document.getElementById('player-progress');
-  const volumeSlider = document.getElementById('player-volume');
+const $ = (id) => document.getElementById(id);
 
-  // Expanded Mobile Player Elements
-  const empContainer = document.getElementById('expanded-mobile-player');
-  const empBtnClose = document.getElementById('emp-btn-close');
-  const empCoverEl = document.getElementById('emp-cover');
-  const empTitleEl = document.getElementById('emp-title');
-  const empArtistEl = document.getElementById('emp-artist');
-  const empBtnPlay = document.getElementById('emp-btn-play');
-  const empBtnPrev = document.getElementById('emp-btn-prev');
-  const empBtnNext = document.getElementById('emp-btn-next');
-  const empBtnShuffle = document.getElementById('emp-btn-shuffle');
-  const empBtnRepeat = document.getElementById('emp-btn-repeat');
-  const empBtnLike = document.getElementById('emp-btn-like');
-  const empBtnAddPlaylist = document.getElementById('emp-btn-add-playlist');
-  const empBtnDownload = document.getElementById('emp-btn-download');
-  const empBtnLyrics = document.getElementById('emp-btn-lyrics');
-  const empBtnQueue = document.getElementById('emp-btn-queue');
-  const empProgressSlider = document.getElementById('emp-progress');
-  const empCurrentTimeEl = document.getElementById('emp-current-time');
-  const empTotalTimeEl = document.getElementById('emp-total-time');
+export function initPlayerUI() {
+  // Singleton controls (mini player)
+  const btnPrev = $('player-btn-prev');
+  const btnNext = $('player-btn-next');
+  const btnSkipBack = $('player-btn-skip-back');
+  const btnSkipForward = $('player-btn-skip-forward');
+  const speedBadge = $('player-speed-badge');
+  const qualityBadge = $('player-quality-badge');
+  const volumeSlider = $('player-volume');
+  const btnVolume = $('player-btn-volume');
+
+  // Expanded mobile player
+  const empContainer = $('expanded-mobile-player');
+  const empBtnClose = $('emp-btn-close');
+  const mainPlayerBar = document.querySelector('.main-player');
+
+  // Controls that exist in both the mini player and the expanded mobile player
+  const pairs = {
+    cover: [$('player-track-cover'), $('emp-cover')],
+    title: [$('player-track-title'), $('emp-title')],
+    artist: [$('player-track-artist'), $('emp-artist')],
+    current: [$('player-current-time'), $('emp-current-time')],
+    total: [$('player-total-time'), $('emp-total-time')],
+    play: [$('player-btn-play'), $('emp-btn-play')],
+    prev: [btnPrev, $('emp-btn-prev')],
+    next: [btnNext, $('emp-btn-next')],
+    like: [$('player-btn-like'), $('emp-btn-like')],
+    addPlaylist: [$('player-btn-add-playlist'), $('emp-btn-add-playlist')],
+    download: [$('player-btn-download'), $('emp-btn-download')],
+    shuffle: [$('player-btn-shuffle'), $('emp-btn-shuffle')],
+    repeat: [$('player-btn-repeat'), $('emp-btn-repeat')],
+    lyrics: [$('player-btn-lyrics'), $('emp-btn-lyrics')],
+    queue: [$('player-btn-queue'), $('emp-btn-queue')],
+    progress: [$('player-progress'), $('emp-progress')]
+  };
+
+  const each = (els, fn) => els.forEach((el) => el && fn(el));
+  const setDisplay = (el, value) => { el.style.display = value; };
+  const setIcon = (el, text) => {
+    const icon = el.querySelector('.material-symbols-outlined');
+    if (icon) icon.textContent = text;
+  };
+  const isMusic = (track) => !!(track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl);
 
   let currentPlayingTrack = null;
 
-  const updateLikeButton = (track) => {
-    const isLiked = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl && isTrackLiked(track.Id);
-    const showLike = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl;
-
-    [btnLike, empBtnLike].forEach(btn => {
-      if (!btn) return;
-      if (showLike) {
-        btn.style.display = 'flex';
-        btn.classList.toggle('liked', !!isLiked);
-        btn.title = isLiked ? 'Unlike' : 'Like';
-        const icon = btn.querySelector('.material-symbols-outlined');
-        if (icon) icon.textContent = isLiked ? 'favorite' : 'favorite_border';
-      } else {
-        btn.style.display = 'none';
-      }
+  const updateActionButtons = (track) => {
+    const music = isMusic(track);
+    const liked = music && isTrackLiked(track.Id);
+    each(pairs.like, (btn) => {
+      if (!music) return setDisplay(btn, 'none');
+      setDisplay(btn, 'flex');
+      btn.classList.toggle('liked', liked);
+      btn.title = liked ? 'Unlike' : 'Like';
+      setIcon(btn, liked ? 'favorite' : 'favorite_border');
     });
-  };
-
-  const updateAddPlaylistButton = (track) => {
-    const showBtn = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl;
-    [btnAddPlaylist, empBtnAddPlaylist].forEach(btn => {
-      if (!btn) return;
-      btn.style.display = showBtn ? 'flex' : 'none';
-    });
+    each(pairs.addPlaylist, (btn) => setDisplay(btn, music ? 'flex' : 'none'));
   };
 
   const updateDownloadButton = async (track) => {
     const trackId = track && (track.Id || track.id);
-    [btnDownload, empBtnDownload].forEach(btn => {
-      if (!btn) return;
+    each(pairs.download, (btn) => {
       if (trackId) {
-        btn.style.display = 'flex';
+        setDisplay(btn, 'flex');
         btn.setAttribute('data-track-id', trackId);
       } else {
-        btn.style.display = 'none';
+        setDisplay(btn, 'none');
         btn.removeAttribute('data-track-id');
       }
     });
     if (trackId) {
-      await refreshDownloadButton(btnDownload);
-      await refreshDownloadButton(empBtnDownload);
+      await Promise.all(pairs.download.filter(Boolean).map((btn) => refreshDownloadButton(btn)));
     }
   };
 
   const handleDownloadClick = async (e) => {
     e.stopPropagation();
     e.preventDefault();
-    if (currentPlayingTrack) {
-      await toggleTrackDownload(currentPlayingTrack, e.currentTarget);
-    }
+    if (currentPlayingTrack) await toggleTrackDownload(currentPlayingTrack, e.currentTarget);
   };
 
-  btnDownload?.addEventListener('click', handleDownloadClick);
-  empBtnDownload?.addEventListener('click', handleDownloadClick);
+  each(pairs.download, (btn) => btn.addEventListener('click', handleDownloadClick));
 
   window.addEventListener('melo-download-changed', (e) => {
     const { trackId } = e.detail || {};
@@ -110,8 +99,8 @@ export function initPlayerUI() {
     }
   });
 
-  [btnAddPlaylist, empBtnAddPlaylist].forEach(btn => {
-    btn?.addEventListener('click', (e) => {
+  each(pairs.addPlaylist, (btn) => {
+    btn.addEventListener('click', (e) => {
       e.stopPropagation();
       e.preventDefault();
       if (currentPlayingTrack && currentPlayingTrack.Id && !currentPlayingTrack.isPodcastEpisode) {
@@ -121,7 +110,6 @@ export function initPlayerUI() {
   });
 
   // Open expanded mobile player when mini-player bar is tapped on mobile
-  const mainPlayerBar = document.querySelector('.main-player');
   mainPlayerBar?.addEventListener('click', (e) => {
     if (window.innerWidth > 768) return;
     if (e.target.closest('button') || e.target.closest('input')) return;
@@ -132,7 +120,7 @@ export function initPlayerUI() {
     }
   });
 
-  empBtnClose?.addEventListener('click', () => {
+  const closeExpandedPlayer = () => {
     if (window.location.hash === '#player') {
       window.history.back();
       setTimeout(() => {
@@ -144,46 +132,78 @@ export function initPlayerUI() {
     } else {
       empContainer?.classList.remove('open');
     }
-  });
+  };
+
+  empBtnClose?.addEventListener('click', closeExpandedPlayer);
+
+  // Collapse the full-player back to the mini bar when scrolling/pulling down
+  let empTouchStartY = null;
+  let empTouchAccum = 0;
+  let empWheelAccum = 0;
+  const resetEmpGesture = () => {
+    empTouchStartY = null;
+    empTouchAccum = 0;
+    empWheelAccum = 0;
+  };
+
+  empContainer?.addEventListener('touchstart', (e) => {
+    if (!empContainer.classList.contains('open')) return;
+    if (e.target.closest('button, input')) return;
+    empTouchStartY = e.touches[0].clientY;
+    empTouchAccum = 0;
+  }, { passive: true });
+
+  empContainer?.addEventListener('touchmove', (e) => {
+    if (empTouchStartY === null) return;
+    const y = e.touches[0].clientY;
+    const deltaY = y - empTouchStartY;
+    empTouchStartY = y;
+    empTouchAccum = deltaY > 0 ? Math.max(0, empTouchAccum + deltaY) : 0;
+    if (empTouchAccum > 60) {
+      empTouchStartY = null;
+      empTouchAccum = 0;
+      closeExpandedPlayer();
+    }
+  }, { passive: true });
+
+  empContainer?.addEventListener('touchend', resetEmpGesture);
+  empContainer?.addEventListener('touchcancel', resetEmpGesture);
+
+  empContainer?.addEventListener('wheel', (e) => {
+    if (!empContainer.classList.contains('open') || e.target.closest('input')) return;
+    if (e.deltaY > 0) {
+      empWheelAccum += e.deltaY;
+      if (empWheelAccum > 60) {
+        empWheelAccum = 0;
+        closeExpandedPlayer();
+      }
+    } else {
+      empWheelAccum = 0;
+    }
+  }, { passive: true });
 
   window.addEventListener('resize', () => {
-    if (window.innerWidth > 768) {
-      empContainer?.classList.remove('open');
-    }
+    if (window.innerWidth > 768) empContainer?.classList.remove('open');
   });
 
   initAudioPlayer((state) => {
-    // Update queue drawer list if open
-    const queueDrawer = document.getElementById('queue-drawer');
-    if (queueDrawer && queueDrawer.classList.contains('open')) {
-      renderQueueDrawerList();
-    }
+    const queueDrawer = $('queue-drawer');
+    if (queueDrawer && queueDrawer.classList.contains('open')) renderQueueDrawerList();
 
-    // Update player bars with state
     const track = state.track;
     currentPlayingTrack = track;
-    updateLikeButton(track);
-    updateAddPlaylistButton(track);
+    updateActionButtons(track);
     updateDownloadButton(track);
-
-    const coverEl = document.getElementById('player-track-cover');
-    const titleEl = document.getElementById('player-track-title');
-    const artistEl = document.getElementById('player-track-artist');
-    const currentTimeEl = document.getElementById('player-current-time');
-    const totalTimeEl = document.getElementById('player-total-time');
 
     if (track) {
       const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 300);
-      if (coverEl) coverEl.src = artUrl;
-      if (empCoverEl) empCoverEl.src = artUrl;
+      each(pairs.cover, (el) => { el.src = artUrl; });
 
       const titleStr = track.title || track.Name || 'Unknown Title';
-      if (titleEl) titleEl.textContent = titleStr;
-      if (empTitleEl) empTitleEl.textContent = titleStr;
+      each(pairs.title, (el) => { el.textContent = titleStr; });
 
       const artistStr = track.showTitle || track.Artists?.join(', ') || track.AlbumArtist || 'Unknown Artist';
-      if (artistEl) artistEl.textContent = artistStr;
-      if (empArtistEl) empArtistEl.textContent = artistStr;
+      each(pairs.artist, (el) => { el.textContent = artistStr; });
 
       const isPodcast = !!(track.isPodcastEpisode || track.enclosureUrl);
       if (btnSkipBack) btnSkipBack.style.display = isPodcast ? 'flex' : 'none';
@@ -192,110 +212,67 @@ export function initPlayerUI() {
         speedBadge.style.display = isPodcast ? 'flex' : 'none';
         speedBadge.textContent = `${state.playbackSpeed || 1.0}x`;
       }
-      if (qualityBadge) {
-        qualityBadge.style.display = isPodcast ? 'none' : 'flex';
-      }
+      if (qualityBadge) qualityBadge.style.display = isPodcast ? 'none' : 'flex';
 
       const currentSec = Math.floor(state.currentTime || 0);
       let totalSec = Math.floor(state.duration || 0);
       if (!isFinite(totalSec) || totalSec <= 0) {
-        if (track.duration) {
-          totalSec = track.duration;
-        } else if (track.RunTimeTicks) {
-          totalSec = Math.floor(track.RunTimeTicks / 10000000);
-        } else {
-          totalSec = 0;
-        }
+        totalSec = track.duration || (track.RunTimeTicks ? Math.floor(track.RunTimeTicks / 10000000) : 0);
       }
 
       const formattedCurrent = formatTime(currentSec);
       const formattedTotal = formatTime(totalSec);
 
-      if (currentTimeEl && !progressSlider?.isSeeking) currentTimeEl.textContent = formattedCurrent;
-      if (empCurrentTimeEl && !empProgressSlider?.isSeeking) empCurrentTimeEl.textContent = formattedCurrent;
-
-      if (totalTimeEl) totalTimeEl.textContent = formattedTotal;
-      if (empTotalTimeEl) empTotalTimeEl.textContent = formattedTotal;
-
-      [progressSlider, empProgressSlider].forEach(slider => {
-        if (slider && !slider.isSeeking) {
+      each(pairs.progress, (slider, i) => {
+        if (!slider.isSeeking) {
+          if (pairs.current[i]) pairs.current[i].textContent = formattedCurrent;
           slider.max = totalSec > 0 ? totalSec : 100;
           slider.value = isFinite(currentSec) ? currentSec : 0;
           updateSliderFill(slider);
         }
       });
+      each(pairs.total, (el) => { el.textContent = formattedTotal; });
 
-      // Check lyrics button availability for current track
-      [btnLyrics, empBtnLyrics].forEach(btn => {
-        if (!btn) return;
-        if (isPodcast) {
-          btn.style.display = 'none';
-        } else {
-          btn.style.display = 'flex';
-        }
-      });
+      each(pairs.lyrics, (btn) => setDisplay(btn, isPodcast ? 'none' : 'flex'));
     } else {
-      [btnLyrics, empBtnLyrics].forEach(btn => { if (btn) btn.style.display = 'none'; });
+      each(pairs.lyrics, (btn) => setDisplay(btn, 'none'));
     }
 
     updateLyricsSync(state.currentTime);
 
-    const playIconText = state.isPlaying ? 'pause_circle' : 'play_circle';
-    if (btnPlay) {
-      const icon = btnPlay.querySelector('.material-symbols-outlined');
-      if (icon) icon.textContent = playIconText;
-    }
-    if (empBtnPlay) {
-      const icon = empBtnPlay.querySelector('.material-symbols-outlined');
-      if (icon) icon.textContent = playIconText;
-    }
+    each(pairs.play, (btn) => setIcon(btn, state.isPlaying ? 'pause_circle' : 'play_circle'));
 
     if (volumeSlider && state.volume !== undefined && !volumeSlider.isInteracting) {
       volumeSlider.value = state.volume;
       updateSliderFill(volumeSlider);
     }
 
-    if (btnVolume) {
-      const icon = btnVolume.querySelector('.material-symbols-outlined');
-      if (icon && state.volume !== undefined) {
-        if (state.volume === 0) {
-          icon.textContent = 'volume_off';
-        } else if (state.volume < 0.5) {
-          icon.textContent = 'volume_down';
-        } else {
-          icon.textContent = 'volume_up';
-        }
-      }
+    if (btnVolume && state.volume !== undefined) {
+      setIcon(btnVolume, state.volume === 0 ? 'volume_off' : state.volume < 0.5 ? 'volume_down' : 'volume_up');
     }
 
     if (state.queueState) {
       const isShuffled = state.queueState.shuffle;
-      [btnShuffle, empBtnShuffle].forEach(btn => {
-        if (btn) {
-          btn.style.color = isShuffled ? 'var(--accent)' : 'var(--text-secondary)';
-          btn.classList.toggle('active', isShuffled);
-        }
+      each(pairs.shuffle, (btn) => {
+        btn.style.color = isShuffled ? 'var(--accent)' : 'var(--text-secondary)';
+        btn.classList.toggle('active', isShuffled);
       });
 
       const mode = state.queueState.repeat;
-      const isActive = mode !== 'none' && mode !== false;
-
-      [btnRepeat, empBtnRepeat].forEach(btn => {
-        if (!btn) return;
-        btn.classList.toggle('active', isActive);
-        const icon = btn.querySelector('.material-symbols-outlined');
+      each(pairs.repeat, (btn) => {
+        btn.classList.toggle('active', mode !== 'none' && mode !== false);
         if (mode === 'one') {
           btn.style.color = 'var(--accent)';
           btn.title = 'Repeat Song Once (Auto-Disables)';
-          if (icon) icon.textContent = 'repeat_one';
+          setIcon(btn, 'repeat_one');
         } else if (mode === 'all') {
           btn.style.color = 'var(--accent)';
           btn.title = 'Repeat Song (Continuous)';
-          if (icon) icon.textContent = 'repeat';
+          setIcon(btn, 'repeat');
         } else {
           btn.style.color = 'var(--text-secondary)';
           btn.title = 'Repeat Off';
-          if (icon) icon.textContent = 'repeat';
+          setIcon(btn, 'repeat');
         }
       });
     }
@@ -306,71 +283,30 @@ export function initPlayerUI() {
     }
   });
 
-  // Mini Player Controls Event Listeners
-  btnPlay?.addEventListener('click', () => togglePlayPause());
-  btnPrev?.addEventListener('click', () => playPrevTrack());
-  btnNext?.addEventListener('click', () => playNextTrack());
+  // Mini & expanded playback controls
+  each(pairs.play, (btn) => btn.addEventListener('click', () => togglePlayPause()));
+  each(pairs.prev, (btn) => btn.addEventListener('click', () => playPrevTrack()));
+  each(pairs.next, (btn) => btn.addEventListener('click', () => playNextTrack()));
   btnSkipBack?.addEventListener('click', () => skipSeconds(-15));
   btnSkipForward?.addEventListener('click', () => skipSeconds(30));
 
-  // Expanded Mobile Player Controls Event Listeners
-  empBtnPlay?.addEventListener('click', () => togglePlayPause());
-  empBtnPrev?.addEventListener('click', () => playPrevTrack());
-  empBtnNext?.addEventListener('click', () => playNextTrack());
+  const runShuffle = () => { toggleShuffle(); savePlayerState(); notifyUI(); };
+  const runRepeat = () => { toggleRepeat(); savePlayerState(); notifyUI(); };
+  each(pairs.shuffle, (btn) => btn.addEventListener('click', runShuffle));
+  each(pairs.repeat, (btn) => btn.addEventListener('click', runRepeat));
 
-  empBtnShuffle?.addEventListener('click', () => {
-    toggleShuffle();
-    savePlayerState();
-    notifyUI();
-  });
+  const toggleLike = () => { if (currentPlayingTrack) toggleTrackLiked(currentPlayingTrack); };
+  each(pairs.like, (btn) => btn.addEventListener('click', toggleLike));
+  window.addEventListener('melo-likes-changed', () => updateActionButtons(currentPlayingTrack));
 
-  empBtnRepeat?.addEventListener('click', () => {
-    toggleRepeat();
-    savePlayerState();
-    notifyUI();
-  });
-
-  empBtnLike?.addEventListener('click', () => {
-    if (currentPlayingTrack) {
-      toggleTrackLiked(currentPlayingTrack);
-    }
-  });
-
-  empBtnLyrics?.addEventListener('click', () => toggleLyricsModal());
-  empBtnQueue?.addEventListener('click', () => toggleQueueDrawer());
-
-  btnLike?.addEventListener('click', () => {
-    if (currentPlayingTrack) {
-      toggleTrackLiked(currentPlayingTrack);
-    }
-  });
-
-  window.addEventListener('melo-likes-changed', () => {
-    updateLikeButton(currentPlayingTrack);
-  });
+  each(pairs.lyrics, (btn) => btn.addEventListener('click', () => toggleLyricsModal()));
+  each(pairs.queue, (btn) => btn.addEventListener('click', () => toggleQueueDrawer()));
 
   speedBadge?.addEventListener('click', () => {
     const speeds = [0.8, 1.0, 1.25, 1.5, 2.0];
-    const current = getPlaybackSpeed();
-    const idx = speeds.indexOf(current);
-    const nextSpeed = speeds[(idx + 1) % speeds.length];
-    setPlaybackSpeed(nextSpeed);
+    const idx = speeds.indexOf(getPlaybackSpeed());
+    setPlaybackSpeed(speeds[(idx + 1) % speeds.length]);
   });
-
-  btnShuffle?.addEventListener('click', () => {
-    toggleShuffle();
-    savePlayerState();
-    notifyUI();
-  });
-
-  btnRepeat?.addEventListener('click', () => {
-    toggleRepeat();
-    savePlayerState();
-    notifyUI();
-  });
-
-  btnQueue?.addEventListener('click', () => toggleQueueDrawer());
-  btnLyrics?.addEventListener('click', () => toggleLyricsModal());
 
   qualityBadge?.addEventListener('click', () => {
     const session = getSession();
@@ -382,65 +318,50 @@ export function initPlayerUI() {
     playTrack();
   });
 
-  // Progress Seek Bars (Mini & Expanded)
-  [progressSlider, empProgressSlider].forEach(slider => {
-    if (!slider) return;
+  // Progress seek bars (mini & expanded)
+  each(pairs.progress, (slider) => {
     const startSeeking = () => { slider.isSeeking = true; };
-
     slider.addEventListener('mousedown', startSeeking);
     slider.addEventListener('touchstart', startSeeking, { passive: true });
-
     slider.addEventListener('input', (e) => {
       slider.isSeeking = true;
       const val = parseFloat(e.target.value);
-      const currentTimeEl = document.getElementById('player-current-time');
-      if (currentTimeEl) currentTimeEl.textContent = formatTime(val);
-      if (empCurrentTimeEl) empCurrentTimeEl.textContent = formatTime(val);
+      each(pairs.current, (el) => { el.textContent = formatTime(val); });
       updateSliderFill(slider);
     });
-
     slider.addEventListener('change', (e) => {
-      const val = parseFloat(e.target.value);
-      seekTo(val);
+      seekTo(parseFloat(e.target.value));
       setTimeout(() => { slider.isSeeking = false; }, 300);
     });
   });
 
-  // Volume Button & Slider
+  // Volume button & slider
   btnVolume?.addEventListener('click', () => toggleMute());
 
   if (volumeSlider) {
     updateSliderFill(volumeSlider);
     const startVolumeInteract = () => { volumeSlider.isInteracting = true; };
     const stopVolumeInteract = () => { volumeSlider.isInteracting = false; };
-
     volumeSlider.addEventListener('mousedown', startVolumeInteract);
     volumeSlider.addEventListener('touchstart', startVolumeInteract, { passive: true });
     volumeSlider.addEventListener('mouseup', stopVolumeInteract);
     volumeSlider.addEventListener('touchend', stopVolumeInteract);
-
-    volumeSlider.addEventListener('input', (e) => {
-      setVolume(parseFloat(e.target.value));
-    });
+    const handleVolumeInput = (e) => setVolume(parseFloat(e.target.value));
+    volumeSlider.addEventListener('input', handleVolumeInput);
     volumeSlider.addEventListener('change', (e) => {
       stopVolumeInteract();
-      setVolume(parseFloat(e.target.value));
+      handleVolumeInput(e);
     });
   }
 
-  // Settings Modal Save Button
-  document.getElementById('btn-save-settings')?.addEventListener('click', () => {
-    saveSettingsFromModal();
-  });
+  // Settings modal save button
+  $('btn-save-settings')?.addEventListener('click', () => saveSettingsFromModal());
 }
 
 function formatTime(seconds) {
-  if (seconds === undefined || seconds === null || isNaN(seconds) || !isFinite(seconds) || seconds < 0) {
-    return '0:00';
-  }
-  const totalSec = Math.floor(seconds);
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
+  if (!isFinite(seconds) || seconds < 0) return '0:00';
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
@@ -448,6 +369,6 @@ function updateSliderFill(slider) {
   if (!slider) return;
   const max = parseFloat(slider.max) || 100;
   const val = parseFloat(slider.value) || 0;
-  const percent = max > 0 ? Math.min(100, Math.max(0, (val / max) * 100)) : 0;
-  slider.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${percent}%, var(--bg-tertiary) ${percent}%, var(--bg-tertiary) 100%)`;
+  const pct = max > 0 ? Math.min(100, Math.max(0, (val / max) * 100)) : 0;
+  slider.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct}%, var(--bg-tertiary) ${pct}%, var(--bg-tertiary) 100%)`;
 }

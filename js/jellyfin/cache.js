@@ -99,6 +99,24 @@ export async function clearApiCache() {
   }
 }
 
+export async function deleteCachedApiData(key) {
+  try {
+    const db = await initCacheDB();
+    if (!db) return;
+
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      const request = store.delete(key);
+
+      request.onsuccess = () => resolve(true);
+      request.onerror = () => resolve(false);
+    });
+  } catch (err) {
+    console.warn(`[Cache] deleteCachedApiData error for ${key}:`, err);
+  }
+}
+
 /**
  * Executes Stale-While-Revalidate pattern:
  * 1. Immediately returns cached data if available.

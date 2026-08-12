@@ -126,6 +126,13 @@ export function toggleRepeat() {
   return repeat;
 }
 
+export function addToQueue(tracks) {
+  if (!Array.isArray(tracks) || tracks.length === 0) return 0;
+  originalQueue.push(...tracks);
+  queue.push(...tracks);
+  return tracks.length;
+}
+
 export function getQueueState() {
   return {
     queue,

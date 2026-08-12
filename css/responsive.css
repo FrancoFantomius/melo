@@ -7,6 +7,17 @@
 
 /* Mobile View Rules */
 @media (max-width: 768px) {
+  #btn-refresh-discover-daily .btn-refresh-label {
+    display: none;
+  }
+
+  .btn-play-label-short {
+    display: inline;
+  }
+
+  .btn-play-label-full {
+    display: none;
+  }
   #app-layout {
     display: flex;
     flex-direction: column;
@@ -118,7 +129,7 @@
   /* Simplified Track Row Layout on Mobile */
   .track-row {
     display: grid !important;
-    grid-template-columns: 44px minmax(0, 1fr) 32px 32px 32px !important;
+    grid-template-columns: 44px minmax(0, 1fr) 32px 32px !important;
     gap: 8px !important;
     align-items: center !important;
     padding: 8px 10px !important;
@@ -129,9 +140,18 @@
   /* Hide track index, album name, duration, and play icon on mobile */
   .track-row > .track-num,
   .track-row > div:nth-child(4),
-  .track-row > div:nth-child(8),
-  .track-row > div:nth-child(9) {
+  .track-row > div:nth-child(7),
+  .track-row > div:nth-child(8) {
     display: none !important;
+  }
+
+  /* Use Material Symbols check icon for track selection on mobile */
+  .track-row.selected .track-info::before {
+    content: 'check';
+    font-family: var(--font-icon);
+    font-weight: normal;
+    font-size: 24px;
+    line-height: 40px;
   }
 
   /* Two-column horizontal swipable tracks grid on mobile home index */

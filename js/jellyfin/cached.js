@@ -1,4 +1,4 @@
-import { fetchWithCache } from './cache.js';
+import { fetchWithCache, deleteCachedApiData } from './cache.js';
 import {
   getAlbums,
   getArtists,
@@ -18,8 +18,10 @@ export async function getArtistsCached(options = {}, onRevalidate = null) {
   return fetchWithCache(`artists_${JSON.stringify(options)}`, () => getArtists(options), onRevalidate);
 }
 
-export async function getSongsCached(options = {}, onRevalidate = null) {
-  return fetchWithCache(`songs_${JSON.stringify(options)}`, () => getSongs(options), onRevalidate);
+export async function getSongsCached(options = {}, onRevalidate = null, force = false) {
+  const key = `songs_${JSON.stringify(options)}`;
+  if (force) await deleteCachedApiData(key);
+  return fetchWithCache(key, () => getSongs(options), onRevalidate);
 }
 
 export async function getFavoriteSongsCached(options = {}, onRevalidate = null) {

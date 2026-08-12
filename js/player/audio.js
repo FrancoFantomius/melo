@@ -1,120 +1,18 @@
-import { getSession } from '../jellyfin/session.js';
-import { getAudioStreamUrl, getArtworkUrl, reportPlaybackStart, reportPlaybackProgress, reportPlaybackStopped } from '../jellyfin/client.js';
-import { isTrackDownloaded, getDownloadedBlobUrl } from '../jellyfin/offline.js';
-import { getCurrentTrack, nextTrack, prevTrack, toggleShuffle, toggleRepeat, getQueueState, restoreQueueState, setCurrentTrack, setCurrentIndex } from './queue.js';
+import {
+  reportPlaybackStart,
+  reportPlaybackProgress,
+  reportPlaybackStopped
+} from '../jellyfin/client.js';
+import { getCurrentTrack, nextTrack, prevTrack, getQueueState, setCurrentTrack } from './queue.js';
 import { getEpisodeState, saveEpisodeProgress, getSavedPlaybackSpeed, savePlaybackSpeed } from '../podcasts/storage.js';
 import { cleanAudioUrl } from '../podcasts/rss.js';
-
-let audio = new Audio();
-let isPlaying = false;
-let updateProgressTimer = null;
-let currentBitrateMode = 'Direct';
-let lastSaveTimestamp = 0;
-let previousVolume = 0.8;
-let currentPlaybackSpeed = 1.0;
-
-// Server-side seek offset: when we request a stream starting at e.g. 160s,
-// audio.currentTime starts at 0 but the real position is seekOffset + audio.currentTime
-let seekOffset = 0;
-
-// Callbacks for UI updates
-let onStateChangeCallback = null;
-
-export function initAudioPlayer(onStateChange) {
-  onStateChangeCallback = onStateChange;
-  currentPlaybackSpeed = getSavedPlaybackSpeed();
-  audio.playbackRate = currentPlaybackSpeed;
-
-  audio.addEventListener('play', () => {
-    isPlaying = true;
-    startProgressReporting();
-    updateMediaSessionState();
-    notifyUI();
-    savePlayerState();
-  });
-
-  audio.addEventListener('pause', () => {
-    isPlaying = false;
-    stopProgressReporting();
-    updateMediaSessionState();
-    notifyUI();
-    savePlayerState();
-  });
-
-  audio.addEventListener('ended', () => {
-    const track = getCurrentTrack();
-    if (track) {
-      const realPosition = seekOffset + audio.currentTime;
-      reportPlaybackStopped(track.Id, Math.floor(realPosition * 10000000));
-    }
-    savePlayerState();
-    playNextTrack(true);
-  });
-
-  audio.addEventListener('timeupdate', () => {
-    const track = getCurrentTrack();
-    if (track && track.isPodcastEpisode) {
-      saveEpisodeProgress(track.id, audio.currentTime, audio.duration || track.duration || 0);
-    }
-    notifyUI();
-    savePlayerStateThrottled();
-  });
-
-  audio.addEventListener('loadedmetadata', () => {
-    notifyUI();
-  });
-
-  audio.addEventListener('durationchange', () => {
-    notifyUI();
-  });
-
-  audio.addEventListener('error', (e) => {
-    console.error('[Audio Engine] Playback error:', e);
-    isPlaying = false;
-    notifyUI();
-  });
-
-  window.addEventListener('beforeunload', () => {
-    savePlayerState();
-  });
-
-  setupMediaSessionHandlers();
-  restorePlayerState();
-}
-
-export function resolveCurrentBitrate() {
-  const session = getSession();
-  let isMobile = false;
-
-  if (navigator.connection) {
-    const type = navigator.connection.type || navigator.connection.effectiveType || '';
-    if (type.includes('cellular') || type.includes('2g') || type.includes('3g') || type.includes('4g')) {
-      isMobile = true;
-    }
-  }
-
-  const selected = isMobile ? session.qualityMobile : session.qualityWifi;
-  currentBitrateMode = session.forceTranscode && selected === 'Direct' ? '320000' : selected;
-  return currentBitrateMode;
-}
-
-export async function resolveStreamUrl(track, startTimeTicks = 0) {
-  const key = track ? (track.Id || track.id) : null;
-  if (key && await isTrackDownloaded(key)) {
-    const blobUrl = await getDownloadedBlobUrl(key);
-    if (blobUrl) return blobUrl;
-  }
-  if (track.isPodcastEpisode || track.enclosureUrl) {
-    return cleanAudioUrl(track.enclosureUrl);
-  }
-  const bitrate = resolveCurrentBitrate();
-  const session = getSession();
-  return getAudioStreamUrl(track.Id, {
-    maxStreamingBitrate: bitrate,
-    forceTranscode: session.forceTranscode,
-    startTimeTicks
-  });
-}
+import { isTrackDownloaded } from '../jellyfin/offline.js';
+import { audio, state } from './state.js';
+import { resolveStreamUrl, buildSeekStreamUrl, resolvePodcastProxyBlobUrl } from './stream.js';
+import { savePlayerState, savePlayerStateThrottled, restorePlayerState } from './persistence.js';
+import { setupMediaSessionMetadata, updateMediaSessionState, updateMediaSessionPositionState, setupMediaSessionHandlers } from './media-session.js';
+import { startProgressReporting, stopProgressReporting } from './progress.js';
+import { ensureBackgroundContext, armAutoAdvanceRetry, initBackgroundKeepalive } from './background.js';
 
 export async function playTrack(trackOverride = null) {
   if (trackOverride) {
@@ -125,7 +23,7 @@ export async function playTrack(trackOverride = null) {
   if (!track) return;
 
   // Reset seek offset when starting a new track from the beginning
-  seekOffset = 0;
+  state.seekOffset = 0;
 
   let streamUrl = '';
   let startPositionSec = 0;
@@ -141,11 +39,7 @@ export async function playTrack(trackOverride = null) {
   if (!streamUrl) return;
 
   if (audio.src === streamUrl) {
-    if (startPositionSec > 0) {
-      audio.currentTime = startPositionSec;
-    } else {
-      audio.currentTime = 0;
-    }
+    audio.currentTime = startPositionSec > 0 ? startPositionSec : 0;
   } else {
     audio.src = streamUrl;
     if (startPositionSec > 0) {
@@ -153,7 +47,7 @@ export async function playTrack(trackOverride = null) {
     }
   }
 
-  audio.playbackRate = currentPlaybackSpeed;
+  audio.playbackRate = state.currentPlaybackSpeed;
 
   audio.play().then(() => {
     if (track.Id) reportPlaybackStart(track.Id, Math.floor(startPositionSec * 10000000));
@@ -162,25 +56,29 @@ export async function playTrack(trackOverride = null) {
     notifyUI();
   }).catch((err) => {
     console.warn('[Audio Engine] Autoplay interrupted:', err);
+    // When the phone screen is off the browser may block this play(); keep the
+    // new track's index in state and retry as soon as the app is foregrounded.
+    savePlayerState();
+    armAutoAdvanceRetry(notifyUI);
   });
 }
 
 export function setPlaybackSpeed(speed) {
   const num = parseFloat(speed);
-  if (isNaN(num) || num <= 0) return currentPlaybackSpeed;
-  currentPlaybackSpeed = num;
-  audio.playbackRate = currentPlaybackSpeed;
-  savePlaybackSpeed(currentPlaybackSpeed);
+  if (isNaN(num) || num <= 0) return state.currentPlaybackSpeed;
+  state.currentPlaybackSpeed = num;
+  audio.playbackRate = state.currentPlaybackSpeed;
+  savePlaybackSpeed(state.currentPlaybackSpeed);
   notifyUI();
-  return currentPlaybackSpeed;
+  return state.currentPlaybackSpeed;
 }
 
 export function getPlaybackSpeed() {
-  return currentPlaybackSpeed;
+  return state.currentPlaybackSpeed;
 }
 
 export function skipSeconds(secs) {
-  const realCurrent = seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
+  const realCurrent = state.seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
   seekTo(realCurrent + secs);
 }
 
@@ -232,7 +130,7 @@ export async function seekTo(seconds) {
   if (track.RunTimeTicks) {
     totalDuration = track.RunTimeTicks / 10000000;
   } else if (isFinite(audio.duration) && audio.duration > 0) {
-    totalDuration = audio.duration + seekOffset;
+    totalDuration = audio.duration + state.seekOffset;
   }
 
   if (totalDuration > 0 && seconds > totalDuration) {
@@ -240,7 +138,7 @@ export async function seekTo(seconds) {
   }
 
   // Check if native seeking within currently playing stream is possible
-  const relativeTarget = seconds - seekOffset;
+  const relativeTarget = seconds - state.seekOffset;
   if (
     relativeTarget >= 0 &&
     audio.seekable.length > 0 &&
@@ -255,17 +153,8 @@ export async function seekTo(seconds) {
   // Server-side seeking: request a new stream from the desired position
   const wasPaused = audio.paused;
   const startTicks = Math.floor(seconds * 10000000);
-  seekOffset = seconds;
-  const bitrate = resolveCurrentBitrate();
-  const session = getSession();
-
-  const streamUrl = getAudioStreamUrl(track.Id, {
-    maxStreamingBitrate: bitrate,
-    forceTranscode: session.forceTranscode,
-    startTimeTicks: startTicks
-  });
-
-  audio.src = streamUrl;
+  state.seekOffset = seconds;
+  audio.src = buildSeekStreamUrl(track, startTicks);
   if (!wasPaused) {
     audio.play().catch((err) => {
       console.warn('[Audio Engine] Seek autoplay interrupted:', err);
@@ -276,109 +165,11 @@ export async function seekTo(seconds) {
   savePlayerState();
 }
 
-function savePlayerStateThrottled() {
-  const now = Date.now();
-  if (now - lastSaveTimestamp > 2000) {
-    lastSaveTimestamp = now;
-    savePlayerState();
-  }
-}
-
-export function savePlayerState() {
-  const track = getCurrentTrack();
-  if (!track) return;
-
-  const realPosition = seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
-  const queueState = getQueueState();
-
-  const state = {
-    queue: queueState.queue,
-    originalQueue: queueState.originalQueue,
-    currentIndex: queueState.currentIndex,
-    shuffle: queueState.shuffle,
-    repeat: queueState.repeat,
-    position: isFinite(realPosition) ? realPosition : 0,
-    volume: audio.volume
-  };
-
-  try {
-    localStorage.setItem('melo_player_state', JSON.stringify(state));
-  } catch (e) {
-    console.warn('[Audio Engine] Failed to save player state:', e);
-  }
-}
-
-export async function restorePlayerState() {
-  try {
-    const raw = localStorage.getItem('melo_player_state');
-    if (!raw) return null;
-    const state = JSON.parse(raw);
-
-    if (state.queue && Array.isArray(state.queue) && state.queue.length > 0 && typeof state.currentIndex === 'number' && state.currentIndex >= 0) {
-      restoreQueueState(state);
-
-      if (typeof state.volume === 'number' && isFinite(state.volume)) {
-        audio.volume = Math.max(0, Math.min(1, state.volume));
-        if (audio.volume > 0) {
-          previousVolume = audio.volume;
-        }
-      }
-
-      const track = getCurrentTrack();
-      if (track) {
-        const savedPos = state.position || 0;
-        const trackKey = track.Id || track.id;
-        const downloaded = trackKey && await isTrackDownloaded(trackKey);
-
-        if (downloaded) {
-          const blobUrl = await getDownloadedBlobUrl(trackKey);
-          if (blobUrl) {
-            seekOffset = 0;
-            audio.src = blobUrl;
-            if (savedPos > 0) audio.currentTime = savedPos;
-          } else {
-            seekOffset = savedPos;
-            const bitrate = resolveCurrentBitrate();
-            const session = getSession();
-            const startTicks = Math.floor(savedPos * 10000000);
-            audio.src = getAudioStreamUrl(track.Id, {
-              maxStreamingBitrate: bitrate,
-              forceTranscode: session.forceTranscode,
-              startTimeTicks: startTicks
-            });
-          }
-        } else {
-          seekOffset = savedPos;
-          const bitrate = resolveCurrentBitrate();
-          const session = getSession();
-          const startTicks = Math.floor(savedPos * 10000000);
-
-          const streamUrl = (track.isPodcastEpisode || track.enclosureUrl)
-            ? cleanAudioUrl(track.enclosureUrl)
-            : getAudioStreamUrl(track.Id, {
-                maxStreamingBitrate: bitrate,
-                forceTranscode: session.forceTranscode,
-                startTimeTicks: startTicks
-              });
-
-          audio.src = streamUrl;
-        }
-        setupMediaSessionMetadata(track);
-        notifyUI();
-        return state;
-      }
-    }
-  } catch (err) {
-    console.warn('[Audio Engine] Failed to restore player state:', err);
-  }
-  return null;
-}
-
 export function setVolume(value) {
   const clamped = Math.max(0, Math.min(1, value));
   audio.volume = clamped;
   if (clamped > 0) {
-    previousVolume = clamped;
+    state.previousVolume = clamped;
   }
   savePlayerState();
   notifyUI();
@@ -386,121 +177,110 @@ export function setVolume(value) {
 
 export function toggleMute() {
   if (audio.volume > 0) {
-    previousVolume = audio.volume;
+    state.previousVolume = audio.volume;
     setVolume(0);
   } else {
-    setVolume(previousVolume > 0 ? previousVolume : 0.8);
+    setVolume(state.previousVolume > 0 ? state.previousVolume : 0.8);
   }
 }
 
-function startProgressReporting() {
-  stopProgressReporting();
-  updateProgressTimer = setInterval(() => {
+export function initAudioPlayer(onStateChange) {
+  state.onStateChangeCallback = onStateChange;
+  state.currentPlaybackSpeed = getSavedPlaybackSpeed();
+  audio.playbackRate = state.currentPlaybackSpeed;
+
+  audio.addEventListener('play', () => {
+    state.isPlaying = true;
+    // Must be created/resumed inside a user-gesture-driven play() so the
+    // context is not suspended (a suspended context would mute the element).
+    ensureBackgroundContext();
+    startProgressReporting();
+    updateMediaSessionState();
+    notifyUI();
+    savePlayerState();
+  });
+
+  audio.addEventListener('pause', () => {
+    state.isPlaying = false;
+    // A pause that happens while the app is hidden was not caused by the user
+    // (the screen is off), so it can be safely auto-resumed on next unlock.
+    if (document.visibilityState === 'hidden') state.pausedWhileHidden = true;
+    stopProgressReporting();
+    updateMediaSessionState();
+    notifyUI();
+    savePlayerState();
+  });
+
+  audio.addEventListener('ended', () => {
     const track = getCurrentTrack();
-    if (track && !audio.paused && isFinite(audio.currentTime)) {
-      const realPosition = seekOffset + audio.currentTime;
-      reportPlaybackProgress(track.Id, Math.floor(realPosition * 10000000), false);
+    if (track) {
+      const realPosition = state.seekOffset + audio.currentTime;
+      reportPlaybackStopped(track.Id, Math.floor(realPosition * 10000000));
     }
-  }, 10000);
-}
+    savePlayerState();
+    playNextTrack(true);
+  });
 
-function stopProgressReporting() {
-  if (updateProgressTimer) {
-    clearInterval(updateProgressTimer);
-    updateProgressTimer = null;
-  }
-}
-
-// MediaSession API Integration
-function setupMediaSessionMetadata(track) {
-  if ('mediaSession' in navigator) {
-    const artworkUrl = getArtworkUrl(track, 'Primary', 512);
-    const artistName = track.Artists && track.Artists.length > 0 ? track.Artists.join(', ') : (track.AlbumArtist || 'Unknown Artist');
-
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.Name || 'Unknown Title',
-      artist: artistName,
-      album: track.Album || 'Melo',
-      artwork: [
-        { src: artworkUrl, sizes: '512x512', type: 'image/jpeg' }
-      ]
-    });
-    updateMediaSessionPositionState();
-  }
-}
-
-function updateMediaSessionState() {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.playbackState = isPlaying ? 'playing' : 'paused';
-    updateMediaSessionPositionState();
-  }
-}
-
-function updateMediaSessionPositionState() {
-  if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+  audio.addEventListener('timeupdate', () => {
     const track = getCurrentTrack();
-    let effectiveDuration = 0;
-    if (track && track.RunTimeTicks) {
-      effectiveDuration = track.RunTimeTicks / 10000000;
-    } else if (isFinite(audio.duration) && audio.duration > 0) {
-      effectiveDuration = audio.duration + seekOffset;
+    if (track && track.isPodcastEpisode) {
+      saveEpisodeProgress(track.id, audio.currentTime, audio.duration || track.duration || 0);
     }
+    notifyUI();
+    savePlayerStateThrottled();
+  });
 
-    const realCurrentTime = seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
+  audio.addEventListener('loadedmetadata', () => {
+    notifyUI();
+  });
 
-    if (isFinite(effectiveDuration) && effectiveDuration > 0 && isFinite(realCurrentTime) && realCurrentTime >= 0) {
-      try {
-        const safePosition = Math.min(realCurrentTime, effectiveDuration);
-        navigator.mediaSession.setPositionState({
-          duration: effectiveDuration,
-          playbackRate: audio.playbackRate || 1.0,
-          position: safePosition
+  audio.addEventListener('durationchange', () => {
+    notifyUI();
+  });
+
+  audio.addEventListener('error', (e) => {
+    console.error('[Audio Engine] Playback error:', e);
+    state.isPlaying = false;
+    notifyUI();
+
+    // Fall back to a CORS proxy blob for podcast hosts that don't answer with
+    // Access-Control-Allow-Origin (which the crossOrigin fetch now requires).
+    const track = getCurrentTrack();
+    if (track && (track.isPodcastEpisode || track.enclosureUrl) && track.id !== state.podcastProxyTrackKey) {
+      state.podcastProxyTrackKey = track.id;
+      resolvePodcastProxyBlobUrl(cleanAudioUrl(track.enclosureUrl)).then((blobUrl) => {
+        if (!blobUrl) return;
+        if (state.podcastProxyBlobUrl) URL.revokeObjectURL(state.podcastProxyBlobUrl);
+        state.podcastProxyBlobUrl = blobUrl;
+        audio.src = blobUrl;
+        audio.play().catch((err) => {
+          console.warn('[Audio Engine] Podcast proxy play interrupted:', err);
         });
-      } catch (err) {
-        console.warn('[Audio Engine] mediaSession.setPositionState error:', err);
-      }
+      });
     }
-  }
-}
+  });
 
-function setupMediaSessionHandlers() {
-  if (!('mediaSession' in navigator)) return;
+  window.addEventListener('beforeunload', () => {
+    savePlayerState();
+  });
 
-  const handlers = {
-    play: () => togglePlayPause(),
-    pause: () => togglePlayPause(),
-    previoustrack: () => playPrevTrack(),
-    nexttrack: () => playNextTrack(),
-    seekbackward: (details) => {
-      const skipTime = (details && details.seekOffset) || 10;
-      const realPosition = seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
-      seekTo(Math.max(0, realPosition - skipTime));
-    },
-    seekforward: (details) => {
-      const skipTime = (details && details.seekOffset) || 10;
-      const realPosition = seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
-      seekTo(realPosition + skipTime);
-    },
-    seekto: (details) => {
-      if (details && details.seekTime !== undefined && details.seekTime !== null) {
-        seekTo(details.seekTime);
-      }
-    },
-    stop: () => {
-      audio.pause();
-      audio.currentTime = 0;
-      isPlaying = false;
+  setupMediaSessionHandlers({
+    togglePlayPause,
+    playNextTrack,
+    playPrevTrack,
+    seekTo,
+    notifyUI
+  });
+
+  initBackgroundKeepalive();
+
+  restorePlayerState().then((saved) => {
+    if (saved) {
+      const track = getCurrentTrack();
+      if (track) setupMediaSessionMetadata(track);
       notifyUI();
     }
-  };
-
-  for (const [action, handler] of Object.entries(handlers)) {
-    try {
-      navigator.mediaSession.setActionHandler(action, handler);
-    } catch (err) {
-      console.warn(`[Audio Engine] MediaSession action '${action}' not supported:`, err);
-    }
-  }
+  });
 }
 
 export function notifyUI() {
@@ -511,23 +291,27 @@ export function notifyUI() {
     // only reflects the remaining stream length after a server-side seek
     effectiveDuration = track.RunTimeTicks / 10000000;
   } else if (isFinite(audio.duration) && audio.duration > 0) {
-    effectiveDuration = audio.duration + seekOffset;
+    effectiveDuration = audio.duration + state.seekOffset;
   }
 
-  const realCurrentTime = seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
+  const realCurrentTime = state.seekOffset + (isFinite(audio.currentTime) ? audio.currentTime : 0);
 
   updateMediaSessionPositionState();
 
-  if (onStateChangeCallback) {
-    onStateChangeCallback({
+  if (state.onStateChangeCallback) {
+    state.onStateChangeCallback({
       track,
-      isPlaying,
+      isPlaying: state.isPlaying,
       currentTime: realCurrentTime,
       duration: isFinite(effectiveDuration) ? effectiveDuration : 0,
       volume: audio.volume,
-      playbackSpeed: currentPlaybackSpeed,
-      bitrateMode: currentBitrateMode,
+      playbackSpeed: state.currentPlaybackSpeed,
+      bitrateMode: state.currentBitrateMode,
       queueState: getQueueState()
     });
   }
 }
+
+// Kept as the public facade exports (backwards compatible with views/UI).
+export { resolveCurrentBitrate, resolveStreamUrl } from './stream.js';
+export { savePlayerState, restorePlayerState };

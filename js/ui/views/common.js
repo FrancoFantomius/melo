@@ -8,7 +8,48 @@ import { isTrackLiked, toggleTrackLiked, registerTracksFavoriteStatus } from '..
 import { refreshDownloadButton, toggleTrackDownload } from '../downloads.js';
 import { getTranslation } from '../../i18n.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
-import { openSelectPlaylistModal } from '../modals.js';
+
+export function bindLongPress(el, onLongPress) {
+  if (!el || typeof onLongPress !== 'function') return;
+  let timer = null;
+  let startX = 0;
+  let startY = 0;
+  let started = false;
+
+  const cancel = () => {
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+    started = false;
+  };
+
+  el.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    const t = e.touches[0];
+    startX = t.clientX;
+    startY = t.clientY;
+    cancel();
+    started = true;
+    timer = setTimeout(() => {
+      timer = null;
+      if (started) {
+        started = false;
+        onLongPress(e);
+      }
+    }, 550);
+  }, { passive: true });
+
+  el.addEventListener('touchmove', (e) => {
+    if (!started || e.touches.length !== 1) return;
+    const t = e.touches[0];
+    if (Math.abs(t.clientX - startX) > 10 || Math.abs(t.clientY - startY) > 10) cancel();
+  }, { passive: true });
+
+  el.addEventListener('touchend', cancel, { passive: true });
+  el.addEventListener('touchcancel', cancel, { passive: true });
+  el.addEventListener('contextmenu', (e) => e.preventDefault());
+}
 
 export function formatItemType(type) {
   if (type === 'MusicAlbum' || type === 'Album') return 'Album';
@@ -44,7 +85,11 @@ export function renderArtistLinksHTML(artistsInfo) {
 }
 
 export function bindArtistLinks(container) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
   container.querySelectorAll('.artist-link').forEach(link => {
+    if (isMobile && link.closest('.track-row')) {
+      return;
+    }
     link.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -136,11 +181,6 @@ export function renderTrackRowHTML(track, index) {
         </button>
       </div>
       <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-add-playlist" data-track-id="${trackKey}" title="Add to Playlist">
-          <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
-        </button>
-      </div>
-      <div style="display: flex; justify-content: center; align-items: center;">
         <button class="btn-track-download" data-track-id="${trackKey}" title="Download">
           <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
         </button>
@@ -206,8 +246,25 @@ export function bindAlbumCards(container) {
 export function bindTrackRows(container, tracks) {
   container.querySelectorAll('.track-row').forEach(row => {
     row.addEventListener('click', (e) => {
-      // Ignore click if user clicked directly on artist link, like button, add playlist, or download button
-      if (e.target.closest('.artist-link') || e.target.closest('.btn-track-like') || e.target.closest('.btn-track-add-playlist') || e.target.closest('.btn-track-download')) {
+      // Ignore click directly following a long press (selection gesture)
+      if (row.dataset.suppressClick && Date.now() - Number(row.dataset.suppressClick) < 700) {
+        return;
+      }
+      // Ignore click if user clicked directly on artist link, like button, or download button
+      const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+      if (e.target.closest('.btn-track-like') || e.target.closest('.btn-track-download')) {
+        return;
+      }
+      // In selection mode, a single tap toggles selection instead of playing
+      if (row.closest('.track-selection-active')) {
+        row.dispatchEvent(new CustomEvent('melo-track-longpress', {
+          bubbles: true,
+          detail: { trackId: row.getAttribute('data-track-id') }
+        }));
+        return;
+      }
+      // On desktop, clicking the artist name navigates to the artist; on mobile it plays the song
+      if (!isMobile && e.target.closest('.artist-link')) {
         return;
       }
       const index = parseInt(row.getAttribute('data-index'), 10);
@@ -226,17 +283,6 @@ export function bindTrackRows(container, tracks) {
       });
     }
 
-    const addPlaylistBtn = row.querySelector('.btn-track-add-playlist');
-    if (addPlaylistBtn) {
-      addPlaylistBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const trackId = addPlaylistBtn.getAttribute('data-track-id');
-        const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
-        openSelectPlaylistModal(trackObj);
-      });
-    }
-
     const downloadBtn = row.querySelector('.btn-track-download');
     if (downloadBtn) {
       downloadBtn.addEventListener('click', async (e) => {
@@ -245,6 +291,17 @@ export function bindTrackRows(container, tracks) {
         const trackId = downloadBtn.getAttribute('data-track-id');
         const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
         await toggleTrackDownload(trackObj, downloadBtn);
+      });
+    }
+
+    const trackInfo = row.querySelector('.track-info');
+    if (trackInfo) {
+      bindLongPress(trackInfo, () => {
+        row.dataset.suppressClick = String(Date.now());
+        row.dispatchEvent(new CustomEvent('melo-track-longpress', {
+          bubbles: true,
+          detail: { trackId: row.getAttribute('data-track-id') }
+        }));
       });
     }
   });
