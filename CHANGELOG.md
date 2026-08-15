@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.8.0] - 2026-08-15
+
+### Added
+- **Track actions**: added dedicated "Add to Queue" and "Add to Playlist" buttons directly on track rows with temporary checkmark feedback when queued.
+- **Batch playlist addition**: added an "Add to Playlist" button to the multi-track selection toolbar in album and playlist views.
+- **Dynamic lyrics visibility**: the player dynamically checks track lyrics availability via the Jellyfin API and only shows the lyrics button when lyrics exist, caching results to minimize requests.
+- **Keyboard shortcuts**: press the `Space` bar anywhere (outside input fields) to toggle play and pause.
+- **Synchronous offline stream resolution**: added offline cache pre-warming (`warmOfflineCache`) and synchronous download checks (`isTrackDownloadedSync`, `getDownloadedBlobUrlSync`) to eliminate delay when initiating playback of downloaded tracks.
+- **Offline lyrics persistence**: saved offline tracks now preserve the `hasLyrics` flag for offline lyrics handling.
+- **Clean script**: added `npm run clean` (`git clean -fdX`) to wipe all `.gitignore`-matched build artifacts and dependencies.
+- **i18n**: added translations for "Add to Queue" across all 8 supported languages.
+
+### Changed
+- **Audio engine simplifications**: removed the complex `AudioContext` destination bridge and forced cross-origin attribute on the `<audio>` element, preventing CORS-related playback failures with third-party podcast streams while retaining resilient visibility-change playback recovery.
+- **Queue drawer performance**: added signature-based memoization to queue drawer rendering to eliminate unnecessary DOM rebuilds and UI stutter during progress updates.
+- **SPA search navigation**: global search submissions and dropdown search result selections now utilize smooth client-side history routing (`pushState`) without triggering unnecessary full page reloads.
+- **Seeking UI**: fixed progress timer display jitter while actively dragging playback sliders.
+- **Track row responsive layout**: refined desktop and mobile grid definitions for track rows to cleanly accommodate queue and playlist actions.
+- Version bumped to `0.8.0`.
+
 ## [0.7.0] - 2026-08-12
 
 ### Added

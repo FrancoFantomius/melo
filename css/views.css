@@ -393,7 +393,7 @@
 
 .track-row {
   display: grid;
-  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 60px 36px;
+  grid-template-columns: 36px 48px 2fr 1.5fr 36px 36px 36px 36px 60px 36px;
   align-items: center;
   padding: 10px 16px;
   border-radius: var(--radius-sm);
@@ -407,7 +407,9 @@
 }
 
 .btn-track-like,
-.btn-track-download {
+.btn-track-download,
+.btn-track-add-queue,
+.btn-track-add-playlist {
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -425,7 +427,9 @@
   background: rgba(249, 115, 22, 0.1);
 }
 
-.btn-track-download:hover {
+.btn-track-download:hover,
+.btn-track-add-queue:hover,
+.btn-track-add-playlist:hover {
   color: var(--accent);
   background: rgba(249, 115, 22, 0.1);
 }

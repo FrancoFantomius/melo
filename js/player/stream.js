@@ -1,6 +1,6 @@
 import { getSession } from '../jellyfin/session.js';
 import { getAudioStreamUrl } from '../jellyfin/client.js';
-import { isTrackDownloaded, getDownloadedBlobUrl } from '../jellyfin/offline.js';
+import { isTrackDownloadedSync, getDownloadedBlobUrlSync } from '../jellyfin/offline.js';
 import { cleanAudioUrl } from '../podcasts/rss.js';
 import { state } from './state.js';
 
@@ -20,10 +20,11 @@ export function resolveCurrentBitrate() {
   return state.currentBitrateMode;
 }
 
-export async function resolveStreamUrl(track, startTimeTicks = 0) {
-  const key = track ? (track.Id || track.id) : null;
-  if (key && await isTrackDownloaded(key)) {
-    const blobUrl = await getDownloadedBlobUrl(key);
+export function resolveStreamUrl(track, startTimeTicks = 0) {
+  if (!track) return '';
+  const key = track.Id || track.id;
+  if (key && isTrackDownloadedSync(key)) {
+    const blobUrl = getDownloadedBlobUrlSync(key);
     if (blobUrl) return blobUrl;
   }
   if (track.isPodcastEpisode || track.enclosureUrl) {

@@ -158,6 +158,7 @@ function playRecord(rec) {
     Name: rec.name,
     Artists: rec.artists ? rec.artists.split(', ') : [],
     Album: rec.album,
+    HasLyrics: rec.hasLyrics,
     isPodcastEpisode: !!rec.isPodcast
   };
   setQueue([track], 0);
@@ -219,6 +220,7 @@ function bindGroupHandlers(listEl, recMap) {
           Name: rec.name,
           Artists: rec.artists ? rec.artists.split(', ') : [],
           Album: rec.album,
+          HasLyrics: rec.hasLyrics,
           isPodcastEpisode: !!rec.isPodcast
         }));
         setQueue(tracks, 0);

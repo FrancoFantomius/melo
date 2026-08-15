@@ -137,11 +137,18 @@
     box-sizing: border-box !important;
   }
 
-  /* Hide track index, album name, duration, and play icon on mobile */
+  /* Hide track index, album name, queue button, playlist button, duration, and play icon on mobile */
   .track-row > .track-num,
+  .track-row > .track-album,
+  .track-row > .track-action-queue,
+  .track-row > .track-action-playlist,
+  .track-row > .track-duration,
+  .track-row > .track-action-play,
   .track-row > div:nth-child(4),
   .track-row > div:nth-child(7),
-  .track-row > div:nth-child(8) {
+  .track-row > div:nth-child(8),
+  .track-row > div:nth-child(9),
+  .track-row > div:nth-child(10) {
     display: none !important;
   }
 

@@ -1,6 +1,7 @@
 import { addToQueue } from '../../../player/queue.js';
 import { notifyUI } from '../../../player/audio.js';
 import { removeTrackFromPlaylist } from '../../../jellyfin/client.js';
+import { openSelectPlaylistModal } from '../../modals.js';
 import { getTranslation } from '../../../i18n.js';
 
 export function setupTrackSelection({ getSongs, getAlbumId, onRemoveDone }) {
@@ -59,6 +60,14 @@ export function setupTrackSelection({ getSongs, getAlbumId, onRemoveDone }) {
   });
 
   document.getElementById('btn-tracks-clear-selection')?.addEventListener('click', () => {
+    selectedKeys.clear();
+    applySelectionUI();
+  });
+
+  document.getElementById('btn-tracks-add-playlist')?.addEventListener('click', () => {
+    const tracks = getSongs().filter(t => selectedKeys.has(String(t.Id || t.id)));
+    if (tracks.length === 0) return;
+    openSelectPlaylistModal(tracks);
     selectedKeys.clear();
     applySelectionUI();
   });

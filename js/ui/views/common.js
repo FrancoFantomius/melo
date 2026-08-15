@@ -1,9 +1,10 @@
 import { getArtworkUrl, getSongsCached, getPlaylistItemsCached, getFavoriteSongsCached } from '../../jellyfin/client.js';
-import { setQueue } from '../../player/queue.js';
-import { playTrack } from '../../player/audio.js';
+import { addToQueue, setQueue } from '../../player/queue.js';
+import { playTrack, notifyUI } from '../../player/audio.js';
 import { openArtist } from './artists.js';
 import { openAlbum } from './albums.js';
 import { openPlaylist } from './playlists.js';
+import { openSelectPlaylistModal } from '../modals.js';
 import { isTrackLiked, toggleTrackLiked, registerTracksFavoriteStatus } from '../../player/likes.js';
 import { refreshDownloadButton, toggleTrackDownload } from '../downloads.js';
 import { getTranslation } from '../../i18n.js';
@@ -170,23 +171,33 @@ export function renderTrackRowHTML(track, index) {
       <div class="track-info">
         <img src="${getArtworkUrl(track, 'Primary', 100)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="track-cover" alt="Cover">
       </div>
-      <div style="overflow: hidden;">
+      <div class="track-main" style="overflow: hidden;">
         <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.Name}</div>
         <div style="font-size: 12px; color: var(--text-secondary);">${artistHTML}</div>
       </div>
-      <div style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.Album || ''}</div>
-      <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${trackKey}" title="${isLiked ? 'Unlike' : 'Like'}">
+      <div class="track-album" style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.Album || ''}</div>
+      <div class="track-action-like" style="display: flex; justify-content: center; align-items: center;">
+        <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${trackKey}" title="${isLiked ? 'Unlike' : 'Like'}" data-i18n-title="${isLiked ? 'Unlike' : 'Like'}">
           <span class="material-symbols-outlined" style="font-size: 18px;">${isLiked ? 'favorite' : 'favorite_border'}</span>
         </button>
       </div>
-      <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-download" data-track-id="${trackKey}" title="Download">
+      <div class="track-action-download" style="display: flex; justify-content: center; align-items: center;">
+        <button class="btn-track-download" data-track-id="${trackKey}" title="Download" data-i18n-title="Download">
           <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
         </button>
       </div>
-      <div style="color: var(--text-muted); font-size: 12px; text-align: right;">${timeStr}</div>
-      <div style="text-align: right; color: var(--text-muted);">
+      <div class="track-action-queue" style="display: flex; justify-content: center; align-items: center;">
+        <button class="btn-track-add-queue" data-track-id="${trackKey}" title="Add to Queue" data-i18n-title="Add to Queue">
+          <span class="material-symbols-outlined" style="font-size: 18px;">queue_music</span>
+        </button>
+      </div>
+      <div class="track-action-playlist" style="display: flex; justify-content: center; align-items: center;">
+        <button class="btn-track-add-playlist" data-track-id="${trackKey}" title="Add to Playlist" data-i18n-title="Add to Playlist">
+          <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
+        </button>
+      </div>
+      <div class="track-duration" style="color: var(--text-muted); font-size: 12px; text-align: right;">${timeStr}</div>
+      <div class="track-action-play" style="text-align: right; color: var(--text-muted);">
         <span class="material-symbols-outlined" style="font-size: 18px;">play_circle</span>
       </div>
     </div>
@@ -250,9 +261,9 @@ export function bindTrackRows(container, tracks) {
       if (row.dataset.suppressClick && Date.now() - Number(row.dataset.suppressClick) < 700) {
         return;
       }
-      // Ignore click if user clicked directly on artist link, like button, or download button
+      // Ignore click if user clicked directly on artist link, like button, download button, queue button, or playlist button
       const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-      if (e.target.closest('.btn-track-like') || e.target.closest('.btn-track-download')) {
+      if (e.target.closest('.btn-track-like') || e.target.closest('.btn-track-download') || e.target.closest('.btn-track-add-queue') || e.target.closest('.btn-track-add-playlist')) {
         return;
       }
       // In selection mode, a single tap toggles selection instead of playing
@@ -291,6 +302,37 @@ export function bindTrackRows(container, tracks) {
         const trackId = downloadBtn.getAttribute('data-track-id');
         const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
         await toggleTrackDownload(trackObj, downloadBtn);
+      });
+    }
+
+    const addQueueBtn = row.querySelector('.btn-track-add-queue');
+    if (addQueueBtn) {
+      addQueueBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const trackId = addQueueBtn.getAttribute('data-track-id');
+        const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
+        addToQueue([trackObj]);
+        notifyUI();
+        const icon = addQueueBtn.querySelector('.material-symbols-outlined');
+        if (icon && icon.textContent !== 'check') {
+          const originalIcon = icon.textContent;
+          icon.textContent = 'check';
+          setTimeout(() => {
+            icon.textContent = originalIcon;
+          }, 1000);
+        }
+      });
+    }
+
+    const addPlaylistBtn = row.querySelector('.btn-track-add-playlist');
+    if (addPlaylistBtn) {
+      addPlaylistBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const trackId = addPlaylistBtn.getAttribute('data-track-id');
+        const trackObj = tracks.find(t => String(t.Id || t.id) === String(trackId)) || { Id: trackId };
+        openSelectPlaylistModal(trackObj);
       });
     }
 

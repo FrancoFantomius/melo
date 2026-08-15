@@ -6,15 +6,15 @@ import {
 import { getCurrentTrack, nextTrack, prevTrack, getQueueState, setCurrentTrack } from './queue.js';
 import { getEpisodeState, saveEpisodeProgress, getSavedPlaybackSpeed, savePlaybackSpeed } from '../podcasts/storage.js';
 import { cleanAudioUrl } from '../podcasts/rss.js';
-import { isTrackDownloaded } from '../jellyfin/offline.js';
+import { isTrackDownloaded, warmOfflineCache } from '../jellyfin/offline.js';
 import { audio, state } from './state.js';
 import { resolveStreamUrl, buildSeekStreamUrl, resolvePodcastProxyBlobUrl } from './stream.js';
 import { savePlayerState, savePlayerStateThrottled, restorePlayerState } from './persistence.js';
 import { setupMediaSessionMetadata, updateMediaSessionState, updateMediaSessionPositionState, setupMediaSessionHandlers } from './media-session.js';
 import { startProgressReporting, stopProgressReporting } from './progress.js';
-import { ensureBackgroundContext, armAutoAdvanceRetry, initBackgroundKeepalive } from './background.js';
+import { armAutoAdvanceRetry, initBackgroundKeepalive } from './background.js';
 
-export async function playTrack(trackOverride = null) {
+export function playTrack(trackOverride = null) {
   if (trackOverride) {
     setCurrentTrack(trackOverride);
   }
@@ -24,6 +24,7 @@ export async function playTrack(trackOverride = null) {
 
   // Reset seek offset when starting a new track from the beginning
   state.seekOffset = 0;
+  state.pausedWhileHidden = false;
 
   let streamUrl = '';
   let startPositionSec = 0;
@@ -35,7 +36,7 @@ export async function playTrack(trackOverride = null) {
     }
   }
 
-  streamUrl = await resolveStreamUrl(track, 0);
+  streamUrl = resolveStreamUrl(track, 0);
   if (!streamUrl) return;
 
   if (audio.src === streamUrl) {
@@ -49,18 +50,25 @@ export async function playTrack(trackOverride = null) {
 
   audio.playbackRate = state.currentPlaybackSpeed;
 
-  audio.play().then(() => {
-    if (track.Id) reportPlaybackStart(track.Id, Math.floor(startPositionSec * 10000000));
-    setupMediaSessionMetadata(track);
-    savePlayerState();
-    notifyUI();
-  }).catch((err) => {
-    console.warn('[Audio Engine] Autoplay interrupted:', err);
-    // When the phone screen is off the browser may block this play(); keep the
-    // new track's index in state and retry as soon as the app is foregrounded.
-    savePlayerState();
-    armAutoAdvanceRetry(notifyUI);
-  });
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      state.isPlaying = true;
+      if (track.Id) reportPlaybackStart(track.Id, Math.floor(startPositionSec * 10000000));
+      setupMediaSessionMetadata(track);
+      savePlayerState();
+      notifyUI();
+    }).catch((err) => {
+      console.warn('[Audio Engine] Autoplay interrupted:', err);
+      // When the phone screen is off the browser may block this play(); keep the
+      // new track's index in state and retry as soon as the app is foregrounded.
+      savePlayerState();
+      armAutoAdvanceRetry(notifyUI);
+    });
+  }
+
+  setupMediaSessionMetadata(track);
+  notifyUI();
 }
 
 export function setPlaybackSpeed(speed) {
@@ -189,11 +197,11 @@ export function initAudioPlayer(onStateChange) {
   state.currentPlaybackSpeed = getSavedPlaybackSpeed();
   audio.playbackRate = state.currentPlaybackSpeed;
 
+  warmOfflineCache().catch(() => {});
+
   audio.addEventListener('play', () => {
     state.isPlaying = true;
-    // Must be created/resumed inside a user-gesture-driven play() so the
-    // context is not suspended (a suspended context would mute the element).
-    ensureBackgroundContext();
+    state.pausedWhileHidden = false;
     startProgressReporting();
     updateMediaSessionState();
     notifyUI();
@@ -204,7 +212,9 @@ export function initAudioPlayer(onStateChange) {
     state.isPlaying = false;
     // A pause that happens while the app is hidden was not caused by the user
     // (the screen is off), so it can be safely auto-resumed on next unlock.
-    if (document.visibilityState === 'hidden') state.pausedWhileHidden = true;
+    if (document.visibilityState === 'hidden' && !audio.ended) {
+      state.pausedWhileHidden = true;
+    }
     stopProgressReporting();
     updateMediaSessionState();
     notifyUI();
@@ -272,7 +282,7 @@ export function initAudioPlayer(onStateChange) {
     notifyUI
   });
 
-  initBackgroundKeepalive();
+  initBackgroundKeepalive(notifyUI);
 
   restorePlayerState().then((saved) => {
     if (saved) {

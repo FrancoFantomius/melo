@@ -1,7 +1,7 @@
 # Melo
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-0.6.1-orange.svg)
+![Version](https://img.shields.io/badge/version-0.8.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![Vite](https://img.shields.io/badge/vite-v8.2-646CFF.svg)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8.svg)
@@ -40,16 +40,20 @@ Melo is a lightweight, installable Progressive Web App (PWA) music player built 
 
 ### Audio Playback Engine
 - Full-featured audio player with play, pause, seek, and volume controls.
-- Queue management with next/previous track navigation.
+- Keyboard shortcuts: `Space` bar anywhere to toggle play/pause.
+- Queue management with next/previous track navigation and memoized drawer rendering.
 - Shuffle and repeat modes (`none` / `all` / `one`).
 - Track progress, elapsed time, and Media Session integration.
-- Synced lyrics support via the Jellyfin lyrics API.
+- Synced lyrics support with dynamic availability checks via the Jellyfin lyrics API.
 - Like/favorite tracks directly from the player.
 
-### Media Browsing
+### Media Browsing & Playlist Management
 - Dedicated views for Albums, Artists, Playlists, Podcasts, and Downloads.
-- Instant search across artists, albums, and tracks with recent search history.
-- Virtual playlists out of the box: **Liked Songs** and **Discover Daily**.
+- Instant search across artists, albums, and tracks with recent search history and client-side SPA navigation.
+- Virtual playlists out of the box: **Liked Songs** and **Discover Daily** (with refresh button).
+- Playlist management: create, edit, delete playlists, and add/remove songs.
+- Inline track row actions (Add to Queue, Add to Playlist, Like, Download).
+- Multi-track long-press selection on mobile and batch actions (Add to Playlist, Add to Queue, Remove).
 - Home screen with a recommendation algorithm that ranks content by recency, favorites, play count, completion, and diversity.
 
 ### Podcasts & RSS Reader
@@ -60,6 +64,7 @@ Melo is a lightweight, installable Progressive Web App (PWA) music player built 
 
 ### Offline Downloads
 - Download tracks and podcast episodes for offline playback.
+- Synchronous blob resolution with cache pre-warming for instant offline playback.
 - Downloads stored in IndexedDB with group-by album/playlist organization.
 - Batch download for entire albums and playlists, with progress reporting.
 - Dedicated Downloads view to manage and remove stored content.
