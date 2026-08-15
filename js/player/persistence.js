@@ -75,7 +75,7 @@ export async function restorePlayerState() {
 
         state.seekOffset = savedPos;
         const startTicks = Math.floor(savedPos * 10000000);
-        audio.src = await resolveStreamUrl(track, startTicks);
+        audio.src = resolveStreamUrl(track, startTicks);
         return saved;
       }
     }

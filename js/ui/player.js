@@ -1,7 +1,7 @@
 import { initAudioPlayer, togglePlayPause, playNextTrack, playPrevTrack, seekTo, setVolume, toggleMute, playTrack, savePlayerState, notifyUI, setPlaybackSpeed, getPlaybackSpeed, skipSeconds } from '../player/audio.js';
 import { toggleShuffle, toggleRepeat } from '../player/queue.js';
 import { toggleQueueDrawer, renderQueueDrawerList, toggleLyricsModal, updateLyricsSync, saveSettingsFromModal, openSelectPlaylistModal } from './modals.js';
-import { getArtworkUrl } from '../jellyfin/client.js';
+import { getArtworkUrl, getLyrics } from '../jellyfin/client.js';
 import { getSession, saveSession } from '../jellyfin/session.js';
 import { isTrackLiked, toggleTrackLiked } from '../player/likes.js';
 import { toggleTrackDownload, refreshDownloadButton } from './downloads.js';
@@ -44,7 +44,7 @@ export function initPlayerUI() {
     progress: [$('player-progress'), $('emp-progress')]
   };
 
-  const each = (els, fn) => els.forEach((el) => el && fn(el));
+  const each = (els, fn) => els.forEach((el, i) => el && fn(el, i));
   const setDisplay = (el, value) => { el.style.display = value; };
   const setIcon = (el, text) => {
     const icon = el.querySelector('.material-symbols-outlined');
@@ -53,6 +53,7 @@ export function initPlayerUI() {
   const isMusic = (track) => !!(track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl);
 
   let currentPlayingTrack = null;
+  const lyricsCache = new Map();
 
   const updateActionButtons = (track) => {
     const music = isMusic(track);
@@ -65,6 +66,59 @@ export function initPlayerUI() {
       setIcon(btn, liked ? 'favorite' : 'favorite_border');
     });
     each(pairs.addPlaylist, (btn) => setDisplay(btn, music ? 'flex' : 'none'));
+  };
+
+  const updateLyricsButton = async (track) => {
+    if (!track || track.isPodcastEpisode || track.enclosureUrl) {
+      each(pairs.lyrics, (btn) => setDisplay(btn, 'none'));
+      return;
+    }
+
+    const trackId = track.Id || track.id;
+    if (!trackId) {
+      each(pairs.lyrics, (btn) => setDisplay(btn, 'none'));
+      return;
+    }
+
+    if (typeof track.HasLyrics === 'boolean') {
+      lyricsCache.set(trackId, track.HasLyrics);
+      each(pairs.lyrics, (btn) => setDisplay(btn, track.HasLyrics ? 'flex' : 'none'));
+      return;
+    }
+
+    if (typeof track.hasLyrics === 'boolean') {
+      lyricsCache.set(trackId, track.hasLyrics);
+      each(pairs.lyrics, (btn) => setDisplay(btn, track.hasLyrics ? 'flex' : 'none'));
+      return;
+    }
+
+    if (lyricsCache.has(trackId)) {
+      const has = lyricsCache.get(trackId);
+      each(pairs.lyrics, (btn) => setDisplay(btn, has ? 'flex' : 'none'));
+      return;
+    }
+
+    each(pairs.lyrics, (btn) => setDisplay(btn, 'none'));
+
+    try {
+      const data = await getLyrics(trackId);
+      const hasLyrics = !!(data && (
+        (Array.isArray(data.Lyrics) && data.Lyrics.length > 0) ||
+        (typeof data === 'string' && data.trim().length > 0)
+      ));
+      lyricsCache.set(trackId, hasLyrics);
+      track.HasLyrics = hasLyrics;
+      const curId = currentPlayingTrack && (currentPlayingTrack.Id || currentPlayingTrack.id);
+      if (curId === trackId) {
+        each(pairs.lyrics, (btn) => setDisplay(btn, hasLyrics ? 'flex' : 'none'));
+      }
+    } catch {
+      lyricsCache.set(trackId, false);
+      const curId = currentPlayingTrack && (currentPlayingTrack.Id || currentPlayingTrack.id);
+      if (curId === trackId) {
+        each(pairs.lyrics, (btn) => setDisplay(btn, 'none'));
+      }
+    }
   };
 
   const updateDownloadButton = async (track) => {
@@ -194,6 +248,7 @@ export function initPlayerUI() {
     currentPlayingTrack = track;
     updateActionButtons(track);
     updateDownloadButton(track);
+    updateLyricsButton(track);
 
     if (track) {
       const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 300);
@@ -223,19 +278,19 @@ export function initPlayerUI() {
       const formattedCurrent = formatTime(currentSec);
       const formattedTotal = formatTime(totalSec);
 
-      each(pairs.progress, (slider, i) => {
+      const isAnySeeking = pairs.progress.some((slider) => slider && slider.isSeeking);
+      if (!isAnySeeking) {
+        each(pairs.current, (el) => { el.textContent = formattedCurrent; });
+      }
+
+      each(pairs.progress, (slider) => {
         if (!slider.isSeeking) {
-          if (pairs.current[i]) pairs.current[i].textContent = formattedCurrent;
           slider.max = totalSec > 0 ? totalSec : 100;
           slider.value = isFinite(currentSec) ? currentSec : 0;
           updateSliderFill(slider);
         }
       });
       each(pairs.total, (el) => { el.textContent = formattedTotal; });
-
-      each(pairs.lyrics, (btn) => setDisplay(btn, isPodcast ? 'none' : 'flex'));
-    } else {
-      each(pairs.lyrics, (btn) => setDisplay(btn, 'none'));
     }
 
     updateLyricsSync(state.currentTime);
@@ -289,6 +344,29 @@ export function initPlayerUI() {
   each(pairs.next, (btn) => btn.addEventListener('click', () => playNextTrack()));
   btnSkipBack?.addEventListener('click', () => skipSeconds(-15));
   btnSkipForward?.addEventListener('click', () => skipSeconds(30));
+
+  // Space bar keyboard shortcut to play/pause when not focused on an input/searchbar
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar') {
+      const active = document.activeElement;
+      const target = e.target;
+      const isInput = (elem) => {
+        if (!elem) return false;
+        const tag = elem.tagName;
+        if (tag === 'TEXTAREA' || elem.isContentEditable) return true;
+        if (tag === 'INPUT') {
+          const type = (elem.type || 'text').toLowerCase();
+          return !['range', 'checkbox', 'radio', 'button', 'submit', 'reset'].includes(type);
+        }
+        return false;
+      };
+
+      if (isInput(target) || isInput(active)) return;
+
+      e.preventDefault();
+      togglePlayPause();
+    }
+  });
 
   const runShuffle = () => { toggleShuffle(); savePlayerState(); notifyUI(); };
   const runRepeat = () => { toggleRepeat(); savePlayerState(); notifyUI(); };

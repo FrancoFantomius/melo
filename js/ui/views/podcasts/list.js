@@ -11,12 +11,8 @@ let podcastFormListenerBound = false;
 export function openPodcastShow(feedUrl, showObj = null) {
   if (!feedUrl) return;
   const targetUrl = `podcasts.html?podcast=${encodeURIComponent(feedUrl)}`;
-  if (!window.location.pathname.endsWith('podcasts.html')) {
-    window.location.href = targetUrl;
-    return;
-  }
   const currentSearch = window.location.search;
-  if (currentSearch !== `?podcast=${encodeURIComponent(feedUrl)}`) {
+  if (currentSearch !== `?podcast=${encodeURIComponent(feedUrl)}` || !window.location.pathname.endsWith('podcasts.html')) {
     window.history.pushState({ view: 'podcast-detail', feedUrl }, '', targetUrl);
   }
   switchView('podcast-detail', showObj || { feedUrl });

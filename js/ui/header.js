@@ -2,7 +2,7 @@ import { getSession, clearSession } from '../jellyfin/session.js';
 import { getUserImageUrl, searchJellyfinCached, getArtworkUrl } from '../jellyfin/client.js';
 import { openLoginModal, openSettingsModal } from './modals.js';
 import { searchPodcastDirectory } from '../podcasts/discovery.js';
-import { openPodcastShow, switchView } from './views.js';
+import { openPodcastShow, switchView, openArtist, openAlbum, openPlaylist } from './views.js';
 import { formatItemType } from './views/common.js';
 import { toggleTheme, updateThemeUI } from './theme.js';
 import { addRecentSearch } from './views/search.js';
@@ -35,21 +35,17 @@ export function initHeader() {
 
   // 2. Search navigation handler
   function executeSearchRedirect() {
-    const query = searchInput?.value?.trim();
+    const query = searchInput?.value?.trim() || '';
     if (query) {
       addRecentSearch(query);
-      if (searchDropdown) searchDropdown.style.display = 'none';
-      const searchUrl = `search.html?q=${encodeURIComponent(query)}`;
-      if (window.location.pathname.endsWith('search.html')) {
-        window.history.pushState(null, '', searchUrl);
-        const viewContainer = document.getElementById('view-container');
-        if (viewContainer) {
-          switchView('search', query);
-        }
-      } else {
-        window.location.href = searchUrl;
-      }
     }
+    if (searchDropdown) searchDropdown.style.display = 'none';
+    const searchUrl = query ? `search.html?q=${encodeURIComponent(query)}` : 'search.html';
+    const currentSearch = window.location.search;
+    if (currentSearch !== (query ? `?q=${encodeURIComponent(query)}` : '') || !window.location.pathname.endsWith('search.html')) {
+      window.history.pushState({ view: 'search', q: query }, '', searchUrl);
+    }
+    switchView('search', query);
   }
 
   btnSearchSubmit?.addEventListener('click', executeSearchRedirect);
@@ -145,11 +141,13 @@ export function initHeader() {
             if (itemType === 'Podcast' && feedUrl) {
               openPodcastShow(decodeURIComponent(feedUrl));
             } else if (itemType === 'MusicArtist' || itemType === 'Artist') {
-              window.location.href = `artists.html?artist=${encodeURIComponent(itemId)}`;
-            } else if (itemType === 'MusicAlbum' || itemType === 'Album' || itemType === 'Playlist') {
-              window.location.href = `albums.html?album=${encodeURIComponent(itemId)}`;
+              openArtist(itemId);
+            } else if (itemType === 'MusicAlbum' || itemType === 'Album') {
+              openAlbum(itemId);
+            } else if (itemType === 'Playlist') {
+              openPlaylist(itemId);
             } else {
-              window.location.href = `search.html?q=${encodeURIComponent(query)}`;
+              executeSearchRedirect();
             }
           });
         });

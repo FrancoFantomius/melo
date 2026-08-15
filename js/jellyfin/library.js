@@ -82,7 +82,11 @@ export async function getPlaylistItems(playlistId) {
 export async function getItem(itemId) {
   const session = getSession();
   if (!itemId) return null;
-  return await jellyfinFetch(`/Users/${session.userId}/Items/${itemId}`);
+  return await jellyfinFetch(`/Users/${session.userId}/Items/${itemId}`, {
+    params: {
+      Fields: 'PrimaryImageAspectRatio,PrimaryImageTag,ImageTags,AlbumPrimaryImageTag,AlbumId,AudioInfo,MediaSources,Chapters,HasLyrics,UserData'
+    }
+  });
 }
 
 export async function searchJellyfin(query) {

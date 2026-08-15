@@ -72,6 +72,37 @@ export async function getDownloadedRecord(id) {
   }
 }
 
+export async function warmOfflineCache() {
+  try {
+    const downloads = await getAllDownloads();
+    for (const item of downloads) {
+      if (item && item.id) {
+        const key = String(item.id);
+        downloadStatusCache.set(key, true);
+        if (item.blob && !objectUrlCache.has(key)) {
+          try {
+            objectUrlCache.set(key, URL.createObjectURL(item.blob));
+          } catch (e) {
+            // ignore
+          }
+        }
+      }
+    }
+  } catch (err) {
+    console.warn('[Offline] warmOfflineCache error:', err);
+  }
+}
+
+export function isTrackDownloadedSync(id) {
+  if (!id) return false;
+  return downloadStatusCache.get(String(id)) === true;
+}
+
+export function getDownloadedBlobUrlSync(id) {
+  if (!id) return null;
+  return objectUrlCache.get(String(id)) || null;
+}
+
 export async function isTrackDownloaded(id) {
   if (!id) return false;
   const key = String(id);
@@ -197,7 +228,8 @@ export async function downloadTrack(track, onProgress = null, group = null, inde
       artworkUrl: track.image || getArtworkUrl(track, 'Primary', 300),
       size: blob.size,
       savedAt: Date.now(),
-      isPodcast: !!(track.isPodcastEpisode || track.enclosureUrl)
+      isPodcast: !!(track.isPodcastEpisode || track.enclosureUrl),
+      hasLyrics: !!(track.HasLyrics || track.hasLyrics)
     };
 
     if (group && group.id) {

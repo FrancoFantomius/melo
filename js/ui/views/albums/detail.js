@@ -131,14 +131,17 @@ export async function renderAlbumDetailView(container, albumOrId) {
         <span id="album-tracks-selected-count" class="tracks-toolbar-count"></span>
         ${!isLikedSongs && !isDiscoverDaily && album.Type === 'Playlist' ? `
           <button id="btn-tracks-remove-playlist" class="tracks-toolbar-icon-btn" title="Remove from Playlist" aria-label="Remove from Playlist">
-            <span class="material-symbols-outlined">playlist_remove</span>
+            <span class="material-symbols-outlined" data-i18n-title="Remove from Playlist">playlist_remove</span>
           </button>
         ` : ''}
+        <button id="btn-tracks-add-playlist" class="tracks-toolbar-icon-btn" title="Add to Playlist" aria-label="Add to Playlist">
+          <span class="material-symbols-outlined" data-i18n-title="Add to Playlist">playlist_add</span>
+        </button>
         <button id="btn-tracks-add-queue" class="tracks-toolbar-icon-btn" title="Add to Queue" aria-label="Add to Queue">
-          <span class="material-symbols-outlined">queue_music</span>
+          <span class="material-symbols-outlined" data-i18n-title="Add to Queue">queue_music</span>
         </button>
         <button id="btn-tracks-clear-selection" class="tracks-toolbar-icon-btn" title="Clear selection" aria-label="Clear selection">
-          <span class="material-symbols-outlined">close</span>
+          <span class="material-symbols-outlined" data-i18n-title="Clear selection">close</span>
         </button>
       </div>
 

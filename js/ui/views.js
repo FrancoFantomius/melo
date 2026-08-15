@@ -79,26 +79,6 @@ export function initViews() {
     handleUrlRouting();
   });
 
-  // Search input event listener on search.html
-  if (getPageFromPath() === 'search') {
-    const searchInput = document.getElementById('global-search-input');
-    let searchDebounce = null;
-    searchInput?.addEventListener('input', (e) => {
-      const query = e.target.value;
-      if (searchDebounce) clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => {
-        const trimmed = query.trim();
-        if (trimmed.length > 0) {
-          window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(trimmed)}`);
-          renderSearchView(trimmed);
-        } else {
-          window.history.replaceState(null, '', 'search.html');
-          renderSearchView('');
-        }
-      }, 300);
-    });
-  }
-
   // Handle initial URL route
   handleUrlRouting();
 }

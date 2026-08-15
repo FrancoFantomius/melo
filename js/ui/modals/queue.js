@@ -5,17 +5,44 @@ import { openSelectPlaylistModal } from './playlists.js';
 import { syncOverlaysWithHash } from './index.js';
 import { escapeHtml } from './shared.js';
 
+let lastRenderedSignature = null;
+
 export function initQueueDrawer() {
   const queueDrawer = document.getElementById('queue-drawer');
   const btnQueueClose = document.getElementById('btn-queue-close');
+  const container = document.getElementById('queue-tracks-list');
 
   btnQueueClose?.addEventListener('click', () => toggleQueueDrawer());
+
+  container?.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.btn-queue-add-playlist');
+    if (addBtn) {
+      e.stopPropagation();
+      e.preventDefault();
+      const idx = parseInt(addBtn.getAttribute('data-queue-index'), 10);
+      const { queue } = getQueueState();
+      if (!isNaN(idx) && queue && queue[idx]) {
+        openSelectPlaylistModal(queue[idx]);
+      }
+      return;
+    }
+
+    const row = e.target.closest('.queue-track-item');
+    if (row) {
+      const idx = parseInt(row.getAttribute('data-queue-index'), 10);
+      if (!isNaN(idx)) {
+        setCurrentIndex(idx);
+        playTrack();
+        renderQueueDrawerList(true);
+      }
+    }
+  });
 }
 
 export function openQueueDrawer() {
   const queueDrawer = document.getElementById('queue-drawer');
   if (!queueDrawer) return;
-  renderQueueDrawerList();
+  renderQueueDrawerList(true);
   queueDrawer.classList.add('open');
   document.getElementById('player-btn-queue')?.classList.add('active');
   document.getElementById('emp-btn-queue')?.classList.add('active');
@@ -55,7 +82,7 @@ export function toggleQueueDrawer() {
   }
 }
 
-export function renderQueueDrawerList() {
+export function renderQueueDrawerList(force = false) {
   const container = document.getElementById('queue-tracks-list');
   const countBadge = document.getElementById('queue-count-badge');
   if (!container) return;
@@ -67,9 +94,20 @@ export function renderQueueDrawerList() {
   }
 
   if (!queue || queue.length === 0) {
-    container.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 30px 20px;">Queue is empty</div>';
+    if (force || lastRenderedSignature !== 'empty') {
+      container.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 30px 20px;">Queue is empty</div>';
+      lastRenderedSignature = 'empty';
+    }
     return;
   }
+
+  const currentTrackId = queue[currentIndex] ? (queue[currentIndex].Id || queue[currentIndex].id || currentIndex) : 'none';
+  const queueSignature = `${currentIndex}_${currentTrackId}_${queue.length}_${queue.map(t => t.Id || t.id || t.Name || '').join(',')}`;
+
+  if (!force && lastRenderedSignature === queueSignature && container.children.length > 0) {
+    return;
+  }
+  lastRenderedSignature = queueSignature;
 
   const currentTrack = queue[currentIndex];
   const upcomingTracks = queue.slice(currentIndex + 1);
@@ -129,28 +167,4 @@ export function renderQueueDrawerList() {
   }
 
   container.innerHTML = html;
-
-  container.querySelectorAll('.queue-track-item').forEach(row => {
-    const addBtn = row.querySelector('.btn-queue-add-playlist');
-    if (addBtn) {
-      addBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-        const idx = parseInt(addBtn.getAttribute('data-queue-index'), 10);
-        if (!isNaN(idx) && queue[idx]) {
-          openSelectPlaylistModal(queue[idx]);
-        }
-      });
-    }
-
-    row.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-queue-add-playlist')) return;
-      const idx = parseInt(row.getAttribute('data-queue-index'), 10);
-      if (!isNaN(idx)) {
-        setCurrentIndex(idx);
-        playTrack();
-        renderQueueDrawerList();
-      }
-    });
-  });
 }
