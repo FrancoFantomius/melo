@@ -248,7 +248,7 @@ function bindSearchPageControls(container) {
 
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      const globalSearchInput = document.getElementById('global-search-input');
+      const globalSearchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
       if (globalSearchInput && document.activeElement !== globalSearchInput) {
         globalSearchInput.value = newQuery;
       }
@@ -269,7 +269,7 @@ function bindSearchPageControls(container) {
       searchInput.value = '';
       searchInput.focus();
     }
-    const globalSearchInput = document.getElementById('global-search-input');
+    const globalSearchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
     if (globalSearchInput) globalSearchInput.value = '';
     if (btnClear) btnClear.style.display = 'none';
 
@@ -294,7 +294,7 @@ function bindRecentSearchesControls(resultsContainer) {
       const container = document.getElementById('view-container');
       const searchInput = container?.querySelector('#search-page-input');
       if (searchInput) searchInput.value = term;
-      const globalSearchInput = document.getElementById('global-search-input');
+      const globalSearchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
       if (globalSearchInput) globalSearchInput.value = term;
       window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(term)}`);
       renderSearchView(container, term);

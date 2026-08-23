@@ -1,6 +1,6 @@
 {
   "name": "melo",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Melo - Music Player powered by Jellyfin",
   "type": "module",
   "license": "MIT",
@@ -20,7 +20,10 @@
   },
   "dependencies": {
     "@fontsource-variable/material-symbols-outlined": "^5.3.2",
-    "@fontsource-variable/plus-jakarta-sans": "^5.3.0"
+    "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
+    "@fontsource-variable/roboto-flex": "^5.3.0",
+    "@fontsource/roboto": "^5.3.0",
+    "@francofantomius/material-components": "^1.1.2"
   },
   "devDependencies": {
     "vite": "^8.2.1",

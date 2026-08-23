@@ -1,5 +1,17 @@
 import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource-variable/plus-jakarta-sans/index.css';
+import '@fontsource-variable/roboto-flex/index.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+
+import '@francofantomius/material-components/top-app-bar';
+import '@francofantomius/material-components/search-bar';
+import '@francofantomius/material-components/account-menu';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon';
+import '@francofantomius/material-components/divider';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

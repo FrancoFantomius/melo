@@ -7,7 +7,7 @@ export function getCurrentTheme() {
 export function getEffectiveTheme() {
   const savedTheme = getCurrentTheme();
   if (savedTheme === 'system') {
-    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
   return savedTheme === 'light' ? 'light' : 'dark';
 }
@@ -17,7 +17,7 @@ export function applyTheme(theme) {
   localStorage.setItem('theme', validTheme);
 
   const effectiveTheme = validTheme === 'system'
-    ? (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
     : validTheme;
 
   if (effectiveTheme === 'light') {
@@ -28,12 +28,36 @@ export function applyTheme(theme) {
     document.body.classList.remove('light-theme');
   }
 
+  document.documentElement.setAttribute('data-theme', effectiveTheme);
+
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', effectiveTheme === 'light' ? '#ffffff' : '#0e1117');
+  }
+
   updateThemeUI();
+
+  window.dispatchEvent(new CustomEvent('melo_theme_changed', {
+    detail: { theme: validTheme, effectiveTheme }
+  }));
 }
 
 export function toggleTheme() {
-  const currentEffective = getEffectiveTheme();
-  const nextTheme = currentEffective === 'dark' ? 'light' : 'dark';
+  const savedTheme = getCurrentTheme();
+  const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  let nextTheme;
+  if (savedTheme === 'system') {
+    // If currently on system/device theme, switch to the opposite theme first
+    nextTheme = isSystemDark ? 'light' : 'dark';
+  } else if (savedTheme === (isSystemDark ? 'light' : 'dark')) {
+    // Next switch to the matching explicit theme
+    nextTheme = isSystemDark ? 'dark' : 'light';
+  } else {
+    // Finally switch back to system / device default
+    nextTheme = 'system';
+  }
+
   applyTheme(nextTheme);
 }
 
@@ -43,18 +67,31 @@ export function updateThemeUI() {
   const effectiveTheme = getEffectiveTheme();
   const savedTheme = getCurrentTheme();
 
-  if (iconEl && btnEl) {
-    if (effectiveTheme === 'dark') {
-      iconEl.textContent = 'light_mode';
-      const label = savedTheme === 'system' ? 'Switch to Light mode (System: Dark)' : 'Switch to Light mode';
-      btnEl.setAttribute('title', label);
-      btnEl.setAttribute('aria-label', label);
-    } else {
-      iconEl.textContent = 'dark_mode';
-      const label = savedTheme === 'system' ? 'Switch to Dark mode (System: Light)' : 'Switch to Dark mode';
-      btnEl.setAttribute('title', label);
-      btnEl.setAttribute('aria-label', label);
+  let iconName;
+  let label;
+
+  if (savedTheme === 'system') {
+    iconName = 'brightness_auto';
+    label = `Theme: Device default (${effectiveTheme === 'dark' ? 'Dark' : 'Light'})`;
+  } else if (savedTheme === 'light') {
+    iconName = 'light_mode';
+    label = 'Theme: Light';
+  } else {
+    iconName = 'dark_mode';
+    label = 'Theme: Dark';
+  }
+
+  if (btnEl) {
+    btnEl.setAttribute('icon', iconName);
+    if ('icon' in btnEl) {
+      btnEl.icon = iconName;
     }
+    btnEl.setAttribute('title', label);
+    btnEl.setAttribute('aria-label', label);
+  }
+
+  if (iconEl) {
+    iconEl.textContent = iconName;
   }
 
   const selectEl = document.getElementById('setting-theme');
@@ -68,7 +105,7 @@ export function initTheme() {
   applyTheme(savedTheme);
 
   if (!systemMediaListenerAdded) {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: light)');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleSystemThemeChange = () => {
       if (getCurrentTheme() === 'system') {
         applyTheme('system');
@@ -82,4 +119,5 @@ export function initTheme() {
     systemMediaListenerAdded = true;
   }
 }
+
 

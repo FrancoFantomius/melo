@@ -348,20 +348,24 @@ export function initPlayerUI() {
   // Space bar keyboard shortcut to play/pause when not focused on an input/searchbar
   window.addEventListener('keydown', (e) => {
     if (e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar') {
-      const active = document.activeElement;
-      const target = e.target;
       const isInput = (elem) => {
-        if (!elem) return false;
-        const tag = elem.tagName;
+        if (!elem || typeof elem !== 'object') return false;
+        const tag = elem.tagName?.toUpperCase();
         if (tag === 'TEXTAREA' || elem.isContentEditable) return true;
         if (tag === 'INPUT') {
           const type = (elem.type || 'text').toLowerCase();
           return !['range', 'checkbox', 'radio', 'button', 'submit', 'reset'].includes(type);
         }
+        if (tag === 'MD-SEARCH-BAR' || tag === 'MD-SEARCH' || tag === 'MD-TEXT-FIELD' || tag === 'MD-CODE') {
+          return true;
+        }
         return false;
       };
 
-      if (isInput(target) || isInput(active)) return;
+      const path = typeof e.composedPath === 'function' ? e.composedPath() : [e.target];
+      const isTyping = path.some((el) => isInput(el)) || isInput(document.activeElement);
+
+      if (isTyping) return;
 
       e.preventDefault();
       togglePlayPause();

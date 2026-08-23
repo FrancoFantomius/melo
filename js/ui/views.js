@@ -37,7 +37,7 @@ export function handleUrlRouting() {
   const artistParam = urlParams.get('artist') || urlParams.get('artistId');
   const podcastParam = urlParams.get('podcast') || urlParams.get('show');
 
-  const searchInput = document.getElementById('global-search-input');
+  const searchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
   if (searchQuery !== null && searchInput) {
     searchInput.value = searchQuery;
   }

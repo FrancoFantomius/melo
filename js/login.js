@@ -1,5 +1,9 @@
 import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource-variable/plus-jakarta-sans/index.css';
+import '@fontsource-variable/roboto-flex/index.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

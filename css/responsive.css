@@ -40,14 +40,9 @@
   }
 
   body[data-page="home"] .main-header {
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    padding: 8px 16px;
+    display: block !important;
     flex-shrink: 0;
     background-color: var(--bg-primary);
-    border-bottom: 1px solid var(--border-color);
   }
 
   body[data-page="home"] .main-header #btn-toggle-sidebar,
@@ -55,17 +50,11 @@
     display: none !important;
   }
 
-  body[data-page="home"] .main-header .header-right {
+  body[data-page="home"] .main-header .header-actions {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     margin-left: auto;
-  }
-
-  body[data-page="home"] .account-dropdown {
-    top: 56px;
-    right: 12px;
-    z-index: 1000;
   }
 
   /* Main scroll area */
