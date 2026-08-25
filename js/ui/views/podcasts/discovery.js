@@ -3,6 +3,7 @@ import { savePodcastFeedUrl } from '../../../jellyfin/client.js';
 import { fetchAndParseFeed } from '../../../podcasts/rss.js';
 import { saveCachedFeed } from '../../../podcasts/storage.js';
 import { openPodcastShow } from './list.js';
+import { getTranslation } from '../../../i18n.js';
 
 export async function renderDiscoverTabContent(container, subscribedFeedUrls = []) {
   container.innerHTML = `
@@ -12,15 +13,15 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
         <input type="text" id="discovery-search-input" placeholder="Search millions of podcasts (e.g. Science, Tech, Daily, Huberman)..." data-i18n-placeholder>
       </div>
 
-      <div class="discovery-pills">
-        <button class="discovery-pill active" data-term="podcast" data-i18n>Top Charts</button>
-        <button class="discovery-pill" data-term="technology" data-i18n>Technology</button>
-        <button class="discovery-pill" data-term="news" data-i18n>News</button>
-        <button class="discovery-pill" data-term="science" data-i18n>Science</button>
-        <button class="discovery-pill" data-term="business" data-i18n>Business</button>
-        <button class="discovery-pill" data-term="comedy" data-i18n>Comedy</button>
-        <button class="discovery-pill" data-term="society" data-i18n>Society</button>
-      </div>
+      <md-chip-set class="discovery-pills" id="discovery-chips">
+        <md-chip variant="filter" selected label="${getTranslation('Top Charts')}" data-term="podcast" data-i18n-label="Top Charts"></md-chip>
+        <md-chip variant="filter" label="${getTranslation('Technology')}" data-term="technology" data-i18n-label="Technology"></md-chip>
+        <md-chip variant="filter" label="${getTranslation('News')}" data-term="news" data-i18n-label="News"></md-chip>
+        <md-chip variant="filter" label="${getTranslation('Science')}" data-term="science" data-i18n-label="Science"></md-chip>
+        <md-chip variant="filter" label="${getTranslation('Business')}" data-term="business" data-i18n-label="Business"></md-chip>
+        <md-chip variant="filter" label="${getTranslation('Comedy')}" data-term="comedy" data-i18n-label="Comedy"></md-chip>
+        <md-chip variant="filter" label="${getTranslation('Society')}" data-term="society" data-i18n-label="Society"></md-chip>
+      </md-chip-set>
 
       <div id="discovery-results" class="cards-grid">
         <div style="text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);" data-i18n>Loading popular podcasts...</div>
@@ -30,7 +31,7 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
 
   const resultsGrid = document.getElementById('discovery-results');
   const searchInput = document.getElementById('discovery-search-input');
-  const pills = container.querySelectorAll('.discovery-pill');
+  const chips = container.querySelectorAll('.discovery-pills md-chip');
 
   let debounceTimer = null;
 
@@ -48,7 +49,7 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
   searchInput?.addEventListener('input', (e) => {
     const q = e.target.value.trim();
     if (debounceTimer) clearTimeout(debounceTimer);
-    pills.forEach(p => p.classList.remove('active'));
+    chips.forEach(c => { c.selected = false; });
 
     debounceTimer = setTimeout(async () => {
       if (q.length > 0) {
@@ -62,13 +63,13 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
     }, 400);
   });
 
-  // Genre pills handler
-  pills.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pills.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
+  // Genre chips handler
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => { c.selected = false; });
+      chip.selected = true;
       if (searchInput) searchInput.value = '';
-      const term = pill.getAttribute('data-term');
+      const term = chip.getAttribute('data-term');
       loadTerm(term);
     });
   });

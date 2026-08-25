@@ -422,24 +422,6 @@
   flex-wrap: wrap;
 }
 
-.discovery-pill {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-speed);
-}
-
-.discovery-pill:hover, .discovery-pill.active {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  border-color: var(--accent);
-}
-
 .btn-subscribe {
   background: var(--accent);
   color: var(--accent-text);
@@ -754,15 +736,6 @@
 
   .sort-dropdown-item .material-symbols-outlined {
     font-size: 22px;
-  }
-
-  .category-pill,
-  .discovery-pill {
-    padding: 10px 18px;
-    font-size: 14px;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
   }
 
   .episode-item {

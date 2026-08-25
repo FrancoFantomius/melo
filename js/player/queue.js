@@ -57,15 +57,25 @@ export function setCurrentTrack(track) {
   return null;
 }
 
+export function peekNextTrack(isAutoEnd = true) {
+  if (queue.length === 0) return null;
+
+  if (repeat === 'one') {
+    return getCurrentTrack();
+  }
+
+  if (currentIndex < queue.length - 1) {
+    return queue[currentIndex + 1];
+  } else if (repeat === 'all') {
+    return queue[0];
+  }
+  return null;
+}
+
 export function nextTrack(isAutoEnd = false) {
   if (queue.length === 0) return null;
 
   if (repeat === 'one') {
-    if (isAutoEnd) {
-      repeat = 'none';
-      return getCurrentTrack();
-    }
-  } else if (repeat === 'all') {
     if (isAutoEnd) {
       return getCurrentTrack();
     }

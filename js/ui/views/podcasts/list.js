@@ -5,6 +5,7 @@ import { openAddPodcastModal, closeAddPodcastModal } from '../../modals.js';
 import { switchView } from '../../views.js';
 import { renderSubscribedCarousel, renderContinuePlayingCarousel, renderLatestEpisodesGrid } from './carousels.js';
 import { renderDiscoverTabContent } from './discovery.js';
+import { getTranslation } from '../../../i18n.js';
 
 let podcastFormListenerBound = false;
 
@@ -76,14 +77,14 @@ export async function renderPodcastsView(container, viewData = 'all') {
         </button>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="category-pills" id="podcast-category-pills">
-        <button class="category-pill ${activeCategory === 'all' ? 'active' : ''}" data-category="all" data-i18n>All</button>
-        <button class="category-pill ${activeCategory === 'subscribed' ? 'active' : ''}" data-category="subscribed" data-i18n>Subscribed Podcasts</button>
-        <button class="category-pill ${activeCategory === 'continue' ? 'active' : ''}" data-category="continue" data-i18n>Continue Playing</button>
-        <button class="category-pill ${activeCategory === 'latest' ? 'active' : ''}" data-category="latest" data-i18n>Latest Episodes</button>
-        <button class="category-pill ${activeCategory === 'discover' ? 'active' : ''}" data-category="discover" data-i18n>Discover Podcasts</button>
-      </div>
+      <!-- Category Filter Chips -->
+      <md-chip-set class="category-pills" id="podcast-category-pills">
+        <md-chip variant="filter" ${activeCategory === 'all' ? 'selected' : ''} label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'subscribed' ? 'selected' : ''} label="${getTranslation('Subscribed Podcasts')}" data-category="subscribed" data-i18n-label="Subscribed Podcasts"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'continue' ? 'selected' : ''} label="${getTranslation('Continue Playing')}" data-category="continue" data-i18n-label="Continue Playing"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'latest' ? 'selected' : ''} label="${getTranslation('Latest Episodes')}" data-category="latest" data-i18n-label="Latest Episodes"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'discover' ? 'selected' : ''} label="${getTranslation('Discover Podcasts')}" data-category="discover" data-i18n-label="Discover Podcasts"></md-chip>
+      </md-chip-set>
 
       <!-- Section 1: Subscribed Podcasts Carousel -->
       <section id="podcast-subscribed-section" class="podcast-view-section" data-category="subscribed">
@@ -146,8 +147,8 @@ export async function renderPodcastsView(container, viewData = 'all') {
     openAddPodcastModal();
   });
 
-  // Bind Category Filter Pills
-  const pillButtons = container.querySelectorAll('#podcast-category-pills .category-pill');
+  // Bind Category Filter Chips
+  const chipButtons = container.querySelectorAll('#podcast-category-pills md-chip');
   const sections = container.querySelectorAll('.podcast-view-section');
 
   const updateSectionVisibility = (cat) => {
@@ -161,11 +162,11 @@ export async function renderPodcastsView(container, viewData = 'all') {
     });
   };
 
-  pillButtons.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pillButtons.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      const cat = pill.getAttribute('data-category');
+  chipButtons.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chipButtons.forEach(c => { c.selected = false; });
+      chip.selected = true;
+      const cat = chip.getAttribute('data-category');
       updateSectionVisibility(cat);
     });
   });

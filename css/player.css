@@ -15,10 +15,6 @@
   align-items: center;
   gap: 14px;
   cursor: pointer;
-  border-radius: var(--radius-sm);
-  padding: 4px 8px;
-  margin: -4px -8px;
-  transition: background-color var(--transition-speed);
   user-select: none;
   min-width: 0;
   max-width: 100%;
@@ -26,10 +22,6 @@
 
 .player-left .btn-icon {
   flex-shrink: 0;
-}
-
-.player-left:hover {
-  background-color: var(--bg-hover);
 }
 
 .player-cover {

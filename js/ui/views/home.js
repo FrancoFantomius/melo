@@ -21,10 +21,10 @@ export async function renderHomeView(container) {
     albums: 'Albums'
   };
 
-  const pillsHTML = `<button class="category-pill active" data-category="all" data-i18n>All</button>` +
+  const pillsHTML = `<md-chip variant="filter" selected label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>` +
     userOrder.map(cat => {
       const defaultText = pillDefaultText[cat] || cat;
-      return `<button class="category-pill" data-category="${cat}" data-i18n>${defaultText}</button>`;
+      return `<md-chip variant="filter" label="${getTranslation(defaultText)}" data-category="${cat}" data-i18n-label="${defaultText}"></md-chip>`;
     }).join('');
 
   const sectionHTMLMap = {
@@ -113,10 +113,10 @@ export async function renderHomeView(container) {
 
   container.innerHTML = `
     <div class="view-section">
-      <!-- Category Filter Pillows -->
-      <div class="category-pills" id="home-category-pills">
+      <!-- Category Filter Chips -->
+      <md-chip-set class="category-pills" id="home-category-pills">
         ${pillsHTML}
-      </div>
+      </md-chip-set>
 
       ${sectionsHTML}
     </div>
@@ -171,16 +171,16 @@ export async function renderHomeView(container) {
     }
   });
 
-  // Bind Category Filter Pills
-  const pillButtons = container.querySelectorAll('#home-category-pills .category-pill');
+  // Bind Category Filter Chips
+  const chipButtons = container.querySelectorAll('#home-category-pills md-chip');
   const sections = container.querySelectorAll('.home-section');
 
-  pillButtons.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pillButtons.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
+  chipButtons.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chipButtons.forEach(c => { c.selected = false; });
+      chip.selected = true;
 
-      const selectedCategory = pill.getAttribute('data-category');
+      const selectedCategory = chip.getAttribute('data-category');
 
       sections.forEach(section => {
         const secCat = section.getAttribute('data-category');

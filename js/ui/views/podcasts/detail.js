@@ -103,7 +103,7 @@ export async function renderPodcastDetailView(container, viewData) {
           </div>
         </div>
 
-        <div id="podcast-year-pills" class="category-pills" style="margin-bottom: 16px;"></div>
+        <md-chip-set id="podcast-year-pills" class="category-pills" style="margin-bottom: 16px;"></md-chip-set>
 
         <div id="podcast-episodes-container"></div>
       </div>
@@ -179,18 +179,18 @@ export async function renderPodcastDetailView(container, viewData) {
           .sort((a, b) => b - a);
 
         yearPillsContainer.innerHTML = `
-          <button class="category-pill ${!currentYearFilter ? 'active' : ''}" data-year="">${getTranslation('All')}</button>
+          <md-chip variant="filter" ${!currentYearFilter ? 'selected' : ''} label="${getTranslation('All')}" data-year="" data-i18n-label="All"></md-chip>
           ${years.map(year => `
-            <button class="category-pill ${currentYearFilter === String(year) ? 'active' : ''}" data-year="${year}">${year}</button>
+            <md-chip variant="filter" ${currentYearFilter === String(year) ? 'selected' : ''} label="${year}" data-year="${year}"></md-chip>
           `).join('')}
         `;
 
-        yearPillsContainer.querySelectorAll('.category-pill').forEach(pill => {
-          pill.addEventListener('click', () => {
-            const year = pill.getAttribute('data-year');
+        yearPillsContainer.querySelectorAll('md-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            const year = chip.getAttribute('data-year');
             currentYearFilter = currentYearFilter === year ? '' : year;
-            yearPillsContainer.querySelectorAll('.category-pill').forEach(p => {
-              p.classList.toggle('active', p.getAttribute('data-year') === currentYearFilter);
+            yearPillsContainer.querySelectorAll('md-chip').forEach(p => {
+              p.selected = p.getAttribute('data-year') === currentYearFilter;
             });
             updateEpisodesList();
           });

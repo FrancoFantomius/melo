@@ -34,33 +34,12 @@
   margin-bottom: 0;
 }
 
-/* Category Filter Pills / Pillows */
+/* Category Filter Chips */
 .category-pills {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
   margin-bottom: 8px;
-}
-
-.category-pill {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  padding: 8px 18px;
-  border-radius: var(--radius-full);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-speed);
-  user-select: none;
-}
-
-.category-pill:hover,
-.category-pill.active {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  border-color: var(--accent);
-  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
 }
 
 

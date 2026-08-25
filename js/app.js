@@ -11,6 +11,7 @@ import '@francofantomius/material-components/navigation-rail';
 import '@francofantomius/material-components/navigation-bar';
 import '@francofantomius/material-components/search-bar';
 import '@francofantomius/material-components/account-menu';
+import '@francofantomius/material-components/app-drawer';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon';
@@ -18,6 +19,7 @@ import '@francofantomius/material-components/divider';
 import '@francofantomius/material-components/side-sheet';
 import '@francofantomius/material-components/bottom-sheet';
 import '@francofantomius/material-components/badge';
+import '@francofantomius/material-components/chip';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';
