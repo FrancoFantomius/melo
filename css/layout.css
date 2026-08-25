@@ -14,13 +14,6 @@
 }
 
 #app-layout.sidebar-collapsed {
-  grid-template-columns: 0px 1fr;
+  grid-template-columns: var(--rail-width, 80px) 1fr;
 }
 
-#app-layout.sidebar-collapsed .main-sidebar {
-  opacity: 0;
-  visibility: hidden;
-  padding-left: 0;
-  padding-right: 0;
-  pointer-events: none;
-}

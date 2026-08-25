@@ -1,20 +1,64 @@
 import { getArtworkUrl } from '../../jellyfin/client.js';
-import { getQueueState, setCurrentIndex } from '../../player/queue.js';
+import { getQueueState, setCurrentIndex, removeFromQueue, clearQueue } from '../../player/queue.js';
 import { playTrack } from '../../player/audio.js';
 import { openSelectPlaylistModal } from './playlists.js';
 import { syncOverlaysWithHash } from './index.js';
 import { escapeHtml } from './shared.js';
 
 let lastRenderedSignature = null;
+let isClosingInternally = false;
+let wasPlayerOpenWhenQueueOpened = false;
 
-export function initQueueDrawer() {
-  const queueDrawer = document.getElementById('queue-drawer');
-  const btnQueueClose = document.getElementById('btn-queue-close');
-  const container = document.getElementById('queue-tracks-list');
+function isMobile() {
+  return window.matchMedia('(max-width: 768px)').matches;
+}
 
-  btnQueueClose?.addEventListener('click', () => toggleQueueDrawer());
+export function isQueueOpen() {
+  const desktopSheet = document.getElementById('desktop-queue-sheet');
+  const mobileSheet = document.getElementById('mobile-queue-sheet');
+  return Boolean((desktopSheet && desktopSheet.open) || (mobileSheet && mobileSheet.open));
+}
 
-  container?.addEventListener('click', (e) => {
+function updateQueueButtonStates(isOpen) {
+  const playerBtn = document.getElementById('player-btn-queue');
+  const empBtn = document.getElementById('emp-btn-queue');
+  if (isOpen) {
+    playerBtn?.classList.add('active');
+    empBtn?.classList.add('active');
+  } else {
+    playerBtn?.classList.remove('active');
+    empBtn?.classList.remove('active');
+  }
+}
+
+function handleSheetClosed() {
+  if (isClosingInternally) return;
+  updateQueueButtonStates(false);
+
+  const empContainer = document.getElementById('expanded-mobile-player');
+
+  if (wasPlayerOpenWhenQueueOpened) {
+    wasPlayerOpenWhenQueueOpened = false;
+    empContainer?.classList.add('open');
+    if (window.location.hash !== '#player') {
+      window.location.hash = 'player';
+    }
+  } else if (window.location.hash === '#queue') {
+    window.history.back();
+    setTimeout(() => {
+      if (window.location.hash === '#queue') {
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+        syncOverlaysWithHash();
+      }
+    }, 50);
+  }
+}
+
+function bindQueueContainerEvents(container) {
+  if (!container) return;
+
+  container.addEventListener('click', (e) => {
+    // Add to playlist button
     const addBtn = e.target.closest('.btn-queue-add-playlist');
     if (addBtn) {
       e.stopPropagation();
@@ -27,6 +71,20 @@ export function initQueueDrawer() {
       return;
     }
 
+    // Remove from queue button
+    const removeBtn = e.target.closest('.btn-queue-remove');
+    if (removeBtn) {
+      e.stopPropagation();
+      e.preventDefault();
+      const idx = parseInt(removeBtn.getAttribute('data-queue-index'), 10);
+      if (!isNaN(idx)) {
+        removeFromQueue(idx);
+        renderQueueDrawerList(true);
+      }
+      return;
+    }
+
+    // Click on track item
     const row = e.target.closest('.queue-track-item');
     if (row) {
       const idx = parseInt(row.getAttribute('data-queue-index'), 10);
@@ -39,41 +97,104 @@ export function initQueueDrawer() {
   });
 }
 
+export function initQueueDrawer() {
+  const desktopSheet = document.getElementById('desktop-queue-sheet');
+  const mobileSheet = document.getElementById('mobile-queue-sheet');
+  const desktopContainer = document.getElementById('desktop-queue-tracks-list');
+  const mobileContainer = document.getElementById('mobile-queue-tracks-list');
+  const desktopClearBtn = document.getElementById('desktop-btn-clear-queue');
+  const mobileClearBtn = document.getElementById('mobile-btn-clear-queue');
+
+  // Bind track container click delegations
+  bindQueueContainerEvents(desktopContainer);
+  bindQueueContainerEvents(mobileContainer);
+
+  // Clear queue buttons
+  const onClear = (e) => {
+    e?.stopPropagation();
+    clearQueue();
+    renderQueueDrawerList(true);
+  };
+  desktopClearBtn?.addEventListener('click', onClear);
+  mobileClearBtn?.addEventListener('click', onClear);
+
+  // Bind Sheet close / dismiss events
+  const closeEvents = ['close', 'cancel', 'scrim-click', 'close-click', 'drag-dismiss'];
+  [desktopSheet, mobileSheet].forEach((sheet) => {
+    if (!sheet) return;
+    closeEvents.forEach((evtName) => {
+      sheet.addEventListener(evtName, () => {
+        if (!desktopSheet?.open && !mobileSheet?.open) {
+          handleSheetClosed();
+        }
+      });
+    });
+  });
+
+  // Responsive breakpoint listener: migrate open sheet on window resize
+  const mediaQuery = window.matchMedia('(max-width: 768px)');
+  mediaQuery.addEventListener('change', (e) => {
+    if (!isQueueOpen()) return;
+    isClosingInternally = true;
+    if (e.matches) {
+      // Switched to Mobile
+      desktopSheet?.close();
+      mobileSheet?.show();
+    } else {
+      // Switched to Desktop
+      mobileSheet?.close();
+      desktopSheet?.show();
+    }
+    isClosingInternally = false;
+    renderQueueDrawerList(true);
+  });
+}
+
 export function openQueueDrawer() {
-  const queueDrawer = document.getElementById('queue-drawer');
-  if (!queueDrawer) return;
+  const desktopSheet = document.getElementById('desktop-queue-sheet');
+  const mobileSheet = document.getElementById('mobile-queue-sheet');
+  const empContainer = document.getElementById('expanded-mobile-player');
+
+  if (empContainer?.classList.contains('open') || window.location.hash === '#player') {
+    wasPlayerOpenWhenQueueOpened = true;
+  }
+
   renderQueueDrawerList(true);
-  queueDrawer.classList.add('open');
-  document.getElementById('player-btn-queue')?.classList.add('active');
-  document.getElementById('emp-btn-queue')?.classList.add('active');
+
+  if (isMobile()) {
+    desktopSheet?.close();
+    mobileSheet?.show();
+  } else {
+    mobileSheet?.close();
+    desktopSheet?.show();
+  }
+
+  updateQueueButtonStates(true);
 }
 
 export function closeQueueDrawer() {
-  const queueDrawer = document.getElementById('queue-drawer');
-  if (!queueDrawer) return;
-  queueDrawer.classList.remove('open');
-  document.getElementById('player-btn-queue')?.classList.remove('active');
-  document.getElementById('emp-btn-queue')?.classList.remove('active');
+  const desktopSheet = document.getElementById('desktop-queue-sheet');
+  const mobileSheet = document.getElementById('mobile-queue-sheet');
+
+  isClosingInternally = true;
+  desktopSheet?.close();
+  mobileSheet?.close();
+  isClosingInternally = false;
+
+  updateQueueButtonStates(false);
 }
 
 export function toggleQueueDrawer() {
-  const queueDrawer = document.getElementById('queue-drawer');
-  if (!queueDrawer) return;
+  const isOpen = isQueueOpen() || window.location.hash === '#queue';
 
-  const isOpen = queueDrawer.classList.contains('open') || window.location.hash === '#queue';
   if (isOpen) {
-    if (window.location.hash === '#queue') {
-      window.history.back();
-      setTimeout(() => {
-        if (window.location.hash === '#queue') {
-          history.replaceState(null, '', window.location.pathname + window.location.search);
-          syncOverlaysWithHash();
-        }
-      }, 50);
-    } else {
-      closeQueueDrawer();
-    }
+    closeQueueDrawer();
+    handleSheetClosed();
   } else {
+    const empContainer = document.getElementById('expanded-mobile-player');
+    if (empContainer?.classList.contains('open') || window.location.hash === '#player') {
+      wasPlayerOpenWhenQueueOpened = true;
+    }
     if (window.location.hash !== '#queue') {
       window.location.hash = 'queue';
     } else {
@@ -83,19 +204,29 @@ export function toggleQueueDrawer() {
 }
 
 export function renderQueueDrawerList(force = false) {
-  const container = document.getElementById('queue-tracks-list');
-  const countBadge = document.getElementById('queue-count-badge');
-  if (!container) return;
+  const desktopContainer = document.getElementById('desktop-queue-tracks-list');
+  const mobileContainer = document.getElementById('mobile-queue-tracks-list');
+  const desktopBadge = document.getElementById('desktop-queue-count');
+  const mobileBadge = document.getElementById('mobile-queue-count');
+
+  if (!desktopContainer && !mobileContainer) return;
 
   const { queue, currentIndex } = getQueueState();
+  const countText = queue && queue.length > 0 ? `(${queue.length})` : '';
 
-  if (countBadge) {
-    countBadge.textContent = queue && queue.length > 0 ? `(${queue.length})` : '';
-  }
+  if (desktopBadge) desktopBadge.textContent = countText;
+  if (mobileBadge) mobileBadge.textContent = countText;
 
   if (!queue || queue.length === 0) {
     if (force || lastRenderedSignature !== 'empty') {
-      container.innerHTML = '<div style="color: var(--text-secondary); text-align: center; padding: 30px 20px;">Queue is empty</div>';
+      const emptyHtml = `
+        <div class="queue-empty-state">
+          <span class="material-symbols-outlined queue-empty-icon">queue_music</span>
+          <div class="queue-empty-text">Queue is empty</div>
+        </div>
+      `;
+      if (desktopContainer) desktopContainer.innerHTML = emptyHtml;
+      if (mobileContainer) mobileContainer.innerHTML = emptyHtml;
       lastRenderedSignature = 'empty';
     }
     return;
@@ -104,7 +235,7 @@ export function renderQueueDrawerList(force = false) {
   const currentTrackId = queue[currentIndex] ? (queue[currentIndex].Id || queue[currentIndex].id || currentIndex) : 'none';
   const queueSignature = `${currentIndex}_${currentTrackId}_${queue.length}_${queue.map(t => t.Id || t.id || t.Name || '').join(',')}`;
 
-  if (!force && lastRenderedSignature === queueSignature && container.children.length > 0) {
+  if (!force && lastRenderedSignature === queueSignature && ((desktopContainer && desktopContainer.children.length > 0) || (mobileContainer && mobileContainer.children.length > 0))) {
     return;
   }
   lastRenderedSignature = queueSignature;
@@ -117,7 +248,6 @@ export function renderQueueDrawerList(force = false) {
     const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 100);
     const artistStr = track.Artists ? track.Artists.join(', ') : (track.AlbumArtist || track.showTitle || 'Unknown Artist');
     const titleStr = track.Name || track.title || 'Unknown Title';
-
     const canAddToPlaylist = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl;
 
     return `
@@ -133,11 +263,18 @@ export function renderQueueDrawerList(force = false) {
           <div class="queue-track-title">${escapeHtml(titleStr)}</div>
           <div class="queue-track-artist">${escapeHtml(artistStr)}</div>
         </div>
-        ${canAddToPlaylist ? `
-          <button class="btn-queue-add-playlist btn-icon" title="Add to Playlist" data-queue-index="${idx}" style="margin-left: auto; padding: 4px;">
-            <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
-          </button>
-        ` : ''}
+        <div class="queue-track-actions">
+          ${canAddToPlaylist ? `
+            <button class="btn-queue-action btn-queue-add-playlist btn-icon" title="Add to Playlist" data-queue-index="${idx}" aria-label="Add to Playlist">
+              <span class="material-symbols-outlined" style="font-size: 20px;">playlist_add</span>
+            </button>
+          ` : ''}
+          ${!isCurrent ? `
+            <button class="btn-queue-action btn-queue-remove btn-icon" title="Remove from Queue" data-queue-index="${idx}" aria-label="Remove from Queue">
+              <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
+            </button>
+          ` : ''}
+        </div>
       </div>
     `;
   };
@@ -152,7 +289,12 @@ export function renderQueueDrawerList(force = false) {
   }
 
   if (upcomingTracks.length > 0) {
-    html += `<div class="queue-section-header" style="margin-top: 16px;">UP NEXT (${upcomingTracks.length})</div>`;
+    html += `
+      <div class="queue-section-header">
+        <span>UP NEXT</span>
+        <span style="opacity: 0.75; font-size: 11px; font-weight: 500;">(${upcomingTracks.length})</span>
+      </div>
+    `;
     upcomingTracks.forEach((track, relIdx) => {
       const actualIdx = currentIndex + 1 + relIdx;
       html += renderQueueItem(track, actualIdx, false);
@@ -160,11 +302,17 @@ export function renderQueueDrawerList(force = false) {
   }
 
   if (previousTracks.length > 0) {
-    html += `<div class="queue-section-header" style="margin-top: 16px; opacity: 0.6;">PREVIOUSLY PLAYED</div>`;
+    html += `
+      <div class="queue-section-header previous-section">
+        <span>PREVIOUSLY PLAYED</span>
+        <span style="opacity: 0.75; font-size: 11px; font-weight: 500;">(${previousTracks.length})</span>
+      </div>
+    `;
     previousTracks.forEach((track, actualIdx) => {
       html += renderQueueItem(track, actualIdx, false);
     });
   }
 
-  container.innerHTML = html;
-}
+  if (desktopContainer) desktopContainer.innerHTML = html;
+  if (mobileContainer) mobileContainer.innerHTML = html;
+}

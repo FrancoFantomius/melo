@@ -1,22 +1,67 @@
-<nav class="mobile-bottom-nav" id="mobile-bottom-nav">
-  <a href="./index.html" data-view="home" class="mobile-nav-item {{#if isHome}}active{{/if}}">
-    <span class="material-symbols-outlined">home</span>
-    <span class="mobile-nav-label" data-i18n>Home</span>
-  </a>
-  <a href="./search.html" data-view="search" class="mobile-nav-item {{#if isSearch}}active{{/if}}">
-    <span class="material-symbols-outlined">search</span>
-    <span class="mobile-nav-label" data-i18n>Search</span>
-  </a>
-  <a href="./playlists.html" data-view="playlists" class="mobile-nav-item {{#if isPlaylists}}active{{/if}}">
-    <span class="material-symbols-outlined">queue_music</span>
-    <span class="mobile-nav-label" data-i18n>Playlists</span>
-  </a>
-  <a href="./downloads.html" data-view="downloads" class="mobile-nav-item {{#if isDownloads}}active{{/if}}">
-    <span class="material-symbols-outlined">download</span>
-    <span class="mobile-nav-label" data-i18n>Downloads</span>
-  </a>
-  <a href="./podcasts.html" data-view="podcasts" class="mobile-nav-item {{#if isPodcasts}}active{{/if}}">
-    <span class="material-symbols-outlined">podcasts</span>
-    <span class="mobile-nav-label" data-i18n>Podcasts</span>
-  </a>
-</nav>
+<md-navigation-bar
+  class="mobile-bottom-nav"
+  id="mobile-bottom-nav"
+  label-mode="alwaysShow"
+  aria-label="Mobile navigation"
+>
+  <md-navigation-bar-item
+    label="Home"
+    data-i18n-label="Home"
+    data-view="home"
+    value="home"
+    href="./index.html"
+    {{#if isHome}}active selected{{/if}}
+  >
+    <md-icon slot="icon" name="home" {{#if isHome}}filled{{/if}}></md-icon>
+    <span class="label" data-i18n>Home</span>
+  </md-navigation-bar-item>
+
+  <md-navigation-bar-item
+    label="Search"
+    data-i18n-label="Search"
+    data-view="search"
+    value="search"
+    href="./search.html"
+    {{#if isSearch}}active selected{{/if}}
+  >
+    <md-icon slot="icon" name="search" {{#if isSearch}}filled{{/if}}></md-icon>
+    <span class="label" data-i18n>Search</span>
+  </md-navigation-bar-item>
+
+  <md-navigation-bar-item
+    label="Playlists"
+    data-i18n-label="Playlists"
+    data-view="playlists"
+    value="playlists"
+    href="./playlists.html"
+    {{#if isPlaylists}}active selected{{/if}}
+  >
+    <md-icon slot="icon" name="queue_music" {{#if isPlaylists}}filled{{/if}}></md-icon>
+    <span class="label" data-i18n>Playlists</span>
+  </md-navigation-bar-item>
+
+  <md-navigation-bar-item
+    label="Downloads"
+    data-i18n-label="Downloads"
+    data-view="downloads"
+    value="downloads"
+    href="./downloads.html"
+    {{#if isDownloads}}active selected{{/if}}
+  >
+    <md-icon slot="icon" name="download" {{#if isDownloads}}filled{{/if}}></md-icon>
+    <span class="label" data-i18n>Downloads</span>
+  </md-navigation-bar-item>
+
+  <md-navigation-bar-item
+    label="Podcasts"
+    data-i18n-label="Podcasts"
+    data-view="podcasts"
+    value="podcasts"
+    href="./podcasts.html"
+    {{#if isPodcasts}}active selected{{/if}}
+  >
+    <md-icon slot="icon" name="podcasts" {{#if isPodcasts}}filled{{/if}}></md-icon>
+    <span class="label" data-i18n>Podcasts</span>
+  </md-navigation-bar-item>
+</md-navigation-bar>
+

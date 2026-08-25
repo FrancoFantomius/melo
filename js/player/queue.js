@@ -133,6 +133,36 @@ export function addToQueue(tracks) {
   return tracks.length;
 }
 
+export function removeFromQueue(index) {
+  if (typeof index !== 'number' || index < 0 || index >= queue.length) return false;
+  const removedTrack = queue[index];
+  queue.splice(index, 1);
+  const origIdx = originalQueue.indexOf(removedTrack);
+  if (origIdx > -1) originalQueue.splice(origIdx, 1);
+
+  if (index < currentIndex) {
+    currentIndex--;
+  } else if (index === currentIndex) {
+    if (currentIndex >= queue.length) {
+      currentIndex = queue.length - 1;
+    }
+  }
+  return true;
+}
+
+export function clearQueue() {
+  const current = getCurrentTrack();
+  if (current) {
+    queue = [current];
+    originalQueue = [current];
+    currentIndex = 0;
+  } else {
+    queue = [];
+    originalQueue = [];
+    currentIndex = -1;
+  }
+}
+
 export function getQueueState() {
   return {
     queue,

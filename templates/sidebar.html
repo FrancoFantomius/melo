@@ -1,41 +1,152 @@
 <aside class="main-sidebar" id="main-sidebar">
+  <!-- Expanded Navigation Drawer -->
+  <div class="sidebar-drawer" id="main-sidebar-drawer">
+    <div class="sidebar-menu-list">
+      <md-navigation-drawer-item
+        label="Home"
+        data-i18n-label="Home"
+        data-view="home"
+        value="home"
+        href="./index.html"
+        {{#if isHome}}active selected{{/if}}
+      >
+        <md-icon slot="icon" name="home" {{#if isHome}}filled{{/if}}></md-icon>
+      </md-navigation-drawer-item>
 
-  <ul class="nav-menu">
-    <li class="nav-item {{#if isHome}}active{{/if}}">
-      <a href="./index.html" data-view="home">
-        <span class="material-symbols-outlined">home</span>
-        <span data-i18n>Home</span>
-      </a>
-    </li>
-    <li class="nav-item {{#if isAlbums}}active{{/if}}">
-      <a href="./albums.html" data-view="albums">
-        <span class="material-symbols-outlined">album</span>
-        <span data-i18n>Albums</span>
-      </a>
-    </li>
-    <li class="nav-item {{#if isArtists}}active{{/if}}">
-      <a href="./artists.html" data-view="artists">
-        <span class="material-symbols-outlined">artist</span>
-        <span data-i18n>Artists</span>
-      </a>
-    </li>
-    <li class="nav-item {{#if isPlaylists}}active{{/if}}">
-      <a href="./playlists.html" data-view="playlists">
-        <span class="material-symbols-outlined">queue_music</span>
-        <span data-i18n>Playlists</span>
-      </a>
-    </li>
-    <li class="nav-item {{#if isDownloads}}active{{/if}}">
-      <a href="./downloads.html" data-view="downloads">
-        <span class="material-symbols-outlined">download</span>
-        <span data-i18n>Downloads</span>
-      </a>
-    </li>
-    <li class="nav-item {{#if isPodcasts}}active{{/if}}">
-      <a href="./podcasts.html" data-view="podcasts">
-        <span class="material-symbols-outlined">podcasts</span>
-        <span data-i18n>Podcasts</span>
-      </a>
-    </li>
-  </ul>
+      <md-navigation-drawer-item
+        label="Albums"
+        data-i18n-label="Albums"
+        data-view="albums"
+        value="albums"
+        href="./albums.html"
+        {{#if isAlbums}}active selected{{/if}}
+      >
+        <md-icon slot="icon" name="album" {{#if isAlbums}}filled{{/if}}></md-icon>
+      </md-navigation-drawer-item>
+
+      <md-navigation-drawer-item
+        label="Artists"
+        data-i18n-label="Artists"
+        data-view="artists"
+        value="artists"
+        href="./artists.html"
+        {{#if isArtists}}active selected{{/if}}
+      >
+        <md-icon slot="icon" name="artist" {{#if isArtists}}filled{{/if}}></md-icon>
+      </md-navigation-drawer-item>
+
+      <md-navigation-drawer-item
+        label="Playlists"
+        data-i18n-label="Playlists"
+        data-view="playlists"
+        value="playlists"
+        href="./playlists.html"
+        {{#if isPlaylists}}active selected{{/if}}
+      >
+        <md-icon slot="icon" name="queue_music" {{#if isPlaylists}}filled{{/if}}></md-icon>
+      </md-navigation-drawer-item>
+
+      <md-navigation-drawer-item
+        label="Downloads"
+        data-i18n-label="Downloads"
+        data-view="downloads"
+        value="downloads"
+        href="./downloads.html"
+        {{#if isDownloads}}active selected{{/if}}
+      >
+        <md-icon slot="icon" name="download" {{#if isDownloads}}filled{{/if}}></md-icon>
+      </md-navigation-drawer-item>
+
+      <md-navigation-drawer-item
+        label="Podcasts"
+        data-i18n-label="Podcasts"
+        data-view="podcasts"
+        value="podcasts"
+        href="./podcasts.html"
+        {{#if isPodcasts}}active selected{{/if}}
+      >
+        <md-icon slot="icon" name="podcasts" {{#if isPodcasts}}filled{{/if}}></md-icon>
+      </md-navigation-drawer-item>
+    </div>
+  </div>
+
+  <!-- Retracted Navigation Rail -->
+  <md-navigation-rail
+    class="sidebar-rail"
+    id="main-sidebar-rail"
+    alignment="top"
+    aria-label="Navigation rail"
+  >
+    <md-navigation-rail-item
+      label="Home"
+      data-i18n-label="Home"
+      data-view="home"
+      value="home"
+      href="./index.html"
+      {{#if isHome}}active selected{{/if}}
+    >
+      <md-icon slot="icon" name="home" {{#if isHome}}filled{{/if}}></md-icon>
+      <span class="label" data-i18n>Home</span>
+    </md-navigation-rail-item>
+
+    <md-navigation-rail-item
+      label="Albums"
+      data-i18n-label="Albums"
+      data-view="albums"
+      value="albums"
+      href="./albums.html"
+      {{#if isAlbums}}active selected{{/if}}
+    >
+      <md-icon slot="icon" name="album" {{#if isAlbums}}filled{{/if}}></md-icon>
+      <span class="label" data-i18n>Albums</span>
+    </md-navigation-rail-item>
+
+    <md-navigation-rail-item
+      label="Artists"
+      data-i18n-label="Artists"
+      data-view="artists"
+      value="artists"
+      href="./artists.html"
+      {{#if isArtists}}active selected{{/if}}
+    >
+      <md-icon slot="icon" name="artist" {{#if isArtists}}filled{{/if}}></md-icon>
+      <span class="label" data-i18n>Artists</span>
+    </md-navigation-rail-item>
+
+    <md-navigation-rail-item
+      label="Playlists"
+      data-i18n-label="Playlists"
+      data-view="playlists"
+      value="playlists"
+      href="./playlists.html"
+      {{#if isPlaylists}}active selected{{/if}}
+    >
+      <md-icon slot="icon" name="queue_music" {{#if isPlaylists}}filled{{/if}}></md-icon>
+      <span class="label" data-i18n>Playlists</span>
+    </md-navigation-rail-item>
+
+    <md-navigation-rail-item
+      label="Downloads"
+      data-i18n-label="Downloads"
+      data-view="downloads"
+      value="downloads"
+      href="./downloads.html"
+      {{#if isDownloads}}active selected{{/if}}
+    >
+      <md-icon slot="icon" name="download" {{#if isDownloads}}filled{{/if}}></md-icon>
+      <span class="label" data-i18n>Downloads</span>
+    </md-navigation-rail-item>
+
+    <md-navigation-rail-item
+      label="Podcasts"
+      data-i18n-label="Podcasts"
+      data-view="podcasts"
+      value="podcasts"
+      href="./podcasts.html"
+      {{#if isPodcasts}}active selected{{/if}}
+    >
+      <md-icon slot="icon" name="podcasts" {{#if isPodcasts}}filled{{/if}}></md-icon>
+      <span class="label" data-i18n>Podcasts</span>
+    </md-navigation-rail-item>
+  </md-navigation-rail>
 </aside>

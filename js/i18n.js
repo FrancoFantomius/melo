@@ -96,7 +96,7 @@ function startTranslationObserver() {
     if (pendingNodes.length === 0) return;
     requestAnimationFrame(() => {
       for (const node of pendingNodes) {
-        if (node.isConnected && (node.querySelector('[data-i18n], [data-i18n-placeholder], [data-i18n-title]') || node.hasAttribute('data-i18n') || node.hasAttribute('data-i18n-placeholder') || node.hasAttribute('data-i18n-title'))) {
+        if (node.isConnected && (node.querySelector('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-label]') || node.hasAttribute('data-i18n') || node.hasAttribute('data-i18n-placeholder') || node.hasAttribute('data-i18n-title') || node.hasAttribute('data-i18n-label'))) {
           applyTranslations(node);
         }
       }
@@ -151,6 +151,23 @@ export function applyTranslations(container = document) {
       if (translated) {
         el.title = translated;
         el.setAttribute('aria-label', translated);
+      }
+    }
+  });
+
+  // 4. Custom Element labels with data-i18n-label
+  const labelElements = container.querySelectorAll('[data-i18n-label]');
+  labelElements.forEach(el => {
+    if (!el.dataset.i18nLabelEn) {
+      const attrVal = el.getAttribute('data-i18n-label');
+      el.dataset.i18nLabelEn = (attrVal && attrVal !== 'true') ? attrVal : (el.getAttribute('label') || '');
+    }
+    const key = el.dataset.i18nLabelEn;
+    if (key) {
+      const translated = getTranslation(key);
+      if (translated) {
+        el.setAttribute('label', translated);
+        el.label = translated;
       }
     }
   });

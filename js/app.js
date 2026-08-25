@@ -6,12 +6,18 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import '@francofantomius/material-components/top-app-bar';
+import '@francofantomius/material-components/navigation-drawer';
+import '@francofantomius/material-components/navigation-rail';
+import '@francofantomius/material-components/navigation-bar';
 import '@francofantomius/material-components/search-bar';
 import '@francofantomius/material-components/account-menu';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon';
 import '@francofantomius/material-components/divider';
+import '@francofantomius/material-components/side-sheet';
+import '@francofantomius/material-components/bottom-sheet';
+import '@francofantomius/material-components/badge';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

@@ -7,6 +7,7 @@
   /* Layout Dimensions */
   --header-height: 64px;
   --sidebar-width: 240px;
+  --rail-width: 80px;
   --player-height: 90px;
 
   /* Radii & Timings */
@@ -74,6 +75,29 @@
   --md-top-app-bar-container-color: var(--bg-secondary);
   --md-top-app-bar-on-container-color: var(--text-primary);
   --md-search-bar-container-color: var(--bg-tertiary);
+
+  /* Navigation Drawer / Sidebar Tokens */
+  --md-navigation-drawer-container-color: var(--bg-secondary);
+  --md-navigation-drawer-on-container-color: var(--text-primary);
+  --md-navigation-drawer-headline-color: var(--text-secondary);
+
+  /* Navigation Rail Tokens */
+  --md-navigation-rail-container-color: var(--bg-secondary);
+  --md-navigation-rail-on-container-color: var(--text-primary);
+  --md-navigation-rail-border: 1px solid var(--border-color);
+  --md-navigation-rail-active-indicator-color: var(--accent-bg-glow);
+  --md-navigation-rail-active-indicator-hover-color: rgba(245, 158, 11, 0.25);
+  --md-navigation-rail-active-icon-color: var(--accent);
+  --md-navigation-rail-active-label-color: var(--accent);
+  --md-navigation-rail-label-color: var(--text-secondary);
+
+  /* Navigation Bar (Bottom) Tokens */
+  --md-navigation-bar-container-color: var(--bg-tertiary);
+  --md-navigation-bar-on-container-color: var(--text-primary);
+  --md-navigation-bar-active-indicator-color: var(--accent-bg-glow);
+  --md-navigation-bar-active-icon-color: var(--accent);
+  --md-navigation-bar-active-label-color: var(--accent);
+  --md-navigation-bar-inactive-label-color: var(--text-secondary);
 }
 
 /* Theme: Light Mode Override */
@@ -130,4 +154,27 @@
   --md-top-app-bar-container-color: #ffffff;
   --md-top-app-bar-on-container-color: #121212;
   --md-search-bar-container-color: #eaeaea;
+
+  /* Navigation Drawer / Sidebar Tokens */
+  --md-navigation-drawer-container-color: var(--bg-secondary);
+  --md-navigation-drawer-on-container-color: var(--text-primary);
+  --md-navigation-drawer-headline-color: var(--text-secondary);
+
+  /* Navigation Rail Tokens */
+  --md-navigation-rail-container-color: var(--bg-secondary);
+  --md-navigation-rail-on-container-color: var(--text-primary);
+  --md-navigation-rail-border: 1px solid var(--border-color);
+  --md-navigation-rail-active-indicator-color: rgba(217, 119, 6, 0.15);
+  --md-navigation-rail-active-indicator-hover-color: rgba(217, 119, 6, 0.25);
+  --md-navigation-rail-active-icon-color: var(--accent);
+  --md-navigation-rail-active-label-color: var(--accent);
+  --md-navigation-rail-label-color: var(--text-secondary);
+
+  /* Navigation Bar (Bottom) Tokens */
+  --md-navigation-bar-container-color: var(--bg-secondary);
+  --md-navigation-bar-on-container-color: var(--text-primary);
+  --md-navigation-bar-active-indicator-color: rgba(217, 119, 6, 0.15);
+  --md-navigation-bar-active-icon-color: var(--accent);
+  --md-navigation-bar-active-label-color: var(--accent);
+  --md-navigation-bar-inactive-label-color: var(--text-secondary);
 }
