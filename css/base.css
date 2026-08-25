@@ -1,3 +1,6 @@
+@import "@fontsource-variable/roboto-flex/index.css";
+@import "./fonts.css";
+
 /* Reset & Global Base */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -44,17 +47,6 @@ body {
 
 ::-webkit-scrollbar-thumb:active {
   background: var(--accent);
-}
-
-/* Material Symbols Font Aliasing */
-@font-face {
-  font-family: 'Material Symbols Outlined';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 100 700;
-  src: local('Material Symbols Outlined Variable'),
-       local('Material Symbols Outlined'),
-       url('@fontsource-variable/material-symbols-outlined/files/material-symbols-outlined-latin-full-normal.woff2') format('woff2-variations');
 }
 
 /* Material Symbols Styling */

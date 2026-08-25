@@ -1,10 +1,3 @@
-import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource-variable/roboto-flex/index.css';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-
 import '@francofantomius/material-components/top-app-bar';
 import '@francofantomius/material-components/navigation-drawer';
 import '@francofantomius/material-components/navigation-rail';
@@ -20,6 +13,7 @@ import '@francofantomius/material-components/side-sheet';
 import '@francofantomius/material-components/bottom-sheet';
 import '@francofantomius/material-components/badge';
 import '@francofantomius/material-components/chip';
+import '@francofantomius/material-components/tooltip';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

@@ -1,3 +1,9 @@
+/* Ensure tooltips never affect flex/grid layout calculations */
+md-tooltip,
+.player-tooltips-container {
+  display: contents !important;
+}
+
 /* Bottom Audio Player Bar */
 .main-player {
   grid-area: player;

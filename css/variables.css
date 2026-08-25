@@ -1,6 +1,6 @@
 :root {
   /* Fonts */
-  --font-main: 'Roboto Flex Variable', 'Roboto', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-main: 'Roboto Flex Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --font-icon: 'Material Symbols Outlined', 'Material Symbols Outlined Variable', 'Material Icons', sans-serif;
   --md-sys-typescale-font-family: var(--font-main);
 

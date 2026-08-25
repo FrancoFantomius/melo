@@ -4,6 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { generateIconSubset } from './scripts/subset-icons.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -43,6 +45,16 @@ export default defineConfig({
         return { isHome: true };
       }
     }),
+    {
+      name: 'subset-material-icons',
+      async buildStart() {
+        try {
+          await generateIconSubset();
+        } catch (err) {
+          console.warn('[Icon Subsetting] Error during buildStart icon subset generation:', err);
+        }
+      }
+    },
     {
       name: 'sync-version-and-sw',
       buildStart() {
@@ -108,21 +120,15 @@ export default defineConfig({
 
         collectFiles(distDir);
 
-        const assetsMatch = swContent.match(/const ASSETS_TO_CACHE = \[([\s\S]*?)\];/);
-        if (assetsMatch) {
-          const currentAssets = assetsMatch[1]
-            .split('\n')
-            .map(line => line.trim().replace(/^['"]|['"],?$/g, ''))
-            .filter(Boolean);
-          const combined = Array.from(new Set([...currentAssets, ...distAssets]));
-          swContent = swContent.replace(
-            /const ASSETS_TO_CACHE = \[[\s\S]*?\];/,
-            `const ASSETS_TO_CACHE = [\n  '${combined.join("',\n  '")}'\n];`
-          );
-        }
+        // Pre-cache all generated production build files in dist/ plus root
+        const distAssetsWithRoot = Array.from(new Set(['./', ...distAssets])).sort();
+        swContent = swContent.replace(
+          /const ASSETS_TO_CACHE = \[[\s\S]*?\];/,
+          `const ASSETS_TO_CACHE = [\n  '${distAssetsWithRoot.join("',\n  '")}'\n];`
+        );
 
         fs.writeFileSync(path.resolve(__dirname, 'dist/sw.js'), swContent, 'utf-8');
-        console.log(`[SW Plugin] Generated dist/sw.js for version ${pkg.version} with ${distAssets.length} static assets.`);
+        console.log(`[SW Plugin] Generated dist/sw.js for version ${pkg.version} with ${distAssetsWithRoot.length} static assets.`);
       }
     }
   ]

@@ -8,9 +8,19 @@ const ASSETS_TO_CACHE = [
   './albums.html',
   './artists.html',
   './playlists.html',
+  './podcasts.html',
+  './downloads.html',
+  './search.html',
+  './terms.html',
+  './privacy.html',
   './manifest.json',
   './img/icons/icon.svg',
+  './img/covers/discover-daily.svg',
+  './img/covers/liked-songs.svg',
+  './fonts/material-symbols-outlined-subset.woff2',
+  './fonts/material-symbols.css',
   './css/variables.css',
+  './css/fonts.css',
   './css/base.css',
   './css/layout.css',
   './css/header.css',
@@ -20,11 +30,25 @@ const ASSETS_TO_CACHE = [
   './css/modals.css',
   './css/queue.css',
   './css/lyrics.css',
+  './css/podcast.css',
   './css/responsive.css',
   './css/style.css',
+  './languages/de.json',
+  './languages/en.json',
+  './languages/es.json',
+  './languages/fr.json',
+  './languages/it.json',
+  './languages/ja.json',
+  './languages/pt.json',
+  './languages/zh.json',
   './js/app.js',
   './js/login.js',
-  './js/auth-guard.js'
+  './js/auth-guard.js',
+  './js/i18n.js',
+  './js/pwa.js',
+  './js/privacy.js',
+  './js/terms.js',
+  './js/recommendations.js'
 ];
 
 // Install Event: Safe pre-caching with Promise.allSettled
@@ -66,6 +90,9 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   if (!url.startsWith('http://') && !url.startsWith('https://')) return;
 
+  // Ignore media streaming range requests so byte-range audio playback is unaffected
+  if (event.request.headers.has('range')) return;
+
   // 1. Handle Jellyfin Artwork Images with Stale-While-Revalidate
   const isImageRequest = url.includes('/Images/') || url.includes('/Images');
   if (isImageRequest) {
@@ -82,8 +109,11 @@ self.addEventListener('fetch', (event) => {
             return cachedResponse;
           });
 
-          // Return cached image immediately if available; revalidate in background
-          return cachedResponse || fetchPromise;
+          if (cachedResponse) {
+            event.waitUntil(fetchPromise);
+            return cachedResponse;
+          }
+          return fetchPromise;
         });
       })
     );
@@ -109,8 +139,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 2b. Bypass all cross-origin requests (Jellyfin API, iTunes discovery directory, RSS feeds, remote artwork).
-  //     These are dynamic API calls that differ by query string; caching them breaks them (e.g. ignoreSearch
-  //     matches every iTunes search to the same cached response).
+  //     These are dynamic API calls that differ by query string; caching them breaks them.
   if (new URL(url).origin !== self.location.origin) {
     return;
   }
@@ -120,13 +149,14 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       if (cachedResponse) {
         // Return cached immediately; update cache in background
-        fetch(event.request)
+        const updatePromise = fetch(event.request)
           .then((networkResponse) => {
             if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse).catch(() => {}));
+              return caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse).catch(() => {}));
             }
           })
           .catch(() => {/* Ignore network errors during background update */});
+        event.waitUntil(updatePromise);
         return cachedResponse;
       }
 
@@ -142,7 +172,7 @@ self.addEventListener('fetch', (event) => {
         // Offline HTML navigation fallback
         const acceptHeader = event.request.headers.get('accept') || '';
         if (acceptHeader.includes('text/html') || event.request.mode === 'navigate') {
-          return (await caches.match('./index.html'));
+          return (await caches.match('./index.html')) || (await caches.match('index.html')) || (await caches.match('./'));
         }
       });
     })

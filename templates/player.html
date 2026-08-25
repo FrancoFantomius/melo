@@ -5,38 +5,38 @@
       <div id="player-track-title" class="player-track-title">No track selected</div>
       <div id="player-track-artist" class="player-track-artist">Select a song to start playing</div>
     </div>
-    <button id="player-btn-like" class="btn-icon btn-like" title="Like" style="display: none; margin-left: 4px;">
+    <button id="player-btn-like" class="btn-icon btn-like" aria-label="Like" style="display: none; margin-left: 4px;">
       <span class="material-symbols-outlined">favorite_border</span>
     </button>
-    <button id="player-btn-add-playlist" class="btn-icon" title="Add to Playlist" style="display: none; margin-left: 4px;">
+    <button id="player-btn-add-playlist" class="btn-icon" aria-label="Add to Playlist" style="display: none; margin-left: 4px;">
       <span class="material-symbols-outlined">playlist_add</span>
     </button>
-    <button id="player-btn-download" class="btn-icon" title="Download" style="display: none; margin-left: 4px;">
+    <button id="player-btn-download" class="btn-icon" aria-label="Download" style="display: none; margin-left: 4px;">
       <span class="material-symbols-outlined">download</span>
     </button>
   </div>
 
   <div class="player-center">
     <div class="player-controls">
-      <button id="player-btn-shuffle" class="btn-icon" title="Shuffle">
+      <button id="player-btn-shuffle" class="btn-icon" aria-label="Shuffle">
         <span class="material-symbols-outlined">shuffle</span>
       </button>
-      <button id="player-btn-skip-back" class="btn-icon btn-skip" title="Rewind 15 seconds" style="display: none;">
+      <button id="player-btn-skip-back" class="btn-icon btn-skip" aria-label="Rewind 15 seconds" style="display: none;">
         <span class="material-symbols-outlined">replay_10</span>
       </button>
-      <button id="player-btn-prev" class="btn-icon" title="Previous Track">
+      <button id="player-btn-prev" class="btn-icon" aria-label="Previous Track">
         <span class="material-symbols-outlined">skip_previous</span>
       </button>
-      <button id="player-btn-play" class="btn-icon" title="Play/Pause">
+      <button id="player-btn-play" class="btn-icon" aria-label="Play">
         <span class="material-symbols-outlined">play_circle</span>
       </button>
-      <button id="player-btn-next" class="btn-icon" title="Next Track">
+      <button id="player-btn-next" class="btn-icon" aria-label="Next Track">
         <span class="material-symbols-outlined">skip_next</span>
       </button>
-      <button id="player-btn-skip-forward" class="btn-icon btn-skip" title="Fast-forward 30 seconds" style="display: none;">
+      <button id="player-btn-skip-forward" class="btn-icon btn-skip" aria-label="Fast-forward 30 seconds" style="display: none;">
         <span class="material-symbols-outlined">forward_30</span>
       </button>
-      <button id="player-btn-repeat" class="btn-icon" title="Repeat">
+      <button id="player-btn-repeat" class="btn-icon" aria-label="Repeat">
         <span class="material-symbols-outlined">repeat</span>
       </button>
     </div>
@@ -54,18 +54,18 @@
   </div>
 
   <div class="player-right">
-    <button id="player-speed-badge" class="player-speed-badge" title="Playback Speed" style="display: none;">1.0x</button>
-    <button id="player-quality-badge" class="quality-badge" title="Click to toggle quality / force transcode">DIRECT</button>
-    <button id="player-btn-lyrics" class="btn-icon" title="Lyrics" style="display: none;">
+    <button id="player-speed-badge" class="player-speed-badge" aria-label="Playback Speed" style="display: none;">1.0x</button>
+    <button id="player-quality-badge" class="quality-badge" aria-label="Click to toggle quality / force transcode">DIRECT</button>
+    <button id="player-btn-lyrics" class="btn-icon" aria-label="Lyrics" style="display: none;">
       <span class="material-symbols-outlined">lyrics</span>
     </button>
-    <button id="player-btn-queue" class="btn-icon" title="Queue">
+    <button id="player-btn-queue" class="btn-icon" aria-label="Queue">
       <span class="material-symbols-outlined">queue_music</span>
     </button>
-    <button id="player-btn-volume" class="btn-icon" title="Mute/Unmute">
+    <button id="player-btn-volume" class="btn-icon" aria-label="Mute">
       <span class="material-symbols-outlined fill">volume_up</span>
     </button>
-    <input type="range" id="player-volume" min="0" max="1" step="0.01" value="0.8" style="width: 80px;">
+    <input type="range" id="player-volume" min="0" max="1" step="0.01" value="0.8" style="width: 80px;" aria-label="Volume">
   </div>
 </footer>
 
@@ -73,12 +73,12 @@
 <div id="expanded-mobile-player" class="expanded-player expanded-mobile-player" role="dialog" aria-modal="true" aria-label="Full-Screen Player">
   <!-- Top Bar with Close/Minimize Chevron -->
   <div class="emp-top-bar">
-    <button id="emp-btn-close" class="btn-icon emp-close-btn" title="Minimize Player" aria-label="Minimize Player">
+    <button id="emp-btn-close" class="btn-icon emp-close-btn" aria-label="Minimize Player">
       <span class="material-symbols-outlined">expand_more</span>
     </button>
-    <div class="emp-top-title" data-i18n>NOW PLAYING</div>
+    <div class="emp-top-title" data-i18n>Now Playing</div>
     <div class="emp-top-actions">
-      <button id="emp-quality-badge" class="quality-badge emp-quality-badge" title="Click to toggle quality / force transcode">DIRECT</button>
+      <button id="emp-quality-badge" class="quality-badge emp-quality-badge" aria-label="Click to toggle quality / force transcode">DIRECT</button>
     </div>
   </div>
 
@@ -99,22 +99,22 @@
 
         <!-- Secondary Action Icons (Like, Add to Playlist, Download, Queue, Lyrics, Speed) -->
         <div class="emp-secondary-actions">
-          <button id="emp-btn-like" class="btn-icon btn-like" title="Like">
+          <button id="emp-btn-like" class="btn-icon btn-like" aria-label="Like">
             <span class="material-symbols-outlined">favorite_border</span>
           </button>
-          <button id="emp-btn-add-playlist" class="btn-icon" title="Add to Playlist" style="display: none;">
+          <button id="emp-btn-add-playlist" class="btn-icon" aria-label="Add to Playlist" style="display: none;">
             <span class="material-symbols-outlined">playlist_add</span>
           </button>
-          <button id="emp-btn-download" class="btn-icon" title="Download" style="display: none;">
+          <button id="emp-btn-download" class="btn-icon" aria-label="Download" style="display: none;">
             <span class="material-symbols-outlined">download</span>
           </button>
-          <button id="emp-btn-queue" class="btn-icon" title="Queue">
+          <button id="emp-btn-queue" class="btn-icon" aria-label="Queue">
             <span class="material-symbols-outlined">queue_music</span>
           </button>
-          <button id="emp-btn-lyrics" class="btn-icon" title="Lyrics" style="display: none;">
+          <button id="emp-btn-lyrics" class="btn-icon" aria-label="Lyrics" style="display: none;">
             <span class="material-symbols-outlined">lyrics</span>
           </button>
-          <button id="emp-speed-badge" class="player-speed-badge emp-speed-badge" title="Playback Speed" style="display: none;">1.0x</button>
+          <button id="emp-speed-badge" class="player-speed-badge emp-speed-badge" aria-label="Playback Speed" style="display: none;">1.0x</button>
         </div>
       </div>
 
@@ -134,25 +134,25 @@
 
       <!-- Primary Playback Controls -->
       <div class="emp-controls">
-        <button id="emp-btn-shuffle" class="btn-icon emp-icon-btn" title="Shuffle">
+        <button id="emp-btn-shuffle" class="btn-icon emp-icon-btn" aria-label="Shuffle">
           <span class="material-symbols-outlined">shuffle</span>
         </button>
-        <button id="emp-btn-skip-back" class="btn-icon emp-icon-btn btn-skip" title="Rewind 15 seconds" style="display: none;">
+        <button id="emp-btn-skip-back" class="btn-icon emp-icon-btn btn-skip" aria-label="Rewind 15 seconds" style="display: none;">
           <span class="material-symbols-outlined">replay_10</span>
         </button>
-        <button id="emp-btn-prev" class="btn-icon emp-icon-btn" title="Previous Track">
+        <button id="emp-btn-prev" class="btn-icon emp-icon-btn" aria-label="Previous Track">
           <span class="material-symbols-outlined">skip_previous</span>
         </button>
-        <button id="emp-btn-play" class="btn-icon emp-play-btn" title="Play/Pause">
+        <button id="emp-btn-play" class="btn-icon emp-play-btn" aria-label="Play">
           <span class="material-symbols-outlined">play_circle</span>
         </button>
-        <button id="emp-btn-next" class="btn-icon emp-icon-btn" title="Next Track">
+        <button id="emp-btn-next" class="btn-icon emp-icon-btn" aria-label="Next Track">
           <span class="material-symbols-outlined">skip_next</span>
         </button>
-        <button id="emp-btn-skip-forward" class="btn-icon emp-icon-btn btn-skip" title="Fast-forward 30 seconds" style="display: none;">
+        <button id="emp-btn-skip-forward" class="btn-icon emp-icon-btn btn-skip" aria-label="Fast-forward 30 seconds" style="display: none;">
           <span class="material-symbols-outlined">forward_30</span>
         </button>
-        <button id="emp-btn-repeat" class="btn-icon emp-icon-btn" title="Repeat">
+        <button id="emp-btn-repeat" class="btn-icon emp-icon-btn" aria-label="Repeat">
           <span class="material-symbols-outlined">repeat</span>
         </button>
       </div>
@@ -160,7 +160,7 @@
       <!-- Extra Controls: Volume -->
       <div class="emp-extra-controls">
         <div class="emp-volume-group">
-          <button id="emp-btn-volume" class="btn-icon emp-icon-btn" title="Mute/Unmute">
+          <button id="emp-btn-volume" class="btn-icon emp-icon-btn" aria-label="Mute">
             <span class="material-symbols-outlined fill">volume_up</span>
           </button>
           <input type="range" id="emp-volume" min="0" max="1" step="0.01" value="0.8" class="emp-volume-slider" aria-label="Volume">
@@ -170,3 +170,40 @@
   </div>
 </div>
 
+<!-- Player Tooltips (Registered by element ID via 'for', isolated from flex/grid flow) -->
+<div class="player-tooltips-container" aria-hidden="true" style="display: contents;">
+  <!-- Mini Player Tooltips -->
+  <md-tooltip for="player-btn-like" id="player-tooltip-like" position="top" data-i18n-value="Like" value="Like"></md-tooltip>
+  <md-tooltip for="player-btn-add-playlist" id="player-tooltip-add-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
+  <md-tooltip for="player-btn-download" id="player-tooltip-download" position="top" data-i18n-value="Download" value="Download"></md-tooltip>
+  <md-tooltip for="player-btn-shuffle" id="player-tooltip-shuffle" position="top" data-i18n-value="Shuffle" value="Shuffle"></md-tooltip>
+  <md-tooltip for="player-btn-skip-back" id="player-tooltip-skip-back" position="top" data-i18n-value="Rewind 15 seconds" value="Rewind 15 seconds"></md-tooltip>
+  <md-tooltip for="player-btn-prev" id="player-tooltip-prev" position="top" data-i18n-value="Previous Track" value="Previous Track"></md-tooltip>
+  <md-tooltip for="player-btn-play" id="player-tooltip-play" position="top" data-i18n-value="Play" value="Play"></md-tooltip>
+  <md-tooltip for="player-btn-next" id="player-tooltip-next" position="top" data-i18n-value="Next Track" value="Next Track"></md-tooltip>
+  <md-tooltip for="player-btn-skip-forward" id="player-tooltip-skip-forward" position="top" data-i18n-value="Fast-forward 30 seconds" value="Fast-forward 30 seconds"></md-tooltip>
+  <md-tooltip for="player-btn-repeat" id="player-tooltip-repeat" position="top" data-i18n-value="Repeat" value="Repeat"></md-tooltip>
+  <md-tooltip for="player-speed-badge" id="player-tooltip-speed-badge" position="top" data-i18n-value="Playback Speed" value="Playback Speed"></md-tooltip>
+  <md-tooltip for="player-quality-badge" id="player-tooltip-quality-badge" position="top" data-i18n-value="Click to toggle quality / force transcode" value="Click to toggle quality / force transcode"></md-tooltip>
+  <md-tooltip for="player-btn-lyrics" id="player-tooltip-lyrics" position="top" data-i18n-value="Lyrics" value="Lyrics"></md-tooltip>
+  <md-tooltip for="player-btn-queue" id="player-tooltip-queue" position="top" data-i18n-value="Queue" value="Queue"></md-tooltip>
+  <md-tooltip for="player-btn-volume" id="player-tooltip-volume" position="top" data-i18n-value="Mute" value="Mute"></md-tooltip>
+
+  <!-- Expanded Player Tooltips -->
+  <md-tooltip for="emp-btn-close" id="emp-tooltip-close" position="bottom" data-i18n-value="Minimize Player" value="Minimize Player"></md-tooltip>
+  <md-tooltip for="emp-quality-badge" id="emp-tooltip-quality-badge" position="bottom" data-i18n-value="Click to toggle quality / force transcode" value="Click to toggle quality / force transcode"></md-tooltip>
+  <md-tooltip for="emp-btn-like" id="emp-tooltip-like" position="top" data-i18n-value="Like" value="Like"></md-tooltip>
+  <md-tooltip for="emp-btn-add-playlist" id="emp-tooltip-add-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
+  <md-tooltip for="emp-btn-download" id="emp-tooltip-download" position="top" data-i18n-value="Download" value="Download"></md-tooltip>
+  <md-tooltip for="emp-btn-queue" id="emp-tooltip-queue" position="top" data-i18n-value="Queue" value="Queue"></md-tooltip>
+  <md-tooltip for="emp-btn-lyrics" id="emp-tooltip-lyrics" position="top" data-i18n-value="Lyrics" value="Lyrics"></md-tooltip>
+  <md-tooltip for="emp-speed-badge" id="emp-tooltip-speed-badge" position="top" data-i18n-value="Playback Speed" value="Playback Speed"></md-tooltip>
+  <md-tooltip for="emp-btn-shuffle" id="emp-tooltip-shuffle" position="top" data-i18n-value="Shuffle" value="Shuffle"></md-tooltip>
+  <md-tooltip for="emp-btn-skip-back" id="emp-tooltip-skip-back" position="top" data-i18n-value="Rewind 15 seconds" value="Rewind 15 seconds"></md-tooltip>
+  <md-tooltip for="emp-btn-prev" id="emp-tooltip-prev" position="top" data-i18n-value="Previous Track" value="Previous Track"></md-tooltip>
+  <md-tooltip for="emp-btn-play" id="emp-tooltip-play" position="top" data-i18n-value="Play" value="Play"></md-tooltip>
+  <md-tooltip for="emp-btn-next" id="emp-tooltip-next" position="top" data-i18n-value="Next Track" value="Next Track"></md-tooltip>
+  <md-tooltip for="emp-btn-skip-forward" id="emp-tooltip-skip-forward" position="top" data-i18n-value="Fast-forward 30 seconds" value="Fast-forward 30 seconds"></md-tooltip>
+  <md-tooltip for="emp-btn-repeat" id="emp-tooltip-repeat" position="top" data-i18n-value="Repeat" value="Repeat"></md-tooltip>
+  <md-tooltip for="emp-btn-volume" id="emp-tooltip-volume" position="top" data-i18n-value="Mute" value="Mute"></md-tooltip>
+</div>

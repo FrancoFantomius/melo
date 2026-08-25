@@ -21,10 +21,21 @@ export async function renderHomeView(container) {
     albums: 'Albums'
   };
 
-  const pillsHTML = `<md-chip variant="filter" selected label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>` +
+  const pillIcons = {
+    all: 'widgets',
+    playlists: 'queue_music',
+    songs: 'music_note',
+    artists: 'artist',
+    podcasts: 'podcasts',
+    albums: 'album'
+  };
+
+  const pillsHTML = `<md-chip variant="filter" selected icon="widgets" label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>` +
     userOrder.map(cat => {
       const defaultText = pillDefaultText[cat] || cat;
-      return `<md-chip variant="filter" label="${getTranslation(defaultText)}" data-category="${cat}" data-i18n-label="${defaultText}"></md-chip>`;
+      const icon = pillIcons[cat];
+      const iconAttr = icon ? `icon="${icon}"` : '';
+      return `<md-chip variant="filter" ${iconAttr} label="${getTranslation(defaultText)}" data-category="${cat}" data-i18n-label="${defaultText}"></md-chip>`;
     }).join('');
 
   const sectionHTMLMap = {

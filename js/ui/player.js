@@ -6,6 +6,7 @@ import { getArtworkUrl, getLyrics } from '../jellyfin/client.js';
 import { getSession, saveSession } from '../jellyfin/session.js';
 import { isTrackLiked, toggleTrackLiked } from '../player/likes.js';
 import { toggleTrackDownload, refreshDownloadButton } from './downloads.js';
+import { getTranslation } from '../i18n.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -58,6 +59,17 @@ export function initPlayerUI() {
     const icon = el.querySelector('.material-symbols-outlined');
     if (icon) icon.textContent = text;
   };
+  const setButtonTooltip = (btn, textKey) => {
+    if (!btn) return;
+    const translated = getTranslation(textKey);
+    btn.setAttribute('aria-label', translated);
+    const tooltip = document.querySelector(`md-tooltip[for="${btn.id}"]`);
+    if (tooltip) {
+      tooltip.dataset.i18nValueEn = textKey;
+      tooltip.value = translated;
+      tooltip.setAttribute('value', translated);
+    }
+  };
   const isMusic = (track) => !!(track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl);
 
   let currentPlayingTrack = null;
@@ -70,7 +82,8 @@ export function initPlayerUI() {
       if (!music) return setDisplay(btn, 'none');
       setDisplay(btn, 'flex');
       btn.classList.toggle('liked', liked);
-      btn.title = liked ? 'Unlike' : 'Like';
+      const label = liked ? 'Unlike' : 'Like';
+      setButtonTooltip(btn, label);
       setIcon(btn, liked ? 'favorite' : 'favorite_border');
     });
     each(pairs.addPlaylist, (btn) => setDisplay(btn, music ? 'flex' : 'none'));
@@ -381,7 +394,10 @@ export function initPlayerUI() {
       stopProgressAnim();
     }
 
-    each(pairs.play, (btn) => setIcon(btn, isPlaying ? 'pause_circle' : 'play_circle'));
+    each(pairs.play, (btn) => {
+      setIcon(btn, isPlaying ? 'pause_circle' : 'play_circle');
+      setButtonTooltip(btn, isPlaying ? 'Pause' : 'Play');
+    });
 
     if (state.volume !== undefined) {
       each(pairs.volumeSlider, (slider) => {
@@ -391,8 +407,10 @@ export function initPlayerUI() {
         }
       });
 
+      const isMuted = state.volume === 0;
       each(pairs.btnVolume, (btn) => {
-        setIcon(btn, state.volume === 0 ? 'volume_off' : state.volume < 0.5 ? 'volume_down' : 'volume_up');
+        setIcon(btn, isMuted ? 'volume_off' : state.volume < 0.5 ? 'volume_down' : 'volume_up');
+        setButtonTooltip(btn, isMuted ? 'Unmute' : 'Mute');
       });
     }
 
@@ -406,19 +424,21 @@ export function initPlayerUI() {
       const mode = state.queueState.repeat;
       each(pairs.repeat, (btn) => {
         btn.classList.toggle('active', mode !== 'none' && mode !== false);
+        let repeatKey = 'Repeat';
         if (mode === 'one') {
           btn.style.color = 'var(--accent)';
-          btn.title = 'Repeat Song Once (Auto-Disables)';
+          repeatKey = 'Repeat Song Once (Auto-Disables)';
           setIcon(btn, 'repeat_one');
         } else if (mode === 'all') {
           btn.style.color = 'var(--accent)';
-          btn.title = 'Repeat Song (Continuous)';
+          repeatKey = 'Repeat Song (Continuous)';
           setIcon(btn, 'repeat');
         } else {
           btn.style.color = 'var(--text-secondary)';
-          btn.title = 'Repeat Off';
+          repeatKey = 'Repeat Off';
           setIcon(btn, 'repeat');
         }
+        setButtonTooltip(btn, repeatKey);
       });
     }
   });

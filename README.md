@@ -106,7 +106,7 @@ Melo is a lightweight, installable Progressive Web App (PWA) music player built 
 - **Styling**: Custom CSS (design-system variables, responsive layouts)
 - **Storage**: `localStorage` (session, settings) and IndexedDB (API cache, offline audio)
 - **Backend**: Jellyfin media server (REST API)
-- **Fonts**: Plus Jakarta Sans and Material Symbols (variable fonts, self-hosted)
+- **Fonts**: Roboto Flex (variable font) and Material Symbols Outlined (subsetted variable font, self-hosted)
 
 ---
 
