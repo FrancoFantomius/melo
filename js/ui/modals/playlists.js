@@ -1,6 +1,7 @@
 import { createPlaylist, updatePlaylist, uploadPlaylistImage, deletePlaylist, addTracksToPlaylist, searchJellyfinCached, getSongsCached, getPlaylistsCached, getArtworkUrl } from '../../jellyfin/client.js';
 import { getTranslation } from '../../i18n.js';
 import { escapeHtml } from './shared.js';
+import { getPlaceholder } from '../placeholders.js';
 
 let currentCreatePlaylistCallback = null;
 let currentEditPlaylistCallback = null;
@@ -299,11 +300,11 @@ function renderAddTracksResults(items, playlistId) {
 
   listEl.innerHTML = items.map(track => {
     const artistName = track.Artists?.join(', ') || track.AlbumArtist || 'Unknown Artist';
-    const artUrl = getArtworkUrl(track, 'Primary', 80);
+    const artUrl = getArtworkUrl(track, 'Primary', 80, 'song');
     return `
       <div class="add-track-item" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
         <div style="display: flex; align-items: center; gap: 10px; overflow: hidden; flex: 1;">
-          <img src="${artUrl}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" alt="Cover">
+          <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : '${getPlaceholder('song')}';" data-placeholder-type="song" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" alt="Cover">
           <div style="overflow: hidden;">
             <div style="font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary);">${escapeHtml(track.Name || '')}</div>
             <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(artistName)}</div>
@@ -436,12 +437,12 @@ function renderSelectPlaylistItems(playlists) {
   }
 
   listEl.innerHTML = playlists.map(pl => {
-    const artUrl = getArtworkUrl(pl, 'Primary', 80);
+    const artUrl = getArtworkUrl(pl, 'Primary', 80, 'playlist');
     const count = pl.ChildCount !== undefined ? `${pl.ChildCount} tracks` : 'Playlist';
     return `
       <div class="select-playlist-item" data-playlist-id="${pl.Id}" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--bg-tertiary); border-radius: var(--radius-sm); border: 1px solid var(--border-color); cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='var(--bg-tertiary)'">
         <div style="display: flex; align-items: center; gap: 12px; overflow: hidden; flex: 1;">
-          <img src="${artUrl}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" alt="Cover">
+          <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('playlist') : '${getPlaceholder('playlist')}';" data-placeholder-type="playlist" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0;" alt="Cover">
           <div style="overflow: hidden;">
             <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary);">${escapeHtml(pl.Name || 'Playlist')}</div>
             <div style="font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(count)}</div>

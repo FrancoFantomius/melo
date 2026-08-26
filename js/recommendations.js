@@ -1,3 +1,5 @@
+import { getPlaceholder } from './ui/placeholders.js';
+
 const RECENCY_HALF_LIFE_DAYS = 45;
 const MIN_DATE_MS = Date.parse('1970-01-01T00:00:00Z');
 
@@ -14,7 +16,9 @@ export const LIKED_SONGS_PLAYLIST = {
   Name: 'Liked Songs',
   Type: 'LikedSongs',
   IsLikedSongs: true,
-  CoverUrl: './img/covers/liked-songs.svg'
+  get CoverUrl() {
+    return getPlaceholder('favorite');
+  }
 };
 
 export const DISCOVER_DAILY_PLAYLIST = {
@@ -22,7 +26,9 @@ export const DISCOVER_DAILY_PLAYLIST = {
   Name: 'Discover Daily',
   Type: 'DiscoverDaily',
   IsDiscoverDaily: true,
-  CoverUrl: './img/covers/discover-daily.svg'
+  get CoverUrl() {
+    return getPlaceholder('explore');
+  }
 };
 
 function getItemDateMs(item, keys) {

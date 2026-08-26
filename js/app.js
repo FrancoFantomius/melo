@@ -17,6 +17,7 @@ import '@francofantomius/material-components/tooltip';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';
+import './ui/placeholders.js';
 import { initHeader } from './ui/header.js';
 import { initModals } from './ui/modals.js';
 import { initViews } from './ui/views.js';

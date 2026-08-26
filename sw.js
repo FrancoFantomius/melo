@@ -15,8 +15,22 @@ const ASSETS_TO_CACHE = [
   './privacy.html',
   './manifest.json',
   './img/icons/icon.svg',
-  './img/covers/discover-daily.svg',
-  './img/covers/liked-songs.svg',
+  './img/album.svg',
+  './img/album_dark.svg',
+  './img/album-1.svg',
+  './img/album_dark-1.svg',
+  './img/artist.svg',
+  './img/artist_dark.svg',
+  './img/podcast.svg',
+  './img/podcast_dark.svg',
+  './img/song.svg',
+  './img/song_dark.svg',
+  './img/favorite.svg',
+  './img/favorite_dark.svg',
+  './img/explore.svg',
+  './img/explore_dark.svg',
+  './img/radio.svg',
+  './img/radio_dark.svg',
   './fonts/material-symbols-outlined-subset.woff2',
   './fonts/material-symbols.css',
   './css/variables.css',
@@ -48,7 +62,8 @@ const ASSETS_TO_CACHE = [
   './js/pwa.js',
   './js/privacy.js',
   './js/terms.js',
-  './js/recommendations.js'
+  './js/recommendations.js',
+  './js/ui/placeholders.js'
 ];
 
 // Install Event: Safe pre-caching with Promise.allSettled

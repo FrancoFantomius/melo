@@ -6,6 +6,10 @@ import { switchView } from '../../views.js';
 import { renderSubscribedCarousel, renderContinuePlayingCarousel, renderLatestEpisodesGrid } from './carousels.js';
 import { renderDiscoverTabContent } from './discovery.js';
 import { getTranslation } from '../../../i18n.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/chip';
+import '@francofantomius/material-components/icon';
 
 let podcastFormListenerBound = false;
 
@@ -71,19 +75,18 @@ export async function renderPodcastsView(container, viewData = 'all') {
           <h1 class="section-title" data-i18n>Podcasts</h1>
           <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" data-i18n>Stream and discover client-side podcast RSS feeds</p>
         </div>
-        <button id="btn-open-add-podcast" class="btn-primary">
-          <span class="material-symbols-outlined">add</span>
+        <md-button id="btn-open-add-podcast" variant="filled" icon="add">
           <span data-i18n>Add Podcast</span>
-        </button>
+        </md-button>
       </div>
 
       <!-- Category Filter Chips -->
       <md-chip-set class="category-pills" id="podcast-category-pills">
-        <md-chip variant="filter" ${activeCategory === 'all' ? 'selected' : ''} label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>
-        <md-chip variant="filter" ${activeCategory === 'subscribed' ? 'selected' : ''} label="${getTranslation('Subscribed Podcasts')}" data-category="subscribed" data-i18n-label="Subscribed Podcasts"></md-chip>
-        <md-chip variant="filter" ${activeCategory === 'continue' ? 'selected' : ''} label="${getTranslation('Continue Playing')}" data-category="continue" data-i18n-label="Continue Playing"></md-chip>
-        <md-chip variant="filter" ${activeCategory === 'latest' ? 'selected' : ''} label="${getTranslation('Latest Episodes')}" data-category="latest" data-i18n-label="Latest Episodes"></md-chip>
-        <md-chip variant="filter" ${activeCategory === 'discover' ? 'selected' : ''} label="${getTranslation('Discover Podcasts')}" data-category="discover" data-i18n-label="Discover Podcasts"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'all' ? 'selected' : ''} icon="grid_view" label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'subscribed' ? 'selected' : ''} icon="subscriptions" label="${getTranslation('Subscribed Podcasts')}" data-category="subscribed" data-i18n-label="Subscribed Podcasts"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'continue' ? 'selected' : ''} icon="history" label="${getTranslation('Continue Playing')}" data-category="continue" data-i18n-label="Continue Playing"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'latest' ? 'selected' : ''} icon="new_releases" label="${getTranslation('Latest Episodes')}" data-category="latest" data-i18n-label="Latest Episodes"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'discover' ? 'selected' : ''} icon="explore" label="${getTranslation('Discover Podcasts')}" data-category="discover" data-i18n-label="Discover Podcasts"></md-chip>
       </md-chip-set>
 
       <!-- Section 1: Subscribed Podcasts Carousel -->
@@ -91,12 +94,8 @@ export async function renderPodcastsView(container, viewData = 'all') {
         <div class="podcast-section-header">
           <h2 class="podcast-section-title" data-i18n>Subscribed Podcasts</h2>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-subscribed" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-subscribed" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-subscribed" variant="standard" icon="chevron_left" aria-label="Previous"></md-icon-button>
+            <md-icon-button id="carousel-next-subscribed" variant="standard" icon="chevron_right" aria-label="Next"></md-icon-button>
           </div>
         </div>
         <div id="podcast-subscribed-carousel" class="cards-carousel">
@@ -109,12 +108,8 @@ export async function renderPodcastsView(container, viewData = 'all') {
         <div class="podcast-section-header">
           <h2 class="podcast-section-title" data-i18n>Continue Playing</h2>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-continue" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-continue" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-continue" variant="standard" icon="chevron_left" aria-label="Previous"></md-icon-button>
+            <md-icon-button id="carousel-next-continue" variant="standard" icon="chevron_right" aria-label="Next"></md-icon-button>
           </div>
         </div>
         <div id="podcast-continue-carousel" class="episodes-carousel">

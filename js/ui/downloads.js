@@ -26,7 +26,14 @@ export function setDownloadButtonState(button, state, title = '') {
         button.title = translated;
       }
     } else {
-      button.title = translated;
+      const tooltip = button.nextElementSibling && button.nextElementSibling.tagName === 'MD-TOOLTIP' ? button.nextElementSibling : null;
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = title;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        button.title = translated;
+      }
     }
   }
 }
@@ -49,7 +56,14 @@ export function setDownloadButtonProgress(button, progress) {
         button.title = translated;
       }
     } else {
-      button.title = translated;
+      const tooltip = button.nextElementSibling && button.nextElementSibling.tagName === 'MD-TOOLTIP' ? button.nextElementSibling : null;
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = titleKey;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        button.title = translated;
+      }
     }
   }
 }

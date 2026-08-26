@@ -25,16 +25,31 @@ export function setupDownloadAllButton({ button, label, getAlbum, isLikedSongs, 
     button.style.display = 'inline-flex';
 
     const allDownloaded = await isAllDownloaded(currentTracks);
-    const icon = button.querySelector('.material-symbols-outlined');
+    const icon = button.querySelector('md-icon') || button.querySelector('.material-symbols-outlined');
+    const tooltip = document.getElementById('tooltip-download-album');
     if (allDownloaded) {
       button.classList.add('downloaded');
       button.title = 'Remove Download';
-      if (icon) icon.textContent = 'download_done';
+      if (tooltip) {
+        tooltip.dataset.i18nValue = 'Remove Download';
+        tooltip.value = getTranslation('Remove Download');
+      }
+      if (icon) {
+        if (icon.tagName === 'MD-ICON') icon.setAttribute('name', 'download_done');
+        else icon.textContent = 'download_done';
+      }
       if (label) label.textContent = getTranslation('Remove Download');
     } else {
       button.classList.remove('downloaded');
       button.title = 'Download';
-      if (icon) icon.textContent = 'download';
+      if (tooltip) {
+        tooltip.dataset.i18nValue = 'Download';
+        tooltip.value = getTranslation('Download');
+      }
+      if (icon) {
+        if (icon.tagName === 'MD-ICON') icon.setAttribute('name', 'download');
+        else icon.textContent = 'download';
+      }
       if (label) label.textContent = getTranslation('Download');
     }
   };
@@ -53,8 +68,15 @@ export function setupDownloadAllButton({ button, label, getAlbum, isLikedSongs, 
 
       button.disabled = true;
       button.classList.add('downloading');
-      const icon = button.querySelector('.material-symbols-outlined');
-      if (icon) icon.textContent = 'downloading';
+      const tooltip = document.getElementById('tooltip-download-album');
+      if (tooltip) {
+        tooltip.value = getTranslation('Downloading...');
+      }
+      const icon = button.querySelector('md-icon') || button.querySelector('.material-symbols-outlined');
+      if (icon) {
+        if (icon.tagName === 'MD-ICON') icon.setAttribute('name', 'downloading');
+        else icon.textContent = 'downloading';
+      }
       if (label) label.textContent = getTranslation('Downloading...');
 
       const album = getAlbum();

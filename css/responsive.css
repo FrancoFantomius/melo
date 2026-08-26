@@ -7,16 +7,22 @@
 
 /* Mobile View Rules */
 @media (max-width: 768px) {
+  /* On mobile, all album/playlist action buttons except Play present only icons */
+  .album-detail-actions md-button:not(#btn-play-album-all) > span,
+  .playlist-manage-actions md-button > span {
+    display: none !important;
+  }
+
   #btn-refresh-discover-daily .btn-refresh-label {
-    display: none;
+    display: none !important;
   }
 
   .btn-play-label-short {
-    display: inline;
+    display: inline !important;
   }
 
   .btn-play-label-full {
-    display: none;
+    display: none !important;
   }
   #app-layout {
     display: flex;

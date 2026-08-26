@@ -2,6 +2,8 @@
  * Client-Side RSS Feed Parser for Podcasts
  */
 
+import { getPlaceholder } from '../ui/placeholders.js';
+
 function parseDuration(durationStr) {
   if (!durationStr) return 0;
   const str = String(durationStr).trim();
@@ -97,7 +99,7 @@ export async function fetchAndParseFeed(feedUrl) {
   const authorEl = channel.querySelector('author, managingEditor') || xmlDoc.getElementsByTagNameNS('*', 'author')[0];
   const linkEl = channel.querySelector('link');
 
-  let image = './img/icons/icon.svg';
+  let image = getPlaceholder('podcast');
   const itunesImage = xmlDoc.getElementsByTagNameNS('*', 'image')[0];
   if (itunesImage && itunesImage.getAttribute('href')) {
     image = itunesImage.getAttribute('href');

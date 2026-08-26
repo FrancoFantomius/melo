@@ -5,6 +5,11 @@ import { switchView } from '../views.js';
 import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTML, bindTrackRows, bindArtistLinks } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
+import { getPlaceholder } from '../placeholders.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/icon';
+import '@francofantomius/material-components/tooltip';
 
 export function openArtist(artistIdOrName, artistObj = null) {
   if (!artistIdOrName) return;
@@ -34,7 +39,7 @@ export async function renderArtistsView(container) {
       } else {
         grid.innerHTML = res.Items.map(artist => `
           <div class="media-card" data-artist-id="${artist.Id}">
-            <img src="${getArtworkUrl(artist, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
+            <img src="${getArtworkUrl(artist, 'Primary', 300, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
             <div class="card-title" style="text-align: center;">${artist.Name}</div>
             <div class="card-subtitle" style="text-align: center;" data-i18n>Artist</div>
           </div>
@@ -63,18 +68,17 @@ export async function renderArtistDetailView(container, artistOrId) {
   container.innerHTML = `
     <div class="view-section">
       <div class="album-detail-banner">
-        <img id="artist-detail-cover" src="${getArtworkUrl(artist, 'Primary', 400)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="album-cover-lg" style="border-radius: 50%;" alt="${artist.Name || 'Artist'}">
+        <img id="artist-detail-cover" src="${getArtworkUrl(artist, 'Primary', 400, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="album-cover-lg" style="border-radius: 50%;" alt="${artist.Name || 'Artist'}">
         <div class="album-info-meta">
           <span class="album-detail-type" data-i18n>Artist</span>
           <h1 id="artist-detail-name" class="album-detail-title">${artist.Name || 'Loading...'}</h1>
           <div class="album-detail-actions">
-            <button id="btn-play-artist-all" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 8px;">
-              <span class="material-symbols-outlined">play_arrow</span>
+            <md-button id="btn-play-artist-all" variant="filled">
+              <md-icon slot="icon" name="play_arrow" filled></md-icon>
               <span data-i18n>Play All</span>
-            </button>
-            <button id="btn-shuffle-artist-all" class="btn btn-secondary" title="Random Play" aria-label="Random Play">
-              <span class="material-symbols-outlined">shuffle</span>
-            </button>
+            </md-button>
+            <md-icon-button id="btn-shuffle-artist-all" variant="tonal" icon="shuffle" aria-label="Random Play"></md-icon-button>
+            <md-tooltip for="btn-shuffle-artist-all" position="top" data-i18n-value="Random Play" value="Random Play"></md-tooltip>
           </div>
         </div>
       </div>
@@ -85,7 +89,9 @@ export async function renderArtistDetailView(container, artistOrId) {
           <div style="color: var(--text-muted);" data-i18n>Loading...</div>
         </div>
         <div id="artist-albums-load-more" style="display: none; text-align: center; margin-top: 16px;">
-          <button id="btn-artist-albums-load-more" class="btn btn-secondary" data-i18n>Load More</button>
+          <md-button id="btn-artist-albums-load-more" variant="tonal">
+            <span data-i18n>Load More</span>
+          </md-button>
         </div>
       </div>
 
@@ -106,7 +112,7 @@ export async function renderArtistDetailView(container, artistOrId) {
         const nameEl = document.getElementById('artist-detail-name');
         const coverEl = document.getElementById('artist-detail-cover');
         if (nameEl && artist.Name) nameEl.textContent = artist.Name;
-        if (coverEl) coverEl.src = getArtworkUrl(artist, 'Primary', 400);
+        if (coverEl) coverEl.src = getArtworkUrl(artist, 'Primary', 400, 'artist');
       }
     });
     if (fetchedArtist) {
@@ -114,7 +120,7 @@ export async function renderArtistDetailView(container, artistOrId) {
       const nameEl = document.getElementById('artist-detail-name');
       const coverEl = document.getElementById('artist-detail-cover');
       if (nameEl && artist.Name) nameEl.textContent = artist.Name;
-      if (coverEl) coverEl.src = getArtworkUrl(artist, 'Primary', 400);
+      if (coverEl) coverEl.src = getArtworkUrl(artist, 'Primary', 400, 'artist');
     }
   } catch (err) {
     console.warn('[Views] getItemCached for artist failed:', err);

@@ -250,27 +250,15 @@
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .playlist-manage-actions {
   margin-top: 10px;
   display: flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
-  flex-wrap: nowrap;
-}
-
-.playlist-manage-actions .btn {
-  padding: 6px 12px;
-  font-size: 12px;
-  gap: 5px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  border-radius: 20px;
-}
-
-.playlist-manage-actions .btn .material-symbols-outlined {
-  font-size: 16px;
+  flex-wrap: wrap;
 }
 
 @media (max-width: 768px) {
@@ -315,58 +303,29 @@
   .album-detail-actions {
     justify-content: center;
     width: 100%;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
-  .album-detail-actions .btn-primary {
-    flex-shrink: 1;
-    min-width: 0;
-    justify-content: center;
-    padding: 10px 16px;
-    font-size: 14px;
-  }
-
-  .album-detail-actions .btn-secondary > span:not(.material-symbols-outlined) {
-    display: none;
-  }
-
-  .album-detail-actions .btn-secondary .material-symbols-outlined {
-    font-size: 20px;
+  /* On mobile, all album/playlist detail action buttons except Play present only icons */
+  .album-detail-actions md-button:not(#btn-play-album-all) > span,
+  .playlist-manage-actions md-button > span {
+    display: none !important;
   }
 
   .playlist-manage-actions {
     justify-content: center;
     width: 100%;
-    gap: 6px;
-    flex-wrap: nowrap;
+    gap: 8px;
+    flex-wrap: wrap;
     box-sizing: border-box;
     padding: 0 4px;
-  }
-
-  .playlist-manage-actions .btn {
-    padding: 6px 10px;
-    font-size: 12px;
-    gap: 4px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .playlist-manage-actions .btn .material-symbols-outlined {
-    font-size: 15px;
   }
 
   #album-tracks-toolbar {
     background: transparent;
     border: none;
     padding-left: 0;
-  }
-
-  #btn-tracks-select-all {
-    padding: 8px;
-  }
-
-  #btn-tracks-select-all .material-symbols-outlined {
-    font-size: 24px;
   }
 }
 
@@ -455,11 +414,14 @@
   color: var(--accent);
 }
 
+#btn-download-album.downloaded md-icon,
 #btn-download-album.downloaded .material-symbols-outlined,
+#btn-download-album.downloading md-icon,
 #btn-download-album.downloading .material-symbols-outlined {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
+#btn-download-album.downloading md-icon,
 #btn-download-album.downloading .material-symbols-outlined {
   animation: spin 1s linear infinite;
 }

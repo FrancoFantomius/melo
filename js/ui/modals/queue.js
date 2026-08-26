@@ -2,12 +2,11 @@ import { getArtworkUrl } from '../../jellyfin/client.js';
 import { getQueueState, setCurrentIndex, removeFromQueue, clearQueue } from '../../player/queue.js';
 import { playTrack } from '../../player/audio.js';
 import { openSelectPlaylistModal } from './playlists.js';
-import { syncOverlaysWithHash } from './index.js';
 import { escapeHtml } from './shared.js';
+import { getPlaceholder } from '../placeholders.js';
 
 let lastRenderedSignature = null;
 let isClosingInternally = false;
-let wasPlayerOpenWhenQueueOpened = false;
 
 function isMobile() {
   return window.matchMedia('(max-width: 768px)').matches;
@@ -35,22 +34,10 @@ function handleSheetClosed() {
   if (isClosingInternally) return;
   updateQueueButtonStates(false);
 
-  const empContainer = document.getElementById('expanded-mobile-player');
-
-  if (wasPlayerOpenWhenQueueOpened) {
-    wasPlayerOpenWhenQueueOpened = false;
-    empContainer?.classList.add('open');
-    if (window.location.hash !== '#player') {
-      window.location.hash = 'player';
-    }
-  } else if (window.location.hash === '#queue') {
-    window.history.back();
-    setTimeout(() => {
-      if (window.location.hash === '#queue') {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-        syncOverlaysWithHash();
-      }
-    }, 50);
+  if (window.location.hash === '#queue') {
+    const empContainer = document.getElementById('expanded-mobile-player');
+    const targetHash = empContainer?.classList.contains('open') ? '#player' : '';
+    history.replaceState(null, '', window.location.pathname + window.location.search + targetHash);
   }
 }
 
@@ -153,11 +140,6 @@ export function initQueueDrawer() {
 export function openQueueDrawer() {
   const desktopSheet = document.getElementById('desktop-queue-sheet');
   const mobileSheet = document.getElementById('mobile-queue-sheet');
-  const empContainer = document.getElementById('expanded-mobile-player');
-
-  if (empContainer?.classList.contains('open') || window.location.hash === '#player') {
-    wasPlayerOpenWhenQueueOpened = true;
-  }
 
   renderQueueDrawerList(true);
 
@@ -182,24 +164,19 @@ export function closeQueueDrawer() {
   isClosingInternally = false;
 
   updateQueueButtonStates(false);
+
+  if (window.location.hash === '#queue') {
+    const empContainer = document.getElementById('expanded-mobile-player');
+    const targetHash = empContainer?.classList.contains('open') ? '#player' : '';
+    history.replaceState(null, '', window.location.pathname + window.location.search + targetHash);
+  }
 }
 
 export function toggleQueueDrawer() {
-  const isOpen = isQueueOpen() || window.location.hash === '#queue';
-
-  if (isOpen) {
+  if (isQueueOpen()) {
     closeQueueDrawer();
-    handleSheetClosed();
   } else {
-    const empContainer = document.getElementById('expanded-mobile-player');
-    if (empContainer?.classList.contains('open') || window.location.hash === '#player') {
-      wasPlayerOpenWhenQueueOpened = true;
-    }
-    if (window.location.hash !== '#queue') {
-      window.location.hash = 'queue';
-    } else {
-      openQueueDrawer();
-    }
+    openQueueDrawer();
   }
 }
 
@@ -245,7 +222,9 @@ export function renderQueueDrawerList(force = false) {
   const previousTracks = queue.slice(0, currentIndex);
 
   const renderQueueItem = (track, idx, isCurrent = false) => {
-    const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 100);
+    const isPodcast = !!(track && (track.isPodcastEpisode || track.enclosureUrl));
+    const placeholderType = isPodcast ? 'podcast' : 'song';
+    const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 100, placeholderType);
     const artistStr = track.Artists ? track.Artists.join(', ') : (track.AlbumArtist || track.showTitle || 'Unknown Artist');
     const titleStr = track.Name || track.title || 'Unknown Title';
     const canAddToPlaylist = track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl;
@@ -256,7 +235,7 @@ export function renderQueueDrawerList(force = false) {
           ${isCurrent ? '<span class="material-symbols-outlined playing-indicator">volume_up</span>' : `<span class="queue-track-num">${idx + 1}</span>`}
         </div>
         <div class="queue-track-thumb-container">
-          <img src="${artUrl}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="queue-track-thumb" alt="Cover">
+          <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="queue-track-thumb" alt="Cover">
           ${isCurrent ? '<div class="queue-playing-overlay"><span class="material-symbols-outlined queue-playing-icon">equalizer</span></div>' : ''}
         </div>
         <div class="queue-track-details">

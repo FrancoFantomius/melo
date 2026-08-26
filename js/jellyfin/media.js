@@ -1,11 +1,15 @@
 import { getSession } from './session.js';
+import { getPlaceholder } from '../ui/placeholders.js';
 
-export function getArtworkUrl(itemOrId, imageType = 'Primary', maxWidth = 400) {
+export function getArtworkUrl(itemOrId, imageType = 'Primary', maxWidth = 400, fallbackType = null) {
   const session = getSession();
-  if (!session.serverUrl || !itemOrId) return './img/icons/icon.svg';
 
   if (typeof itemOrId === 'object' && itemOrId !== null) {
     const item = itemOrId;
+    const determinedType = fallbackType || item.Type || (item.isPodcastEpisode || item.enclosureUrl ? 'podcast' : 'song');
+
+    if (!session.serverUrl) return getPlaceholder(determinedType);
+
     let targetId = null;
     let tag = null;
 
@@ -21,17 +25,18 @@ export function getArtworkUrl(itemOrId, imageType = 'Primary', maxWidth = 400) {
     }
 
     if (!targetId || !tag) {
-      return './img/icons/icon.svg';
+      return getPlaceholder(determinedType);
     }
 
     return `${session.serverUrl}/Items/${targetId}/Images/${imageType}?maxWidth=${maxWidth}&quality=90&tag=${tag}`;
   }
 
   if (typeof itemOrId === 'string' && itemOrId.trim() !== '') {
+    if (!session.serverUrl) return getPlaceholder(fallbackType || 'song');
     return `${session.serverUrl}/Items/${itemOrId}/Images/${imageType}?maxWidth=${maxWidth}&quality=90`;
   }
 
-  return './img/icons/icon.svg';
+  return getPlaceholder(fallbackType || 'song');
 }
 
 export function getAudioStreamUrl(itemId, options = {}) {

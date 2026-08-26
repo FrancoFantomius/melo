@@ -8,8 +8,13 @@ import { openPlaylist } from '../playlists.js';
 import { openEditPlaylistModal, openAddTracksModal, openSelectPlaylistModal } from '../../modals.js';
 import { getTranslation } from '../../../i18n.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../../recommendations.js';
+import { getPlaceholder } from '../../placeholders.js';
 import { setupTrackSelection } from './detail-selection.js';
 import { setupDownloadAllButton } from './detail-download.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/icon';
+import '@francofantomius/material-components/tooltip';
 
 let discoverDailyRefreshCount = 0;
 
@@ -65,11 +70,12 @@ export async function renderAlbumDetailView(container, albumOrId) {
       ? getTranslation('20 fresh picks updated every day')
       : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : getTranslation('Unknown Artist'))));
 
+  const placeholderType = isPlaylist ? 'playlist' : 'album';
   const coverHTML = isLikedSongs
-    ? `<img id="album-detail-cover" src="${LIKED_SONGS_PLAYLIST.CoverUrl}" class="album-cover-lg" alt="Liked Songs">`
+    ? `<img id="album-detail-cover" src="${LIKED_SONGS_PLAYLIST.CoverUrl}" data-placeholder-type="favorite" class="album-cover-lg" alt="Liked Songs">`
     : (isDiscoverDaily
-      ? `<img id="album-detail-cover" src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" class="album-cover-lg" alt="Discover Daily">`
-      : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="album-cover-lg" alt="${album.Name || (isPlaylist ? 'Playlist' : 'Album')}">`);
+      ? `<img id="album-detail-cover" src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" data-placeholder-type="explore" class="album-cover-lg" alt="Discover Daily">`
+      : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400, placeholderType)}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="album-cover-lg" alt="${album.Name || (isPlaylist ? 'Playlist' : 'Album')}">`);
 
   container.innerHTML = `
     <div class="view-section album-detail-section">
@@ -80,42 +86,46 @@ export async function renderAlbumDetailView(container, albumOrId) {
           <h1 id="album-detail-title" class="album-detail-title">${album.Name || (isLikedSongs ? 'Liked Songs' : (isPlaylist ? 'Playlist' : 'Album'))}</h1>
           <span id="album-detail-artist" class="album-detail-artist">${initialArtistHTML}</span>
           <div class="album-detail-actions">
-            <button id="btn-play-album-all" class="btn btn-primary" title="Play All">
-              <span class="material-symbols-outlined">play_arrow</span>
+            <md-button id="btn-play-album-all" variant="filled">
+              <md-icon slot="icon" name="play_arrow" filled></md-icon>
               <span class="btn-play-label-full" data-i18n>Play All</span>
               <span class="btn-play-label-short" data-i18n hidden>Play</span>
-            </button>
-            <button id="btn-shuffle-album-all" class="btn btn-secondary" title="Random Play" aria-label="Random Play">
-              <span class="material-symbols-outlined">shuffle</span>
-            </button>
+            </md-button>
+            <md-icon-button id="btn-shuffle-album-all" variant="tonal" icon="shuffle" aria-label="Random Play"></md-icon-button>
+            <md-tooltip for="btn-shuffle-album-all" position="top" data-i18n-value="Random Play" value="Random Play"></md-tooltip>
             ${isDiscoverDaily ? `
-              <button id="btn-refresh-discover-daily" class="btn btn-secondary" title="Refresh Discover Daily" aria-label="Refresh Discover Daily">
-                <span class="material-symbols-outlined">refresh</span>
+              <md-button id="btn-refresh-discover-daily" variant="tonal" aria-label="Refresh Discover Daily">
+                <md-icon slot="icon" name="refresh"></md-icon>
                 <span class="btn-refresh-label" data-i18n>Refresh</span>
-              </button>
+              </md-button>
+              <md-tooltip for="btn-refresh-discover-daily" position="top" data-i18n-value="Refresh Discover Daily" value="Refresh Discover Daily"></md-tooltip>
             ` : ''}
             ${isPlaylist ? '' : `
-              <button id="btn-add-album-to-playlist" class="btn btn-secondary" title="Add all to playlist" aria-label="Add all to playlist">
-                <span class="material-symbols-outlined">playlist_add</span>
+              <md-button id="btn-add-album-to-playlist" variant="tonal" aria-label="Add all to playlist">
+                <md-icon slot="icon" name="playlist_add"></md-icon>
                 <span data-i18n>Add to Playlist</span>
-              </button>
+              </md-button>
+              <md-tooltip for="btn-add-album-to-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
             `}
-            <button id="btn-download-album" class="btn btn-secondary" title="Download" aria-label="Download">
-              <span class="material-symbols-outlined">download</span>
+            <md-button id="btn-download-album" variant="tonal" aria-label="Download">
+              <md-icon slot="icon" name="download"></md-icon>
               <span id="btn-download-album-label" data-i18n>Download</span>
-            </button>
+            </md-button>
+            <md-tooltip id="tooltip-download-album" for="btn-download-album" position="top" data-i18n-value="Download" value="Download"></md-tooltip>
           </div>
           ${isPlaylist && !isDiscoverDaily ? `
             <div class="playlist-manage-actions">
-              <button id="btn-add-playlist-tracks" class="btn btn-secondary" title="Add Tracks">
-                <span class="material-symbols-outlined">playlist_add</span>
+              <md-button id="btn-add-playlist-tracks" variant="tonal">
+                <md-icon slot="icon" name="playlist_add"></md-icon>
                 <span data-i18n>Add Tracks to Playlist</span>
-              </button>
+              </md-button>
+              <md-tooltip for="btn-add-playlist-tracks" position="top" data-i18n-value="Add Tracks to Playlist" value="Add Tracks to Playlist"></md-tooltip>
               ${!isLikedSongs ? `
-                <button id="btn-edit-playlist" class="btn btn-secondary" title="Edit Playlist">
-                  <span class="material-symbols-outlined">edit</span>
+                <md-button id="btn-edit-playlist" variant="tonal">
+                  <md-icon slot="icon" name="edit"></md-icon>
                   <span data-i18n>Edit</span>
-                </button>
+                </md-button>
+                <md-tooltip for="btn-edit-playlist" position="top" data-i18n-value="Edit" value="Edit"></md-tooltip>
               ` : ''}
             </div>
           ` : ''}
@@ -125,24 +135,19 @@ export async function renderAlbumDetailView(container, albumOrId) {
       <h2 class="section-title" data-i18n>Tracks</h2>
 
       <div id="album-tracks-toolbar" class="tracks-toolbar">
-        <button id="btn-tracks-select-all" class="tracks-toolbar-icon-btn" title="Select All" aria-label="Select All" data-i18n-title="Select All">
-          <span class="material-symbols-outlined">check_box_outline_blank</span>
-        </button>
+        <md-icon-button id="btn-tracks-select-all" variant="standard" icon="check_box_outline_blank" aria-label="Select All"></md-icon-button>
+        <md-tooltip for="btn-tracks-select-all" position="top" data-i18n-value="Select All" value="Select All"></md-tooltip>
         <span id="album-tracks-selected-count" class="tracks-toolbar-count"></span>
         ${!isLikedSongs && !isDiscoverDaily && album.Type === 'Playlist' ? `
-          <button id="btn-tracks-remove-playlist" class="tracks-toolbar-icon-btn" title="Remove from Playlist" aria-label="Remove from Playlist" data-i18n-title="Remove from Playlist">
-            <span class="material-symbols-outlined">playlist_remove</span>
-          </button>
+          <md-icon-button id="btn-tracks-remove-playlist" variant="standard" icon="playlist_remove" aria-label="Remove from Playlist"></md-icon-button>
+          <md-tooltip for="btn-tracks-remove-playlist" position="top" data-i18n-value="Remove from Playlist" value="Remove from Playlist"></md-tooltip>
         ` : ''}
-        <button id="btn-tracks-add-playlist" class="tracks-toolbar-icon-btn" title="Add to Playlist" aria-label="Add to Playlist" data-i18n-title="Add to Playlist">
-          <span class="material-symbols-outlined">playlist_add</span>
-        </button>
-        <button id="btn-tracks-add-queue" class="tracks-toolbar-icon-btn" title="Add to Queue" aria-label="Add to Queue" data-i18n-title="Add to Queue">
-          <span class="material-symbols-outlined">queue_music</span>
-        </button>
-        <button id="btn-tracks-clear-selection" class="tracks-toolbar-icon-btn" title="Clear selection" aria-label="Clear selection" data-i18n-title="Clear selection">
-          <span class="material-symbols-outlined">close</span>
-        </button>
+        <md-icon-button id="btn-tracks-add-playlist" variant="standard" icon="playlist_add" aria-label="Add to Playlist"></md-icon-button>
+        <md-tooltip for="btn-tracks-add-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
+        <md-icon-button id="btn-tracks-add-queue" variant="standard" icon="queue_music" aria-label="Add to Queue"></md-icon-button>
+        <md-tooltip for="btn-tracks-add-queue" position="top" data-i18n-value="Add to Queue" value="Add to Queue"></md-tooltip>
+        <md-icon-button id="btn-tracks-clear-selection" variant="standard" icon="close" aria-label="Clear selection"></md-icon-button>
+        <md-tooltip for="btn-tracks-clear-selection" position="top" data-i18n-value="Clear selection" value="Clear selection"></md-tooltip>
       </div>
 
       <div id="album-songs-list" class="tracks-list">
@@ -180,11 +185,11 @@ export async function renderAlbumDetailView(container, albumOrId) {
   if (btnRefreshDiscoverDaily) {
     btnRefreshDiscoverDaily.addEventListener('click', async () => {
       discoverDailyRefreshCount += 1;
-      const icon = btnRefreshDiscoverDaily.querySelector('.material-symbols-outlined');
+      const icon = btnRefreshDiscoverDaily.querySelector('md-icon') || btnRefreshDiscoverDaily.querySelector('.material-symbols-outlined');
       if (icon) icon.style.animation = 'spin 1s linear infinite';
       await renderAlbumDetailView(container, album);
       const freshBtn = container.querySelector('#btn-refresh-discover-daily');
-      const freshIcon = freshBtn?.querySelector('.material-symbols-outlined');
+      const freshIcon = freshBtn?.querySelector('md-icon') || freshBtn?.querySelector('.material-symbols-outlined');
       if (freshIcon) freshIcon.style.animation = '';
     });
   }
@@ -220,7 +225,11 @@ export async function renderAlbumDetailView(container, albumOrId) {
       }
     }
     if (typeEl) typeEl.textContent = formatItemType(data.Type) || (isPlaylist ? 'Playlist' : 'Album');
-    if (coverEl && coverEl.tagName === 'IMG') coverEl.src = getArtworkUrl(data, 'Primary', 400);
+    if (coverEl && coverEl.tagName === 'IMG') {
+      const pType = isPlaylist || data.Type === 'Playlist' ? 'playlist' : 'album';
+      coverEl.src = getArtworkUrl(data, 'Primary', 400, pType);
+      coverEl.setAttribute('data-placeholder-type', pType);
+    }
   };
 
   // If album metadata is incomplete or loaded from URL, fetch via getItemCached (skip for virtual playlists)

@@ -1,6 +1,6 @@
 <footer class="main-player">
   <div class="player-left">
-    <img id="player-track-cover" src="./img/icons/icon.svg" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="player-cover" alt="Cover">
+    <img id="player-track-cover" src="./img/song.svg" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : './img/song.svg';" data-placeholder-type="song" class="player-cover" alt="Cover">
     <div class="player-track-details">
       <div id="player-track-title" class="player-track-title">No track selected</div>
       <div id="player-track-artist" class="player-track-artist">Select a song to start playing</div>
@@ -86,7 +86,7 @@
   <div class="emp-body-wrapper">
     <!-- Left / Top: Song Cover Image -->
     <div class="emp-cover-container">
-      <img id="emp-cover" src="./img/icons/icon.svg" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="emp-cover-img" alt="Cover">
+      <img id="emp-cover" src="./img/song.svg" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : './img/song.svg';" data-placeholder-type="song" class="emp-cover-img" alt="Cover">
     </div>
 
     <!-- Right / Middle: Song Details, Progress & Controls -->

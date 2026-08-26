@@ -1,8 +1,12 @@
 import { getEpisodeState, markEpisodePlayed } from '../../../podcasts/storage.js';
-import { setQueue } from '../../../player/queue.js';
+import { setQueue, addToQueue } from '../../../player/queue.js';
 import { playTrack } from '../../../player/audio.js';
 import { getTranslation } from '../../../i18n.js';
 import { toggleTrackDownload, refreshDownloadButton } from '../../downloads.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/tooltip';
+import '@francofantomius/material-components/icon';
 
 export function renderEpisodeListHtml(container, episodes, is2Col = false) {
   if (!episodes || episodes.length === 0) {
@@ -16,19 +20,26 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
     let badgeHtml = '';
 
     if (state.isPlayed) {
-      badgeHtml = `<span class="episode-badge played" title="Completed" data-i18n>Played</span>`;
+      badgeHtml = `<span class="episode-badge played" data-i18n>Played</span>`;
     } else if (state.position > 5) {
-      badgeHtml = `<span class="episode-badge in-progress" title="${Math.floor(state.position/60)}m listened"><span data-i18n>In Progress</span> (${progressPct}%)</span>`;
+      badgeHtml = `<span class="episode-badge in-progress"><span data-i18n>In Progress</span> (${progressPct}%)</span>`;
     }
 
     const uniqueNoteId = `notes-${Math.random().toString(36).substr(2, 9)}-${idx}`;
+    const playLabel = getTranslation('Play Episode');
+    const downloadLabel = getTranslation('Download');
+    const queueLabel = getTranslation('Add to Queue');
+    const togglePlayedLabel = state.isPlayed ? getTranslation('Mark as Unplayed') : getTranslation('Mark as Played');
 
     return `
       <div class="episode-item" data-episode-id="${ep.id}" data-index="${idx}">
         <div class="episode-main-row">
-          <button class="episode-play-btn" data-index="${idx}" title="Play Episode">
-            <span class="material-symbols-outlined">play_arrow</span>
-          </button>
+          <div class="action-btn-wrapper">
+            <md-icon-button class="episode-play-btn" data-index="${idx}" variant="filled" aria-label="${playLabel}">
+              <md-icon name="play_arrow" filled></md-icon>
+            </md-icon-button>
+            <md-tooltip position="top" data-i18n-value="Play Episode" value="${playLabel}"></md-tooltip>
+          </div>
           <div class="episode-details">
             <div class="episode-title" title="${ep.title}">${ep.title}</div>
             <div class="episode-meta-bar">
@@ -36,14 +47,19 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
               ${ep.pubDate ? `<span>• ${ep.pubDate}</span>` : ''}
               ${ep.durationFormatted ? `<span>• ${ep.durationFormatted}</span>` : ''}
               ${badgeHtml}
-              <button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" style="background: none; border: none; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" data-i18n>Show Notes</button>
-              <button class="btn-track-download" data-track-id="${ep.id}" title="Download" aria-label="Download" style="gap: 4px; margin-left: auto;">
-                <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-                <span data-i18n>Download</span>
-              </button>
-              <button class="btn-toggle-played" data-id="${ep.id}" style="background: none; border: none; color: var(--text-muted); cursor: pointer; flex-shrink: 0;" title="Toggle Played State">
-                <span class="material-symbols-outlined" style="font-size: 18px;">${state.isPlayed ? 'check_circle' : 'radio_button_unchecked'}</span>
-              </button>
+              <md-button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" variant="text" style="font-size: 12px; height: 28px; --md-button-padding-horizontal: 8px;"><span data-i18n>Show Notes</span></md-button>
+              <div class="action-btn-wrapper" style="margin-left: auto;">
+                <md-icon-button class="btn-track-add-queue" data-index="${idx}" variant="standard" icon="queue_music" aria-label="${queueLabel}"></md-icon-button>
+                <md-tooltip position="top" data-i18n-value="Add to Queue" value="${queueLabel}"></md-tooltip>
+              </div>
+              <div class="action-btn-wrapper">
+                <md-icon-button class="btn-track-download" data-track-id="${ep.id}" variant="standard" icon="download" aria-label="${downloadLabel}"></md-icon-button>
+                <md-tooltip position="top" data-i18n-value="Download" value="${downloadLabel}"></md-tooltip>
+              </div>
+              <div class="action-btn-wrapper">
+                <md-icon-button class="btn-toggle-played" data-id="${ep.id}" variant="standard" icon="${state.isPlayed ? 'check_circle' : 'radio_button_unchecked'}" aria-label="${togglePlayedLabel}"></md-icon-button>
+                <md-tooltip position="top" data-i18n-value="${state.isPlayed ? 'Mark as Unplayed' : 'Mark as Played'}" value="${togglePlayedLabel}"></md-tooltip>
+              </div>
             </div>
           </div>
         </div>
@@ -88,6 +104,21 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
         const isExpanded = notesEl.classList.contains('expanded');
         notesEl.classList.toggle('expanded');
         btn.textContent = isExpanded ? getTranslation('Show Notes') : getTranslation('Hide Notes');
+      }
+    });
+  });
+
+  container.querySelectorAll('.btn-track-add-queue').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.getAttribute('data-index'), 10);
+      const ep = episodes[idx];
+      if (ep) {
+        addToQueue([ep]);
+        btn.setAttribute('icon', 'check');
+        setTimeout(() => {
+          btn.setAttribute('icon', 'queue_music');
+        }, 1200);
       }
     });
   });

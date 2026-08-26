@@ -7,6 +7,7 @@ import { getSession, saveSession } from '../jellyfin/session.js';
 import { isTrackLiked, toggleTrackLiked } from '../player/likes.js';
 import { toggleTrackDownload, refreshDownloadButton } from './downloads.js';
 import { getTranslation } from '../i18n.js';
+import { getPlaceholder } from './placeholders.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -333,8 +334,18 @@ export function initPlayerUI() {
     updateLyricsButton(track);
 
     if (track) {
-      const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 300);
-      each(pairs.cover, (el) => { el.src = artUrl; });
+      const isPodcast = !!(track.isPodcastEpisode || track.enclosureUrl);
+      const placeholderType = isPodcast ? 'podcast' : 'song';
+      const artUrl = track.image ? track.image : getArtworkUrl(track, 'Primary', 300, placeholderType);
+      each(pairs.cover, (el) => {
+        el.src = artUrl;
+        el.setAttribute('data-placeholder-type', placeholderType);
+        el.onerror = () => {
+          el.onerror = null;
+          el.src = getPlaceholder(placeholderType);
+          el.setAttribute('data-placeholder-type', placeholderType);
+        };
+      });
 
       const titleStr = track.title || track.Name || 'Unknown Title';
       each(pairs.title, (el) => { el.textContent = titleStr; });
@@ -342,7 +353,6 @@ export function initPlayerUI() {
       const artistStr = track.showTitle || track.Artists?.join(', ') || track.AlbumArtist || 'Unknown Artist';
       each(pairs.artist, (el) => { el.textContent = artistStr; });
 
-      const isPodcast = !!(track.isPodcastEpisode || track.enclosureUrl);
       each(pairs.skipBack, (el) => setDisplay(el, isPodcast ? 'flex' : 'none'));
       each(pairs.skipForward, (el) => setDisplay(el, isPodcast ? 'flex' : 'none'));
       each(pairs.speedBadge, (el) => {

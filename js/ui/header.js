@@ -9,6 +9,7 @@ import { openPodcastShow, switchView, openArtist, openAlbum, openPlaylist } from
 import { formatItemType } from './views/common.js';
 import { toggleTheme, updateThemeUI } from './theme.js';
 import { getRecentSearches, removeRecentSearch, clearRecentSearches, addRecentSearch } from './views/search.js';
+import { getPlaceholder } from './placeholders.js';
 
 export function initHeader() {
   const btnSyncLogin = document.getElementById('btn-sync-login');
@@ -149,11 +150,11 @@ export function initHeader() {
       `;
 
       html += tracks.map((track, idx) => {
-        const artwork = getArtworkUrl(track, 'Primary', 100);
+        const artwork = getArtworkUrl(track, 'Primary', 100, 'song');
         const artist = track.AlbumArtist || track.Artists?.join(', ') || track.Album || 'Unknown Artist';
         return `
           <div class="search-dropdown-item search-dropdown-suggested-track" data-track-index="${idx}">
-            <img src="${artwork}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="search-dropdown-thumb" alt="${track.Name}">
+            <img src="${artwork}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : '${getPlaceholder('song')}';" data-placeholder-type="song" class="search-dropdown-thumb" alt="${track.Name}">
             <div class="search-dropdown-info">
               <div class="search-dropdown-title">${track.Name}</div>
               <div class="search-dropdown-subtitle">${artist}</div>
@@ -255,13 +256,14 @@ export function initHeader() {
         let itemsHTML = topItems.map(item => {
           const typeStr = item.Type || 'Media';
           const isArtist = typeStr === 'MusicArtist' || typeStr === 'Artist';
+          const placeholderType = isArtist ? 'artist' : (typeStr === 'Playlist' ? 'playlist' : (typeStr === 'MusicAlbum' || typeStr === 'Album' ? 'album' : 'song'));
           const thumbClass = isArtist ? 'search-dropdown-thumb artist' : 'search-dropdown-thumb';
-          const artwork = getArtworkUrl(item, 'Primary', 100);
+          const artwork = getArtworkUrl(item, 'Primary', 100, placeholderType);
           const subtitle = isArtist ? 'Artist' : (item.AlbumArtist || item.Artists?.join(', ') || item.Album || '');
 
           return `
             <div class="search-dropdown-item" data-item-id="${item.Id}" data-item-type="${typeStr}">
-              <img src="${artwork}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="${thumbClass}" alt="${item.Name}">
+              <img src="${artwork}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="${thumbClass}" alt="${item.Name}">
               <div class="search-dropdown-info">
                 <div class="search-dropdown-title">${item.Name}</div>
                 <div class="search-dropdown-subtitle">${subtitle}</div>
@@ -274,7 +276,7 @@ export function initHeader() {
         if (podcastItems.length > 0) {
           itemsHTML += podcastItems.slice(0, 2).map(pod => `
             <div class="search-dropdown-item" data-feed-url="${encodeURIComponent(pod.feedUrl)}" data-item-type="Podcast">
-              <img src="${pod.image || './img/icons/icon.svg'}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="search-dropdown-thumb" alt="${pod.title}">
+              <img src="${pod.image || getPlaceholder('podcast')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast" class="search-dropdown-thumb" alt="${pod.title}">
               <div class="search-dropdown-info">
                 <div class="search-dropdown-title">${pod.title}</div>
                 <div class="search-dropdown-subtitle">${pod.author || 'Podcast'}</div>

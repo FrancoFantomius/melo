@@ -13,16 +13,24 @@ export function setupTrackSelection({ getSongs, getAlbumId, onRemoveDone }) {
     const countEl = document.getElementById('album-tracks-selected-count');
     const songsListEl = document.getElementById('album-songs-list');
     const selectAllBtn = document.getElementById('btn-tracks-select-all');
-    const selectAllIcon = selectAllBtn?.querySelector('.material-symbols-outlined');
+    const selectAllIcon = selectAllBtn?.querySelector('md-icon') || selectAllBtn?.querySelector('.material-symbols-outlined');
 
     if (toolbar) toolbar.classList.toggle('visible', selectedKeys.size > 0);
     if (countEl) countEl.textContent = selectedKeys.size > 0 ? `${selectedKeys.size} ${getTranslation('selected')}` : '';
 
-    if (selectAllBtn && selectAllIcon) {
+    if (selectAllBtn) {
       const total = albumTrackIds.length;
-      if (selectedKeys.size === 0) selectAllIcon.textContent = 'check_box_outline_blank';
-      else if (total > 0 && selectedKeys.size >= total) selectAllIcon.textContent = 'check_box';
-      else selectAllIcon.textContent = 'indeterminate_check_box';
+      let iconName = 'check_box_outline_blank';
+      if (selectedKeys.size === 0) iconName = 'check_box_outline_blank';
+      else if (total > 0 && selectedKeys.size >= total) iconName = 'check_box';
+      else iconName = 'indeterminate_check_box';
+
+      selectAllBtn.setAttribute('icon', iconName);
+      if ('icon' in selectAllBtn) selectAllBtn.icon = iconName;
+      if (selectAllIcon) {
+        if (selectAllIcon.tagName === 'MD-ICON') selectAllIcon.setAttribute('name', iconName);
+        else selectAllIcon.textContent = iconName;
+      }
     }
 
     if (songsListEl) {

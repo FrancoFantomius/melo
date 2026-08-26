@@ -1,11 +1,16 @@
-import { getEpisodeState } from '../../../podcasts/storage.js';
+import { getEpisodeState, markEpisodePlayed } from '../../../podcasts/storage.js';
 import { formatSeconds } from '../../../podcasts/rss.js';
 import { removePodcastFeedUrl } from '../../../jellyfin/client.js';
-import { setQueue } from '../../../player/queue.js';
+import { setQueue, addToQueue } from '../../../player/queue.js';
 import { playTrack } from '../../../player/audio.js';
 import { getTranslation } from '../../../i18n.js';
 import { toggleTrackDownload, refreshDownloadButton } from '../../downloads.js';
 import { openPodcastShow, renderPodcastsView } from './list.js';
+import { getPlaceholder } from '../../placeholders.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/tooltip';
+import '@francofantomius/material-components/icon';
 
 export function renderSubscribedCarousel(container, feeds) {
   if (!container) return;
@@ -20,15 +25,16 @@ export function renderSubscribedCarousel(container, feeds) {
 
   container.innerHTML = feeds.map(feed => `
     <div class="media-card podcast-show-card" data-feed-url="${encodeURIComponent(feed.feedUrl)}">
-      <img src="${feed.image || './img/icons/icon.svg'}" class="card-thumb" alt="${feed.title}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';">
-      <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
+      <img src="${feed.image || getPlaceholder('podcast')}" class="card-thumb" alt="${feed.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
+      <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; padding-right: 36px;">
         <div class="card-title" title="${feed.title}">${feed.title}</div>
         <div class="card-subtitle" title="${feed.author}">${feed.author || 'Podcast'}</div>
         <div style="font-size: 11px; color: var(--accent); margin-top: 4px;">${feed.episodeCount || 0} ${getTranslation('Episodes')}</div>
       </div>
-      <button class="btn-icon btn-delete-podcast" data-feed-url="${encodeURIComponent(feed.feedUrl)}" title="Unsubscribe" data-i18n-title style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.6); color: #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border: none; cursor: pointer;">
-        <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
-      </button>
+      <div style="position: absolute; top: 12px; right: 12px; display: inline-flex;">
+        <md-icon-button class="btn-delete-podcast" data-feed-url="${encodeURIComponent(feed.feedUrl)}" variant="standard" icon="delete" aria-label="${getTranslation('Unsubscribe')}"></md-icon-button>
+        <md-tooltip position="top" data-i18n-value="Unsubscribe" value="${getTranslation('Unsubscribe')}"></md-tooltip>
+      </div>
     </div>
   `).join('');
 
@@ -86,12 +92,12 @@ export function renderContinuePlayingCarousel(container, feeds) {
     const progressPct = Math.min(100, Math.round((state.position / duration) * 100));
     const remainingSec = Math.max(0, duration - state.position);
     const remainingFormatted = formatSeconds(remainingSec);
-    const coverImg = ep.image || feedImage || './img/icons/icon.svg';
+    const coverImg = ep.image || feedImage || getPlaceholder('podcast');
 
     return `
       <div class="continue-playing-card" data-episode-id="${ep.id}">
         <div class="continue-playing-thumb-wrapper">
-          <img src="${coverImg}" class="continue-playing-thumb" alt="${ep.title}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';">
+          <img src="${coverImg}" class="continue-playing-thumb" alt="${ep.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
           <div class="continue-playing-play-btn" title="Resume Episode">
             <span class="material-symbols-outlined" style="font-size: 24px;">play_arrow</span>
           </div>
@@ -149,34 +155,67 @@ export function renderLatestEpisodesGrid(container, feeds) {
   }
 
   container.innerHTML = latestTop.map((ep, idx) => {
-    const coverImg = ep.image || ep.feedImage || './img/icons/icon.svg';
+    const coverImg = ep.image || ep.feedImage || getPlaceholder('podcast');
+    const state = getEpisodeState(ep.id);
+    const progressPct = (state.duration > 0 && state.position > 0) ? Math.min(100, Math.round((state.position / state.duration) * 100)) : 0;
+    
+    let badgeHtml = '';
+    if (state.isPlayed) {
+      badgeHtml = `<span class="episode-badge played" data-i18n>Played</span>`;
+    } else if (state.position > 5) {
+      badgeHtml = `<span class="episode-badge in-progress"><span data-i18n>In Progress</span> (${progressPct}%)</span>`;
+    }
+
+    const playLabel = getTranslation('Play');
+    const downloadLabel = getTranslation('Download');
+    const queueLabel = getTranslation('Add to Queue');
+
     return `
-      <div class="track-row podcast-track-row" data-index="${idx}">
-        <span class="track-num">${idx + 1}</span>
-        <div class="track-info">
-          <img src="${coverImg}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="track-cover" alt="Cover">
+      <div class="podcast-episode-row podcast-track-row ${state.isPlayed ? 'is-played' : ''}" data-index="${idx}" data-episode-id="${ep.id}">
+        <div class="podcast-episode-thumb-container">
+          <img src="${coverImg}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast" class="podcast-episode-thumb" alt="${ep.title}">
         </div>
-        <div style="overflow: hidden;">
-          <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ep.title}">${ep.title}</div>
-          <div style="font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ep.showTitle}">${ep.showTitle || 'Podcast'}</div>
+
+        <div class="podcast-episode-main">
+          <div class="podcast-episode-header">
+            <div class="podcast-episode-title" title="${ep.title}">${ep.title}</div>
+            <div class="podcast-episode-show" title="${ep.showTitle}">${ep.showTitle || 'Podcast'}</div>
+          </div>
+
+          <div class="podcast-episode-meta-row">
+            ${ep.pubDate ? `<span class="podcast-episode-date">${ep.pubDate}</span>` : ''}
+            ${ep.durationFormatted ? `<span class="podcast-episode-duration">• ${ep.durationFormatted}</span>` : ''}
+            ${badgeHtml}
+          </div>
+
+          ${progressPct > 0 && !state.isPlayed ? `
+            <div class="episode-progress-wrapper" style="margin-top: 6px;">
+              <div class="episode-progress-fill" style="width: ${progressPct}%;"></div>
+            </div>
+          ` : ''}
         </div>
-        <div style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${ep.pubDate || ''}</div>
-        <div style="color: var(--text-muted); font-size: 12px; text-align: right;">${ep.durationFormatted || ''}</div>
-        <div style="display: flex; justify-content: center; align-items: center;">
-          <button class="btn-track-download" data-track-id="${ep.id}" title="Download" aria-label="Download">
-            <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
-          </button>
-        </div>
-        <div style="text-align: right; color: var(--text-muted); display: flex; align-items: center; justify-content: flex-end;">
-          <span class="material-symbols-outlined" style="font-size: 20px;">play_circle</span>
+
+        <div class="podcast-episode-actions">
+          <div class="action-btn-wrapper">
+            <md-icon-button class="btn-episode-play" data-index="${idx}" variant="standard" icon="play_arrow" aria-label="${playLabel}"></md-icon-button>
+            <md-tooltip position="top" data-i18n-value="Play" value="${playLabel}"></md-tooltip>
+          </div>
+          <div class="action-btn-wrapper">
+            <md-icon-button class="btn-track-add-queue" data-index="${idx}" variant="standard" icon="queue_music" aria-label="${queueLabel}"></md-icon-button>
+            <md-tooltip position="top" data-i18n-value="Add to Queue" value="${queueLabel}"></md-tooltip>
+          </div>
+          <div class="action-btn-wrapper">
+            <md-icon-button class="btn-track-download" data-track-id="${ep.id}" variant="standard" icon="download" aria-label="${downloadLabel}"></md-icon-button>
+            <md-tooltip position="top" data-i18n-value="Download" value="${downloadLabel}"></md-tooltip>
+          </div>
         </div>
       </div>
     `;
   }).join('');
 
-  container.querySelectorAll('.podcast-track-row').forEach(row => {
+  container.querySelectorAll('.podcast-episode-row').forEach(row => {
     row.addEventListener('click', (e) => {
-      if (e.target.closest('.btn-track-download')) return;
+      if (e.target.closest('.btn-track-download') || e.target.closest('.btn-track-add-queue') || e.target.closest('.btn-episode-play') || e.target.closest('md-tooltip')) return;
       const idx = parseInt(row.getAttribute('data-index'), 10);
       const ep = latestTop[idx];
       if (ep) {
@@ -186,7 +225,44 @@ export function renderLatestEpisodesGrid(container, feeds) {
     });
   });
 
-  container.querySelectorAll('.podcast-track-row .btn-track-download').forEach(btn => {
+  container.querySelectorAll('.btn-episode-play').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.getAttribute('data-index'), 10);
+      const ep = latestTop[idx];
+      if (ep) {
+        setQueue(latestTop, idx);
+        playTrack(ep);
+      }
+    });
+  });
+
+  container.querySelectorAll('.btn-track-add-queue').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const idx = parseInt(btn.getAttribute('data-index'), 10);
+      const ep = latestTop[idx];
+      if (ep) {
+        addToQueue([ep]);
+        btn.setAttribute('icon', 'check');
+        setTimeout(() => {
+          btn.setAttribute('icon', 'queue_music');
+        }, 1200);
+      }
+    });
+  });
+
+  container.querySelectorAll('.btn-toggle-played').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute('data-id');
+      const state = getEpisodeState(id);
+      markEpisodePlayed(id, !state.isPlayed);
+      renderLatestEpisodesGrid(container, feeds);
+    });
+  });
+
+  container.querySelectorAll('.podcast-episode-row .btn-track-download').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const id = btn.getAttribute('data-track-id');

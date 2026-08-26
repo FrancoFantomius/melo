@@ -19,6 +19,8 @@ export function initModals() {
   setTimeout(syncOverlaysWithHash, 100);
 }
 
+let lastSyncedHash = null;
+
 export function syncOverlaysWithHash() {
   const hash = window.location.hash;
 
@@ -44,9 +46,11 @@ export function syncOverlaysWithHash() {
     if (!isQueueOpen()) {
       openQueueDrawer();
     }
-  } else {
+  } else if (lastSyncedHash === '#queue') {
     if (isQueueOpen()) {
       closeQueueDrawer();
     }
   }
+
+  lastSyncedHash = hash;
 }

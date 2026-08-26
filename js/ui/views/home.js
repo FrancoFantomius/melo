@@ -8,6 +8,7 @@ import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTM
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, buildHomeRecommendations } from '../../recommendations.js';
+import { getPlaceholder } from '../placeholders.js';
 
 export async function renderHomeView(container) {
   const session = getSession();
@@ -264,7 +265,7 @@ export async function renderHomeView(container) {
         }
         podcastsGrid.innerHTML = items.map(feed => `
           <div class="media-card podcast-home-card" data-feed-url="${encodeURIComponent(feed.feedUrl)}">
-            <img src="${feed.image || './img/icons/icon.svg'}" class="card-thumb" alt="${feed.title}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';">
+            <img src="${feed.image || getPlaceholder('podcast')}" class="card-thumb" alt="${feed.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
             <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
               <div class="card-title" title="${feed.title}">${feed.title}</div>
               <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.author || 'Podcast'}</div>
@@ -331,7 +332,7 @@ export async function renderHomeView(container) {
       } else {
         artistsGrid.innerHTML = artistsRes.Items.map(artist => `
           <div class="media-card" data-artist-id="${artist.Id}">
-            <img src="${getArtworkUrl(artist, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
+            <img src="${getArtworkUrl(artist, 'Primary', 300, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
             <div class="card-title" style="text-align: center;">${artist.Name}</div>
             <div class="card-subtitle" style="text-align: center;" data-i18n>Artist</div>
           </div>

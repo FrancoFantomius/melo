@@ -9,6 +9,8 @@ import { isTrackLiked, toggleTrackLiked, registerTracksFavoriteStatus } from '..
 import { refreshDownloadButton, toggleTrackDownload } from '../downloads.js';
 import { getTranslation } from '../../i18n.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommendedTracks } from '../../recommendations.js';
+import { getPlaceholder } from '../placeholders.js';
+import '@francofantomius/material-components/tooltip';
 
 export function bindLongPress(el, onLongPress) {
   if (!el || typeof onLongPress !== 'function') return;
@@ -121,36 +123,41 @@ export function renderAlbumCardHTML(item, typeLabel = 'Album') {
   if (item.Id === DISCOVER_DAILY_PLAYLIST.Id || item.Type === DISCOVER_DAILY_PLAYLIST.Type) {
     return `
       <div class="media-card discover-daily-card" data-album-id="discover-daily" data-type="DiscoverDaily">
-        <img src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" class="card-thumb discover-daily-thumb" alt="Discover Daily">
+        <img src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" data-placeholder-type="explore" class="card-thumb discover-daily-thumb" alt="Discover Daily">
         <div class="card-title" data-i18n>Discover Daily</div>
         <div class="card-subtitle" data-i18n>Playlist • 20 fresh picks</div>
-        <div class="card-play-btn" title="Play">
+        <div class="card-play-btn" aria-label="Play">
           <span class="material-symbols-outlined">play_arrow</span>
         </div>
+        <md-tooltip position="top" data-i18n-value="Play" value="Play"></md-tooltip>
       </div>
     `;
   }
   if (item.Id === 'liked-songs' || item.Type === 'LikedSongs') {
     return `
       <div class="media-card liked-songs-card" data-album-id="liked-songs" data-type="LikedSongs">
-        <img src="${LIKED_SONGS_PLAYLIST.CoverUrl}" class="card-thumb liked-songs-thumb" alt="Liked Songs">
+        <img src="${LIKED_SONGS_PLAYLIST.CoverUrl}" data-placeholder-type="favorite" class="card-thumb liked-songs-thumb" alt="Liked Songs">
         <div class="card-title" data-i18n>Liked Songs</div>
         <div class="card-subtitle" data-i18n>Playlist • Favorite Songs</div>
-        <div class="card-play-btn" title="Play">
+        <div class="card-play-btn" aria-label="Play">
           <span class="material-symbols-outlined">play_arrow</span>
         </div>
+        <md-tooltip position="top" data-i18n-value="Play" value="Play"></md-tooltip>
       </div>
     `;
   }
-  const subtitle = item.AlbumArtist || item.Artists?.join(', ') || ((typeLabel === 'Playlist' || item.Type === 'Playlist') ? '' : formatItemType(typeLabel));
+  const isPlaylist = typeLabel === 'Playlist' || item.Type === 'Playlist';
+  const placeholderType = isPlaylist ? 'playlist' : 'album';
+  const subtitle = item.AlbumArtist || item.Artists?.join(', ') || (isPlaylist ? '' : formatItemType(typeLabel));
   return `
     <div class="media-card" data-album-id="${item.Id}" data-type="${item.Type || typeLabel}">
-      <img src="${getArtworkUrl(item, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" alt="${item.Name}">
+      <img src="${getArtworkUrl(item, 'Primary', 300, placeholderType)}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="card-thumb" alt="${item.Name}">
       <div class="card-title">${item.Name}</div>
       <div class="card-subtitle">${subtitle}</div>
-      <div class="card-play-btn" title="Play">
+      <div class="card-play-btn" aria-label="Play">
         <span class="material-symbols-outlined">play_arrow</span>
       </div>
+      <md-tooltip position="top" data-i18n-value="Play" value="Play"></md-tooltip>
     </div>
   `;
 }
@@ -169,7 +176,7 @@ export function renderTrackRowHTML(track, index) {
     <div class="track-row" data-track-id="${trackKey}" data-index="${index}">
       <span class="track-num">${index + 1}</span>
       <div class="track-info">
-        <img src="${getArtworkUrl(track, 'Primary', 100)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="track-cover" alt="Cover">
+        <img src="${getArtworkUrl(track, 'Primary', 100, 'song')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : '${getPlaceholder('song')}';" data-placeholder-type="song" class="track-cover" alt="Cover">
       </div>
       <div class="track-main" style="overflow: hidden;">
         <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.Name}</div>
@@ -177,24 +184,28 @@ export function renderTrackRowHTML(track, index) {
       </div>
       <div class="track-album" style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${track.Album || ''}</div>
       <div class="track-action-like" style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${trackKey}" title="${isLiked ? 'Unlike' : 'Like'}" data-i18n-title="${isLiked ? 'Unlike' : 'Like'}">
+        <button class="btn-track-like ${isLiked ? 'liked' : ''}" data-track-id="${trackKey}" aria-label="${isLiked ? 'Unlike' : 'Like'}">
           <span class="material-symbols-outlined" style="font-size: 18px;">${isLiked ? 'favorite' : 'favorite_border'}</span>
         </button>
+        <md-tooltip position="top" data-i18n-value="${isLiked ? 'Unlike' : 'Like'}" value="${isLiked ? 'Unlike' : 'Like'}"></md-tooltip>
       </div>
       <div class="track-action-download" style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-download" data-track-id="${trackKey}" title="Download" data-i18n-title="Download">
+        <button class="btn-track-download" data-track-id="${trackKey}" aria-label="Download">
           <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
         </button>
+        <md-tooltip position="top" data-i18n-value="Download" value="Download"></md-tooltip>
       </div>
       <div class="track-action-queue" style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-add-queue" data-track-id="${trackKey}" title="Add to Queue" data-i18n-title="Add to Queue">
+        <button class="btn-track-add-queue" data-track-id="${trackKey}" aria-label="Add to Queue">
           <span class="material-symbols-outlined" style="font-size: 18px;">queue_music</span>
         </button>
+        <md-tooltip position="top" data-i18n-value="Add to Queue" value="Add to Queue"></md-tooltip>
       </div>
       <div class="track-action-playlist" style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-add-playlist" data-track-id="${trackKey}" title="Add to Playlist" data-i18n-title="Add to Playlist">
+        <button class="btn-track-add-playlist" data-track-id="${trackKey}" aria-label="Add to Playlist">
           <span class="material-symbols-outlined" style="font-size: 18px;">playlist_add</span>
         </button>
+        <md-tooltip position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
       </div>
       <div class="track-duration" style="color: var(--text-muted); font-size: 12px; text-align: right;">${timeStr}</div>
       <div class="track-action-play" style="text-align: right; color: var(--text-muted);">
@@ -362,7 +373,17 @@ if (typeof window !== 'undefined' && !window.__melo_likes_row_listener_bound) {
     if (!trackId) return;
     document.querySelectorAll(`.btn-track-like[data-track-id="${trackId}"]`).forEach(btn => {
       btn.classList.toggle('liked', isLiked);
-      btn.title = isLiked ? 'Unlike' : 'Like';
+      const label = isLiked ? 'Unlike' : 'Like';
+      const translated = getTranslation(label);
+      btn.setAttribute('aria-label', translated);
+      const tooltip = btn.nextElementSibling && btn.nextElementSibling.tagName === 'MD-TOOLTIP' ? btn.nextElementSibling : null;
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = label;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        btn.title = translated;
+      }
       const icon = btn.querySelector('.material-symbols-outlined');
       if (icon) icon.textContent = isLiked ? 'favorite' : 'favorite_border';
     });
@@ -377,16 +398,25 @@ if (typeof window !== 'undefined' && !window.__melo_download_row_listener_bound)
     if (!trackId) return;
     document.querySelectorAll(`.btn-track-download[data-track-id="${trackId}"]`).forEach(btn => {
       if (btn.classList.contains('downloading')) return;
+      const label = downloaded ? 'Remove Download' : 'Download';
+      const translated = getTranslation(label);
+      btn.setAttribute('aria-label', translated);
+      const tooltip = btn.nextElementSibling && btn.nextElementSibling.tagName === 'MD-TOOLTIP' ? btn.nextElementSibling : null;
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = label;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        btn.title = translated;
+      }
       if (downloaded) {
         btn.classList.add('downloaded');
         btn.classList.remove('downloading');
-        btn.title = 'Remove Download';
         const icon = btn.querySelector('.material-symbols-outlined');
         if (icon) icon.textContent = 'download_done';
         btn.style.setProperty('--download-progress', '100%');
       } else {
         btn.classList.remove('downloaded', 'downloading');
-        btn.title = 'Download';
         const icon = btn.querySelector('.material-symbols-outlined');
         if (icon) icon.textContent = 'download';
         btn.style.setProperty('--download-progress', '0%');
