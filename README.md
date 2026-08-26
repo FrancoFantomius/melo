@@ -1,7 +1,7 @@
 # Melo
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-0.8.0-orange.svg)
+![Version](https://img.shields.io/badge/version-1.0.0-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
 ![Vite](https://img.shields.io/badge/vite-v8.2-646CFF.svg)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8.svg)

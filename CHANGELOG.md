@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.0.0] - 2026-08-26
+
+### Added
+- **Material Design 3 migration**: overhauled application layout, navigation, and components using `@francofantomius/material-components` and Material Design 3 tokens.
+  - Rebuilt top app bar, navigation drawer, navigation rail, and bottom navigation bar with MD3 component standards.
+  - Implemented responsive transitions between navigation rails on desktop/tablet and bottom navigation on mobile.
+- **Material Symbols font subsetting**: introduced a custom build step (`scripts/subset-icons.js` and `npm run optimize`) that scans the codebase for used Material Symbols and subsets the font to only include referenced glyphs, drastically reducing font asset payload size.
+- **PWA storage persistence**: integrated the Persistent Storage API (`navigator.storage.persist`) to protect downloaded audio tracks, podcast episodes, and IndexedDB caches from browser eviction.
+- **Screen Wake Lock**: integrated the Screen Wake Lock API (`navigator.wakeLock`) to keep the display active during playback and lyrics display when desired.
+- **Enhanced Web App Manifest**: expanded `manifest.json` with app shortcuts (Search, Downloads, Podcasts, Favorites), share target support, and high-resolution icons (192x192, 512x512, SVG).
+- **Theme & asset placeholders**: added a complete suite of theme-aware (light/dark) SVG and PNG placeholder assets for albums, artists, explore, favorites, podcasts, radio, and songs (`js/ui/placeholders.js`).
+- **Translation verification tool**: added `npm run check:i18n` (`scripts/check-translations.js`) to scan the codebase for translation keys and verify parity across all 8 supported languages.
+- **Revamped legal pages**: redesigned Privacy Policy (`privacy.html`) and Terms of Service (`terms.html`) with dedicated Material styling (`css/legal.css`).
+- **Typography update**: integrated `@fontsource-variable/roboto-flex` variable font for modern typography rendering across all views.
+
+### Changed
+- **Player & queue overhaul**:
+  - Rebuilt mini-player and expanded player controls using Material Design 3 components, accessible button labels, and responsive sliders.
+  - Queue drawer redesign with smooth reordering, clear/remove actions, active track indicators, and optimized memoized rendering.
+  - Hardened background audio playback and state persistence against mobile suspension and lock-screen interruptions.
+- **Podcast discovery & browsing**: refreshed podcast carousels, responsive episode lists, year filters, and discovery page layouts.
+- **Service worker caching**: optimized `sw.js` cache strategies to pre-cache font subsets, multi-language bundles, and handle offline routing reliably.
+- Version bumped to `1.0.0`.
+
 ## [0.8.0] - 2026-08-15
 
 ### Added
