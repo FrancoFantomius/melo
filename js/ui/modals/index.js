@@ -1,4 +1,3 @@
-import { initLoginModal } from './login.js';
 import { initSettingsModal } from './settings.js';
 import { initLyricsModal, openLyricsModalInternal, closeLyricsModalInternal } from './lyrics.js';
 import { initQueueDrawer, openQueueDrawer, closeQueueDrawer, isQueueOpen } from './queue.js';
@@ -6,7 +5,6 @@ import { initPlaylistModals } from './playlists.js';
 import { initAddPodcastModal } from './podcasts.js';
 
 export function initModals() {
-  initLoginModal();
   initSettingsModal();
   initLyricsModal();
   initQueueDrawer();

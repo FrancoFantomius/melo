@@ -34,7 +34,6 @@ const ASSETS_TO_CACHE = [
   './img/radio.svg',
   './img/radio_dark.svg',
   './fonts/material-symbols-outlined-subset.woff2',
-  './fonts/material-symbols.css',
   './css/variables.css',
   './css/fonts.css',
   './css/base.css',

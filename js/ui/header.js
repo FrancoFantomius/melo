@@ -3,7 +3,7 @@ import { getUserImageUrl, searchJellyfinCached, getArtworkUrl, getFavoriteSongsC
 import { setQueue } from '../player/queue.js';
 import { playTrack } from '../player/audio.js';
 import { registerTracksFavoriteStatus } from '../player/likes.js';
-import { openLoginModal, openSettingsModal } from './modals.js';
+import { openSettingsModal } from './modals.js';
 import { searchPodcastDirectory } from '../podcasts/discovery.js';
 import { openPodcastShow, switchView, openArtist, openAlbum, openPlaylist } from './views.js';
 import { formatItemType } from './views/common.js';
@@ -350,8 +350,10 @@ export function initHeader() {
 
   document.addEventListener('click', handleOutsideSearchClick);
 
-  // 4. Trigger login modal
-  btnSyncLogin?.addEventListener('click', () => openLoginModal());
+  // 4. Trigger login navigation
+  btnSyncLogin?.addEventListener('click', () => {
+    window.location.href = './login.html';
+  });
 
   // 5. Account menu actions
   accountMenu?.addEventListener('open', () => accountMenu.shadowRoot?.querySelector('.manage-btn md-icon')?.setAttribute('name', 'settings'));
