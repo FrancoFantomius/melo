@@ -3,16 +3,23 @@ import { getArtworkUrl } from '../jellyfin/client.js';
 import { audio, state } from './state.js';
 
 export function setupMediaSessionMetadata(track) {
-  if ('mediaSession' in navigator) {
-    const artworkUrl = getArtworkUrl(track, 'Primary', 512);
-    const artistName = track.Artists && track.Artists.length > 0 ? track.Artists.join(', ') : (track.AlbumArtist || 'Unknown Artist');
+  if ('mediaSession' in navigator && track) {
+    const artworkUrl = track.artwork || track.imageUrl || getArtworkUrl(track, 'Primary', 512) || './img/icons/icon_512x.png';
+    const artistName = track.Artists && track.Artists.length > 0
+      ? track.Artists.join(', ')
+      : (track.AlbumArtist || track.artist || track.showTitle || track.podcastTitle || 'Melo');
+    const albumName = track.Album || track.album || track.podcastTitle || track.showTitle || 'Melo';
 
     navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.Name || 'Unknown Title',
+      title: track.Name || track.title || 'Unknown Title',
       artist: artistName,
-      album: track.Album || 'Melo',
+      album: albumName,
       artwork: [
-        { src: artworkUrl, sizes: '512x512', type: 'image/jpeg' }
+        { src: artworkUrl, sizes: '512x512', type: 'image/png' },
+        { src: artworkUrl, sizes: '256x256', type: 'image/png' },
+        { src: artworkUrl, sizes: '192x192', type: 'image/png' },
+        { src: artworkUrl, sizes: '128x128', type: 'image/png' },
+        { src: artworkUrl, sizes: '96x96', type: 'image/png' }
       ]
     });
     updateMediaSessionPositionState();

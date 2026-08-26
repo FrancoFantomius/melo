@@ -8,6 +8,7 @@ import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTM
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, buildHomeRecommendations } from '../../recommendations.js';
+import { getPlaceholder } from '../placeholders.js';
 
 export async function renderHomeView(container) {
   const session = getSession();
@@ -21,10 +22,21 @@ export async function renderHomeView(container) {
     albums: 'Albums'
   };
 
-  const pillsHTML = `<button class="category-pill active" data-category="all" data-i18n>All</button>` +
+  const pillIcons = {
+    all: 'widgets',
+    playlists: 'queue_music',
+    songs: 'music_note',
+    artists: 'artist',
+    podcasts: 'podcasts',
+    albums: 'album'
+  };
+
+  const pillsHTML = `<md-chip variant="filter" selected icon="widgets" label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>` +
     userOrder.map(cat => {
       const defaultText = pillDefaultText[cat] || cat;
-      return `<button class="category-pill" data-category="${cat}" data-i18n>${defaultText}</button>`;
+      const icon = pillIcons[cat];
+      const iconAttr = icon ? `icon="${icon}"` : '';
+      return `<md-chip variant="filter" ${iconAttr} label="${getTranslation(defaultText)}" data-category="${cat}" data-i18n-label="${defaultText}"></md-chip>`;
     }).join('');
 
   const sectionHTMLMap = {
@@ -113,10 +125,10 @@ export async function renderHomeView(container) {
 
   container.innerHTML = `
     <div class="view-section">
-      <!-- Category Filter Pillows -->
-      <div class="category-pills" id="home-category-pills">
+      <!-- Category Filter Chips -->
+      <md-chip-set class="category-pills" id="home-category-pills">
         ${pillsHTML}
-      </div>
+      </md-chip-set>
 
       ${sectionsHTML}
     </div>
@@ -171,16 +183,16 @@ export async function renderHomeView(container) {
     }
   });
 
-  // Bind Category Filter Pills
-  const pillButtons = container.querySelectorAll('#home-category-pills .category-pill');
+  // Bind Category Filter Chips
+  const chipButtons = container.querySelectorAll('#home-category-pills md-chip');
   const sections = container.querySelectorAll('.home-section');
 
-  pillButtons.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pillButtons.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
+  chipButtons.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chipButtons.forEach(c => { c.selected = false; });
+      chip.selected = true;
 
-      const selectedCategory = pill.getAttribute('data-category');
+      const selectedCategory = chip.getAttribute('data-category');
 
       sections.forEach(section => {
         const secCat = section.getAttribute('data-category');
@@ -253,7 +265,7 @@ export async function renderHomeView(container) {
         }
         podcastsGrid.innerHTML = items.map(feed => `
           <div class="media-card podcast-home-card" data-feed-url="${encodeURIComponent(feed.feedUrl)}">
-            <img src="${feed.image || './img/icons/icon.svg'}" class="card-thumb" alt="${feed.title}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';">
+            <img src="${feed.image || getPlaceholder('podcast')}" class="card-thumb" alt="${feed.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
             <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
               <div class="card-title" title="${feed.title}">${feed.title}</div>
               <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${feed.author || 'Podcast'}</div>
@@ -320,7 +332,7 @@ export async function renderHomeView(container) {
       } else {
         artistsGrid.innerHTML = artistsRes.Items.map(artist => `
           <div class="media-card" data-artist-id="${artist.Id}">
-            <img src="${getArtworkUrl(artist, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
+            <img src="${getArtworkUrl(artist, 'Primary', 300, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
             <div class="card-title" style="text-align: center;">${artist.Name}</div>
             <div class="card-subtitle" style="text-align: center;" data-i18n>Artist</div>
           </div>

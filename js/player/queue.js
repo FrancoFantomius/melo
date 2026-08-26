@@ -57,15 +57,25 @@ export function setCurrentTrack(track) {
   return null;
 }
 
+export function peekNextTrack(isAutoEnd = true) {
+  if (queue.length === 0) return null;
+
+  if (repeat === 'one') {
+    return getCurrentTrack();
+  }
+
+  if (currentIndex < queue.length - 1) {
+    return queue[currentIndex + 1];
+  } else if (repeat === 'all') {
+    return queue[0];
+  }
+  return null;
+}
+
 export function nextTrack(isAutoEnd = false) {
   if (queue.length === 0) return null;
 
   if (repeat === 'one') {
-    if (isAutoEnd) {
-      repeat = 'none';
-      return getCurrentTrack();
-    }
-  } else if (repeat === 'all') {
     if (isAutoEnd) {
       return getCurrentTrack();
     }
@@ -131,6 +141,36 @@ export function addToQueue(tracks) {
   originalQueue.push(...tracks);
   queue.push(...tracks);
   return tracks.length;
+}
+
+export function removeFromQueue(index) {
+  if (typeof index !== 'number' || index < 0 || index >= queue.length) return false;
+  const removedTrack = queue[index];
+  queue.splice(index, 1);
+  const origIdx = originalQueue.indexOf(removedTrack);
+  if (origIdx > -1) originalQueue.splice(origIdx, 1);
+
+  if (index < currentIndex) {
+    currentIndex--;
+  } else if (index === currentIndex) {
+    if (currentIndex >= queue.length) {
+      currentIndex = queue.length - 1;
+    }
+  }
+  return true;
+}
+
+export function clearQueue() {
+  const current = getCurrentTrack();
+  if (current) {
+    queue = [current];
+    originalQueue = [current];
+    currentIndex = 0;
+  } else {
+    queue = [];
+    originalQueue = [];
+    currentIndex = -1;
+  }
 }
 
 export function getQueueState() {

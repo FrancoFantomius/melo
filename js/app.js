@@ -1,8 +1,23 @@
-import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource-variable/plus-jakarta-sans/index.css';
+import '@francofantomius/material-components/top-app-bar';
+import '@francofantomius/material-components/navigation-drawer';
+import '@francofantomius/material-components/navigation-rail';
+import '@francofantomius/material-components/navigation-bar';
+import '@francofantomius/material-components/search-bar';
+import '@francofantomius/material-components/account-menu';
+import '@francofantomius/material-components/app-drawer';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon';
+import '@francofantomius/material-components/divider';
+import '@francofantomius/material-components/side-sheet';
+import '@francofantomius/material-components/bottom-sheet';
+import '@francofantomius/material-components/badge';
+import '@francofantomius/material-components/chip';
+import '@francofantomius/material-components/tooltip';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';
+import './ui/placeholders.js';
 import { initHeader } from './ui/header.js';
 import { initModals } from './ui/modals.js';
 import { initViews } from './ui/views.js';

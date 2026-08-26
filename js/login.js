@@ -1,5 +1,3 @@
-import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource-variable/plus-jakarta-sans/index.css';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

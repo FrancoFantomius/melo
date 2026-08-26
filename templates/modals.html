@@ -1,15 +1,32 @@
-<!-- Queue Drawer Overlay -->
-<div id="queue-drawer" class="queue-drawer">
-  <div class="modal-header queue-header">
-    <h3 class="modal-title">
-      <span class="material-symbols-outlined" style="color: var(--accent);">queue_music</span>
-      <span data-i18n>Play Queue</span>
-      <span id="queue-count-badge" class="queue-count-badge"></span>
-    </h3>
-    <button id="btn-queue-close" class="btn-icon" title="Close Queue" aria-label="Close Queue" data-i18n-title><span class="material-symbols-outlined">close</span></button>
+<!-- Desktop Queue Side Sheet -->
+<md-side-sheet id="desktop-queue-sheet" class="queue-sheet queue-side-sheet" type="modal" side="end" divider>
+  <div slot="headline" class="queue-sheet-headline">
+    <md-icon name="queue_music" class="queue-headline-icon"></md-icon>
+    <span data-i18n>Play Queue</span>
+    <span id="desktop-queue-count" class="queue-count-badge"></span>
   </div>
-  <div id="queue-tracks-list" class="tracks-list" style="overflow-y: auto; flex: 1;"></div>
-</div>
+  <div slot="header-actions">
+    <button id="desktop-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
+      <span class="material-symbols-outlined">delete_sweep</span>
+    </button>
+  </div>
+  <div id="desktop-queue-tracks-list" class="queue-tracks-list"></div>
+</md-side-sheet>
+
+<!-- Mobile Queue Bottom Sheet -->
+<md-bottom-sheet id="mobile-queue-sheet" class="queue-sheet queue-bottom-sheet" type="modal" divider>
+  <div slot="headline" class="queue-sheet-headline">
+    <md-icon name="queue_music" class="queue-headline-icon"></md-icon>
+    <span data-i18n>Play Queue</span>
+    <span id="mobile-queue-count" class="queue-count-badge"></span>
+  </div>
+  <div slot="header-actions">
+    <button id="mobile-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
+      <span class="material-symbols-outlined">delete_sweep</span>
+    </button>
+  </div>
+  <div id="mobile-queue-tracks-list" class="queue-tracks-list"></div>
+</md-bottom-sheet>
 
 <!-- Settings & Transcode Quality Modal -->
 <div id="settings-modal" class="modal-overlay" style="display: none;">
@@ -135,9 +152,7 @@
         <span class="material-symbols-outlined" style="color: var(--accent);">podcasts</span>
         <span data-i18n>Add Podcast</span>
       </h2>
-      <button id="btn-add-podcast-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-add-podcast-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <form id="add-podcast-form">
@@ -151,7 +166,7 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
-        <button type="submit" id="btn-submit-add-podcast" class="btn btn-primary" style="width: 100%;" data-i18n>Add Podcast</button>
+        <md-button type="submit" id="btn-submit-add-podcast" variant="filled" style="width: 100%;"><span data-i18n>Add Podcast</span></md-button>
       </div>
     </form>
   </div>

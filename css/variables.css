@@ -1,12 +1,20 @@
 :root {
   /* Fonts */
-  --font-main: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-icon: 'Material Symbols Outlined Variable', 'Material Symbols Outlined', sans-serif;
+  --font-main: 'Roboto Flex Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-icon: 'Material Symbols Outlined', 'Material Symbols Outlined Variable', 'Material Icons', sans-serif;
+  --md-sys-typescale-font-family: var(--font-main);
 
   /* Layout Dimensions */
   --header-height: 64px;
   --sidebar-width: 240px;
+  --rail-width: 80px;
   --player-height: 90px;
+
+  /* Safe Area Insets for Mobile/Notch */
+  --sat: env(safe-area-inset-top, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
 
   /* Radii & Timings */
   --transition-speed: 0.2s;
@@ -44,6 +52,58 @@
   --danger: #f15e6c;
   --danger-hover: #e91429;
   --success: #10b981;
+
+  /* Material Design 3 Tokens (Dark Theme) */
+  --md-sys-color-primary: #f59e0b;
+  --md-sys-color-on-primary: #000000;
+  --md-sys-color-primary-container: #452b00;
+  --md-sys-color-on-primary-container: #ffddb3;
+  --md-sys-color-secondary: #dbc2ad;
+  --md-sys-color-on-secondary: #3d2c1e;
+  --md-sys-color-secondary-container: #332820;
+  --md-sys-color-on-secondary-container: #f8dfcb;
+  --md-sys-color-surface: #000000;
+  --md-sys-color-surface-container-lowest: #0e0e0e;
+  --md-sys-color-surface-container-low: #141414;
+  --md-sys-color-surface-container: #181818;
+  --md-sys-color-surface-container-high: #222222;
+  --md-sys-color-surface-container-highest: #2e2e2e;
+  --md-sys-color-on-surface: #ffffff;
+  --md-sys-color-on-surface-variant: #b3b3b3;
+  --md-sys-color-outline: #737373;
+  --md-sys-color-outline-variant: rgba(255, 255, 255, 0.12);
+  --md-sys-color-error: #f15e6c;
+  --md-sys-color-error-container: #8c0018;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-on-error-container: #ffdada;
+
+  /* Component specific overrides */
+  --md-top-app-bar-container-color: var(--bg-secondary);
+  --md-top-app-bar-on-container-color: var(--text-primary);
+  --md-search-bar-container-color: var(--bg-tertiary);
+
+  /* Navigation Drawer / Sidebar Tokens */
+  --md-navigation-drawer-container-color: var(--bg-secondary);
+  --md-navigation-drawer-on-container-color: var(--text-primary);
+  --md-navigation-drawer-headline-color: var(--text-secondary);
+
+  /* Navigation Rail Tokens */
+  --md-navigation-rail-container-color: var(--bg-secondary);
+  --md-navigation-rail-on-container-color: var(--text-primary);
+  --md-navigation-rail-border: 1px solid var(--border-color);
+  --md-navigation-rail-active-indicator-color: var(--accent-bg-glow);
+  --md-navigation-rail-active-indicator-hover-color: rgba(245, 158, 11, 0.25);
+  --md-navigation-rail-active-icon-color: var(--accent);
+  --md-navigation-rail-active-label-color: var(--accent);
+  --md-navigation-rail-label-color: var(--text-secondary);
+
+  /* Navigation Bar (Bottom) Tokens */
+  --md-navigation-bar-container-color: var(--bg-tertiary);
+  --md-navigation-bar-on-container-color: var(--text-primary);
+  --md-navigation-bar-active-indicator-color: var(--accent-bg-glow);
+  --md-navigation-bar-active-icon-color: var(--accent);
+  --md-navigation-bar-active-label-color: var(--accent);
+  --md-navigation-bar-inactive-label-color: var(--text-secondary);
 }
 
 /* Theme: Light Mode Override */
@@ -72,4 +132,55 @@
   --accent-active: #92400e;
   --accent-bg-glow: rgba(217, 119, 6, 0.12);
   --accent-text: #ffffff;
+
+  /* Material Design 3 Tokens (Light Theme) */
+  --md-sys-color-primary: #d97706;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #fed7aa;
+  --md-sys-color-on-primary-container: #451a03;
+  --md-sys-color-secondary: #705845;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #fbe0cc;
+  --md-sys-color-on-secondary-container: #281808;
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f9fafb;
+  --md-sys-color-surface-container: #f3f4f6;
+  --md-sys-color-surface-container-high: #e5e7eb;
+  --md-sys-color-surface-container-highest: #d1d5db;
+  --md-sys-color-on-surface: #121212;
+  --md-sys-color-on-surface-variant: #5e5e5e;
+  --md-sys-color-outline: #9ca3af;
+  --md-sys-color-outline-variant: rgba(0, 0, 0, 0.1);
+  --md-sys-color-error: #dc2626;
+  --md-sys-color-error-container: #fee2e2;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-on-error-container: #7f1d1d;
+
+  --md-top-app-bar-container-color: #ffffff;
+  --md-top-app-bar-on-container-color: #121212;
+  --md-search-bar-container-color: #eaeaea;
+
+  /* Navigation Drawer / Sidebar Tokens */
+  --md-navigation-drawer-container-color: var(--bg-secondary);
+  --md-navigation-drawer-on-container-color: var(--text-primary);
+  --md-navigation-drawer-headline-color: var(--text-secondary);
+
+  /* Navigation Rail Tokens */
+  --md-navigation-rail-container-color: var(--bg-secondary);
+  --md-navigation-rail-on-container-color: var(--text-primary);
+  --md-navigation-rail-border: 1px solid var(--border-color);
+  --md-navigation-rail-active-indicator-color: rgba(217, 119, 6, 0.15);
+  --md-navigation-rail-active-indicator-hover-color: rgba(217, 119, 6, 0.25);
+  --md-navigation-rail-active-icon-color: var(--accent);
+  --md-navigation-rail-active-label-color: var(--accent);
+  --md-navigation-rail-label-color: var(--text-secondary);
+
+  /* Navigation Bar (Bottom) Tokens */
+  --md-navigation-bar-container-color: var(--bg-secondary);
+  --md-navigation-bar-on-container-color: var(--text-primary);
+  --md-navigation-bar-active-indicator-color: rgba(217, 119, 6, 0.15);
+  --md-navigation-bar-active-icon-color: var(--accent);
+  --md-navigation-bar-active-label-color: var(--accent);
+  --md-navigation-bar-inactive-label-color: var(--text-secondary);
 }

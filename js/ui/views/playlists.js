@@ -5,6 +5,8 @@ import { renderAlbumDetailView } from './albums.js';
 import { getTranslation } from '../../i18n.js';
 import { openCreatePlaylistModal } from '../modals.js';
 import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST } from '../../recommendations.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon';
 
 export function openPlaylist(playlistId, playlistObj = null) {
   if (!playlistId) return;
@@ -32,10 +34,10 @@ export async function renderPlaylistsView(container) {
     <div class="view-section">
       <div class="playlists-header">
         <h2 class="section-title" data-i18n>Playlists</h2>
-        <button id="btn-create-playlist" class="btn btn-primary">
-          <span class="material-symbols-outlined" style="font-size: 20px;">add</span>
+        <md-button id="btn-create-playlist" variant="filled">
+          <md-icon slot="icon" name="add"></md-icon>
           <span data-i18n>Create Playlist</span>
-        </button>
+        </md-button>
       </div>
       <div id="playlists-grid" class="cards-grid">
         <div style="color: var(--text-muted);" data-i18n>Loading...</div>

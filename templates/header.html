@@ -1,79 +1,67 @@
-<header class="main-header">
-  <div class="header-left">
-    <div class="header-brand-area">
-      <button id="btn-toggle-sidebar" class="btn-icon" title="Toggle Sidebar" aria-label="Toggle Sidebar" data-i18n-title>
-        <span class="material-symbols-outlined">menu</span>
-      </button>
+<md-top-app-bar variant="small" id="main-top-app-bar" class="main-header">
+  <div slot="navigation" class="header-brand-area">
+    <md-icon-button id="btn-toggle-sidebar" icon="menu" aria-label="Toggle Sidebar" title="Toggle Sidebar"></md-icon-button>
 
-      <a href="./index.html" data-view="home" class="logo-area" style="text-decoration: none;">
-        <img src="./img/icons/icon.svg" alt="App Logo" class="app-logo">
-        <span class="app-title">Melo</span>
-      </a>
-    </div>
-
-    <div class="search-container">
-      <div class="search-box">
-        <input type="text" id="global-search-input" placeholder="Search artists, albums, tracks..." data-i18n-placeholder autocomplete="off">
-        <button id="btn-search-submit" class="search-icon-btn" title="Search" aria-label="Submit Search">
-          <span class="material-symbols-outlined">search</span>
-        </button>
-      </div>
-      <div id="search-dropdown-results" class="search-dropdown" style="display: none;"></div>
-    </div>
+    <a href="./index.html" data-view="home" class="logo-area" style="text-decoration: none;">
+      <img src="./img/icons/icon.svg" alt="App Logo" class="app-logo">
+      <span class="app-title">Melo</span>
+    </a>
   </div>
 
-  <div class="header-right">
-    <!-- Theme Toggle Button -->
-    <button id="btn-theme-toggle" class="btn-icon" title="Toggle Light/Dark Theme" aria-label="Toggle Light/Dark Theme" data-i18n-title>
-      <span class="material-symbols-outlined" id="theme-toggle-icon">dark_mode</span>
-    </button>
+  <div class="search-container">
+    <md-search-bar
+      id="global-search-bar"
+      size="small"
+      compact
+      placeholder="Search artists, albums, tracks..."
+      data-i18n-placeholder
+    >
+      <div slot="suggestions" id="search-dropdown-results" class="search-dropdown-results"></div>
+    </md-search-bar>
+  </div>
 
-    <!-- Settings Button -->
-    <button id="btn-settings-open" class="btn-icon" title="Settings" aria-label="Open Settings" data-i18n-title>
-      <span class="material-symbols-outlined">settings</span>
-    </button>
+  <div slot="actions" class="header-actions">
+    <!-- Theme Toggle Button -->
+    <md-icon-button id="btn-theme-toggle" icon="brightness_auto" aria-label="Theme: Device default" title="Theme: Device default"></md-icon-button>
+
+    <!-- App Drawer Menu -->
+    <md-app-drawer headline="My Apps" data-i18n>
+      <md-app-drawer-item label="Calculator" href="https://francofantomius.com/calculator/" target="_blank" src="https://francofantomius.com/calculator/img/calculator_x128.png"></md-app-drawer-item>
+      <md-app-drawer-item label="Melo" href="https://melo.francofantomius.com/" target="_blank" src="https://melo.francofantomius.com/img/icons/icon.svg"></md-app-drawer-item>
+      <md-app-drawer-item label="Noten" href="https://noten.francofantomius.com/" target="_blank" src="https://noten.francofantomius.com/noten_x512.png"></md-app-drawer-item>
+      <md-app-drawer-item label="Scriben" href="https://scriben.francofantomius.com/" target="_blank" src="https://scriben.francofantomius.com/icons/icon.svg"></md-app-drawer-item>
+      <md-app-drawer-item label="Maps" href="https://maps.francofantomius.com/" target="_blank" src="https://maps.francofantomius.com/img/icons/maps.png"></md-app-drawer-item>
+    </md-app-drawer>
 
     <!-- Sign In Button (Logged Out state) -->
-    <button id="btn-sync-login" class="btn btn-primary">
+    <md-button id="btn-sync-login" variant="filled">
       <span data-i18n>Sign in</span>
-    </button>
+    </md-button>
 
-    <!-- Profile Button (Logged In state) -->
-    <button id="btn-sync-profile" class="profile-btn" title="Profile" data-i18n-title style="display: none;">
-      <img id="header-profile-img" class="profile-avatar-img" src="" alt="Avatar" style="display: none;"
-        onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='block';">
-      <div id="header-profile-letter" class="profile-avatar-letter" style="display: none;">J</div>
-    </button>
-
-    <!-- Account Dropdown Menu -->
-    <div id="account-dropdown" class="account-dropdown" style="display: none;">
-      <div class="dropdown-avatar-container">
-        <img id="dropdown-profile-img" class="profile-avatar-img" src="" alt="Avatar" style="display: none;"
-          onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='inline-block';">
-        <span id="dropdown-profile-icon" class="material-symbols-outlined"
-          style="font-size: 36px; color: var(--accent);">account_circle</span>
-      </div>
-      <div id="dropdown-profile-username" class="dropdown-username">Jellyfin User</div>
-      <div id="account-dropdown-email" class="account-dropdown-email">http://server.example.com</div>
-
-      <div class="dropdown-actions">
-        <button id="btn-dropdown-settings" class="dropdown-btn">
-          <span class="material-symbols-outlined">settings</span>
-          <span data-i18n>Settings</span>
-        </button>
-        <a id="btn-dropdown-terms" href="./terms.html" class="dropdown-btn" style="text-decoration: none; color: inherit;">
-          <span class="material-symbols-outlined">gavel</span>
-          <span data-i18n>Terms of Service</span>
-        </a>
-        <a id="btn-dropdown-privacy" href="./privacy.html" class="dropdown-btn" style="text-decoration: none; color: inherit;">
-          <span class="material-symbols-outlined">policy</span>
-          <span data-i18n>Privacy Policy</span>
-        </a>
-        <button id="btn-dropdown-signout" class="dropdown-btn" style="color: var(--danger);">
-          <span class="material-symbols-outlined">logout</span>
+    <!-- Account Menu (Logged In state) -->
+    <md-account-menu
+      id="header-account-menu"
+      name="Jellyfin User"
+      email="http://server.example.com"
+      headline="Account"
+      manage-text="Settings"
+      show-tabs="false"
+      alignment="end"
+      pivot="right"
+      style="display: none;"
+    >
+      <div slot="overview"></div>
+      <div slot="footer" class="account-menu-custom-footer">
+        <button type="button" id="btn-account-signout" class="account-signout-btn">
+          <md-icon name="logout"></md-icon>
           <span data-i18n>Sign out</span>
         </button>
+        <div class="account-footer-links">
+          <a id="btn-dropdown-terms" href="./terms.html" data-i18n>Terms of Service</a>
+          <span class="footer-dot">&bull;</span>
+          <a id="btn-dropdown-privacy" href="./privacy.html" data-i18n>Privacy Policy</a>
+        </div>
       </div>
-    </div>
+    </md-account-menu>
   </div>
-</header>
+</md-top-app-bar>

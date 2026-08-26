@@ -1,5 +1,6 @@
-import '@fontsource-variable/material-symbols-outlined/full.css';
-import '@fontsource-variable/plus-jakarta-sans/index.css';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/card';
+import '@francofantomius/material-components/divider';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

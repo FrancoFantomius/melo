@@ -5,11 +5,14 @@
   left: 0;
   right: 0;
   bottom: var(--player-height);
-  z-index: 2200;
+  z-index: 900;
   background-color: var(--bg-primary);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding-top: var(--sat);
+  padding-left: var(--sal);
+  padding-right: var(--sar);
   animation: lyricsFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -100,6 +103,8 @@
   z-index: 2;
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 40px 24px 80px 24px;
   display: flex;
   flex-direction: column;

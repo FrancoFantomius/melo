@@ -1,12 +1,10 @@
-import { initLoginModal } from './login.js';
 import { initSettingsModal } from './settings.js';
 import { initLyricsModal, openLyricsModalInternal, closeLyricsModalInternal } from './lyrics.js';
-import { initQueueDrawer, openQueueDrawer, closeQueueDrawer } from './queue.js';
+import { initQueueDrawer, openQueueDrawer, closeQueueDrawer, isQueueOpen } from './queue.js';
 import { initPlaylistModals } from './playlists.js';
 import { initAddPodcastModal } from './podcasts.js';
 
 export function initModals() {
-  initLoginModal();
   initSettingsModal();
   initLyricsModal();
   initQueueDrawer();
@@ -19,6 +17,8 @@ export function initModals() {
   setTimeout(syncOverlaysWithHash, 100);
 }
 
+let lastSyncedHash = null;
+
 export function syncOverlaysWithHash() {
   const hash = window.location.hash;
 
@@ -27,10 +27,8 @@ export function syncOverlaysWithHash() {
 
   // Handle #player
   if (hash === '#player') {
-    if (window.innerWidth <= 768) {
-      empContainer?.classList.add('open');
-    }
-  } else if (hash !== '#lyrics') {
+    empContainer?.classList.add('open');
+  } else if (hash !== '#lyrics' && hash !== '#queue') {
     empContainer?.classList.remove('open');
   }
 
@@ -43,12 +41,14 @@ export function syncOverlaysWithHash() {
 
   // Handle #queue
   if (hash === '#queue') {
-    if (!document.getElementById('queue-drawer')?.classList.contains('open')) {
+    if (!isQueueOpen()) {
       openQueueDrawer();
     }
-  } else {
-    if (document.getElementById('queue-drawer')?.classList.contains('open')) {
+  } else if (lastSyncedHash === '#queue') {
+    if (isQueueOpen()) {
       closeQueueDrawer();
     }
   }
+
+  lastSyncedHash = hash;
 }

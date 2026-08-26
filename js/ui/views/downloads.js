@@ -2,6 +2,7 @@ import { getAllDownloads, removeDownload, formatBytes } from '../../jellyfin/off
 import { setQueue } from '../../player/queue.js';
 import { playTrack } from '../../player/audio.js';
 import { getTranslation } from '../../i18n.js';
+import { getPlaceholder } from '../placeholders.js';
 
 let renderedContainer = null;
 
@@ -19,13 +20,15 @@ export function renderDownloadsView(container) {
 }
 
 function renderTrackRowHTML(rec) {
+  const placeholderType = rec.isPodcast ? 'podcast' : 'song';
+  const artUrl = rec.artworkUrl || getPlaceholder(placeholderType);
   return `
     <div class="track-row downloads-row" data-track-id="${rec.id}">
       <span class="track-num">
         <span class="material-symbols-outlined" style="font-size: 18px;">${rec.isPodcast ? 'podcasts' : 'music_note'}</span>
       </span>
       <div class="track-info">
-        <img src="${rec.artworkUrl || './img/icons/icon.svg'}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="track-cover" alt="Cover">
+        <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="track-cover" alt="Cover">
       </div>
       <div style="overflow: hidden;">
         <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rec.name || 'Unknown'}</div>
@@ -44,12 +47,14 @@ function renderTrackRowHTML(rec) {
 
 function renderGroupHTML(group) {
   const typeLabel = group.type === 'Playlist' ? 'Playlist' : 'Album';
+  const placeholderType = group.type === 'Playlist' ? 'playlist' : 'album';
   const count = group.tracks.length;
+  const artUrl = group.artworkUrl || getPlaceholder(placeholderType);
   return `
     <div class="downloads-group" data-parent-id="${group.id}">
       <div class="downloads-group-header" role="button" aria-expanded="false">
         <div class="downloads-group-cover-wrap">
-          <img src="${group.artworkUrl}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="track-cover" alt="${group.name}">
+          <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="track-cover" alt="${group.name}">
           <button class="downloads-group-play" title="Play All" aria-label="Play All">
             <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span>
           </button>
@@ -112,7 +117,7 @@ async function loadDownloads(container) {
         id: groupId || `n:${rec.album}`,
         name: rec.parentName || rec.album || 'Unknown',
         type: rec.parentType || 'Album',
-        artworkUrl: rec.parentArtworkUrl || rec.artworkUrl || './img/icons/icon.svg',
+        artworkUrl: rec.parentArtworkUrl || rec.artworkUrl || getPlaceholder(rec.parentType === 'Playlist' ? 'playlist' : 'album'),
         owner: rec.parentOwner || (rec.parentType ? '' : (rec.artists || '')),
         hasParent: !!rec.parentId,
         tracks: [],

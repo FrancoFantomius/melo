@@ -5,6 +5,11 @@ import { openAddPodcastModal, closeAddPodcastModal } from '../../modals.js';
 import { switchView } from '../../views.js';
 import { renderSubscribedCarousel, renderContinuePlayingCarousel, renderLatestEpisodesGrid } from './carousels.js';
 import { renderDiscoverTabContent } from './discovery.js';
+import { getTranslation } from '../../../i18n.js';
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon-button';
+import '@francofantomius/material-components/chip';
+import '@francofantomius/material-components/icon';
 
 let podcastFormListenerBound = false;
 
@@ -58,8 +63,39 @@ export function bindAddPodcastForm() {
   });
 }
 
+function checkAndHandleWebShareTarget() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const sharedUrl = params.get('url') || '';
+    const sharedText = params.get('text') || '';
+
+    let candidate = '';
+    const urlRegex = /(https?:\/\/[^\s]+)/i;
+    if (sharedUrl && urlRegex.test(sharedUrl)) {
+      candidate = sharedUrl.match(urlRegex)[0];
+    } else if (sharedText && urlRegex.test(sharedText)) {
+      candidate = sharedText.match(urlRegex)[0];
+    } else if (sharedUrl) {
+      candidate = sharedUrl;
+    } else if (sharedText && sharedText.startsWith('http')) {
+      candidate = sharedText;
+    }
+
+    if (candidate) {
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      setTimeout(() => {
+        openAddPodcastModal(candidate);
+      }, 150);
+    }
+  } catch (err) {
+    console.warn('[PWA Share Target] Error checking params:', err);
+  }
+}
+
 export async function renderPodcastsView(container, viewData = 'all') {
   bindAddPodcastForm();
+  checkAndHandleWebShareTarget();
   let activeCategory = typeof viewData === 'string' ? viewData : (viewData?.tab || 'all');
   if (activeCategory === 'in-progress') activeCategory = 'continue';
 
@@ -70,32 +106,27 @@ export async function renderPodcastsView(container, viewData = 'all') {
           <h1 class="section-title" data-i18n>Podcasts</h1>
           <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;" data-i18n>Stream and discover client-side podcast RSS feeds</p>
         </div>
-        <button id="btn-open-add-podcast" class="btn-primary">
-          <span class="material-symbols-outlined">add</span>
+        <md-button id="btn-open-add-podcast" variant="filled" icon="add">
           <span data-i18n>Add Podcast</span>
-        </button>
+        </md-button>
       </div>
 
-      <!-- Category Filter Pills -->
-      <div class="category-pills" id="podcast-category-pills">
-        <button class="category-pill ${activeCategory === 'all' ? 'active' : ''}" data-category="all" data-i18n>All</button>
-        <button class="category-pill ${activeCategory === 'subscribed' ? 'active' : ''}" data-category="subscribed" data-i18n>Subscribed Podcasts</button>
-        <button class="category-pill ${activeCategory === 'continue' ? 'active' : ''}" data-category="continue" data-i18n>Continue Playing</button>
-        <button class="category-pill ${activeCategory === 'latest' ? 'active' : ''}" data-category="latest" data-i18n>Latest Episodes</button>
-        <button class="category-pill ${activeCategory === 'discover' ? 'active' : ''}" data-category="discover" data-i18n>Discover Podcasts</button>
-      </div>
+      <!-- Category Filter Chips -->
+      <md-chip-set class="category-pills" id="podcast-category-pills">
+        <md-chip variant="filter" ${activeCategory === 'all' ? 'selected' : ''} icon="grid_view" label="${getTranslation('All')}" data-category="all" data-i18n-label="All"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'subscribed' ? 'selected' : ''} icon="subscriptions" label="${getTranslation('Subscribed Podcasts')}" data-category="subscribed" data-i18n-label="Subscribed Podcasts"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'continue' ? 'selected' : ''} icon="history" label="${getTranslation('Continue Playing')}" data-category="continue" data-i18n-label="Continue Playing"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'latest' ? 'selected' : ''} icon="new_releases" label="${getTranslation('Latest Episodes')}" data-category="latest" data-i18n-label="Latest Episodes"></md-chip>
+        <md-chip variant="filter" ${activeCategory === 'discover' ? 'selected' : ''} icon="explore" label="${getTranslation('Discover Podcasts')}" data-category="discover" data-i18n-label="Discover Podcasts"></md-chip>
+      </md-chip-set>
 
       <!-- Section 1: Subscribed Podcasts Carousel -->
       <section id="podcast-subscribed-section" class="podcast-view-section" data-category="subscribed">
         <div class="podcast-section-header">
           <h2 class="podcast-section-title" data-i18n>Subscribed Podcasts</h2>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-subscribed" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-subscribed" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-subscribed" variant="standard" icon="chevron_left" aria-label="Previous"></md-icon-button>
+            <md-icon-button id="carousel-next-subscribed" variant="standard" icon="chevron_right" aria-label="Next"></md-icon-button>
           </div>
         </div>
         <div id="podcast-subscribed-carousel" class="cards-carousel">
@@ -108,12 +139,8 @@ export async function renderPodcastsView(container, viewData = 'all') {
         <div class="podcast-section-header">
           <h2 class="podcast-section-title" data-i18n>Continue Playing</h2>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-continue" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-continue" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-continue" variant="standard" icon="chevron_left" aria-label="Previous"></md-icon-button>
+            <md-icon-button id="carousel-next-continue" variant="standard" icon="chevron_right" aria-label="Next"></md-icon-button>
           </div>
         </div>
         <div id="podcast-continue-carousel" class="episodes-carousel">
@@ -146,8 +173,8 @@ export async function renderPodcastsView(container, viewData = 'all') {
     openAddPodcastModal();
   });
 
-  // Bind Category Filter Pills
-  const pillButtons = container.querySelectorAll('#podcast-category-pills .category-pill');
+  // Bind Category Filter Chips
+  const chipButtons = container.querySelectorAll('#podcast-category-pills md-chip');
   const sections = container.querySelectorAll('.podcast-view-section');
 
   const updateSectionVisibility = (cat) => {
@@ -161,11 +188,11 @@ export async function renderPodcastsView(container, viewData = 'all') {
     });
   };
 
-  pillButtons.forEach(pill => {
-    pill.addEventListener('click', () => {
-      pillButtons.forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      const cat = pill.getAttribute('data-category');
+  chipButtons.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chipButtons.forEach(c => { c.selected = false; });
+      chip.selected = true;
+      const cat = chip.getAttribute('data-category');
       updateSectionVisibility(cat);
     });
   });

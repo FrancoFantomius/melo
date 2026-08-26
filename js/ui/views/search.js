@@ -5,6 +5,7 @@ import { openPodcastShow } from './podcasts.js';
 import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTML, bindTrackRows, bindArtistLinks } from './common.js';
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
+import { getPlaceholder } from '../placeholders.js';
 
 export function getRecentSearches() {
   try {
@@ -116,7 +117,7 @@ export async function renderSearchView(container, query) {
         podcastsSection.style.display = 'block';
         podcastsGrid.innerHTML = podcasts.map(item => `
           <div class="media-card podcast-search-card" data-feed-url="${encodeURIComponent(item.feedUrl)}">
-            <img src="${item.image || './img/icons/icon.svg'}" class="card-thumb" alt="${item.title}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';">
+            <img src="${item.image || getPlaceholder('podcast')}" class="card-thumb" alt="${item.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
             <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1;">
               <div class="card-title" title="${item.title}">${item.title}</div>
               <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.author || 'Podcast'}</div>
@@ -160,7 +161,7 @@ export async function renderSearchView(container, query) {
           if (item.Type === 'MusicArtist' || item.Type === 'Artist') {
             return `
               <div class="media-card" data-artist-id="${item.Id}">
-                <img src="${getArtworkUrl(item, 'Primary', 300)}" onerror="this.onerror=null; this.src='./img/icons/icon.svg';" class="card-thumb" style="border-radius: 50%;" alt="${item.Name}">
+                <img src="${getArtworkUrl(item, 'Primary', 300, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="card-thumb" style="border-radius: 50%;" alt="${item.Name}">
                 <div class="card-title" style="text-align: center;">${item.Name}</div>
                 <div class="card-subtitle" style="text-align: center;">Artist</div>
               </div>
@@ -248,7 +249,7 @@ function bindSearchPageControls(container) {
 
     if (debounceTimer) clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
-      const globalSearchInput = document.getElementById('global-search-input');
+      const globalSearchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
       if (globalSearchInput && document.activeElement !== globalSearchInput) {
         globalSearchInput.value = newQuery;
       }
@@ -269,7 +270,7 @@ function bindSearchPageControls(container) {
       searchInput.value = '';
       searchInput.focus();
     }
-    const globalSearchInput = document.getElementById('global-search-input');
+    const globalSearchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
     if (globalSearchInput) globalSearchInput.value = '';
     if (btnClear) btnClear.style.display = 'none';
 
@@ -294,7 +295,7 @@ function bindRecentSearchesControls(resultsContainer) {
       const container = document.getElementById('view-container');
       const searchInput = container?.querySelector('#search-page-input');
       if (searchInput) searchInput.value = term;
-      const globalSearchInput = document.getElementById('global-search-input');
+      const globalSearchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
       if (globalSearchInput) globalSearchInput.value = term;
       window.history.replaceState(null, '', `search.html?q=${encodeURIComponent(term)}`);
       renderSearchView(container, term);

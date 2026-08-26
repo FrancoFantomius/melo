@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melo-v0.7.0';
+const CACHE_NAME = 'melo-v1.0.0';
 const IMAGE_CACHE_NAME = 'jellyfin-images-v1';
 
 const ASSETS_TO_CACHE = [
@@ -8,9 +8,15 @@ const ASSETS_TO_CACHE = [
   './albums.html',
   './artists.html',
   './playlists.html',
+  './podcasts.html',
+  './downloads.html',
+  './search.html',
+  './terms.html',
+  './privacy.html',
   './manifest.json',
-  './img/icons/icon.svg',
+  './fonts/material-symbols-outlined-subset.woff2',
   './css/variables.css',
+  './css/fonts.css',
   './css/base.css',
   './css/layout.css',
   './css/header.css',
@@ -20,11 +26,130 @@ const ASSETS_TO_CACHE = [
   './css/modals.css',
   './css/queue.css',
   './css/lyrics.css',
+  './css/podcast.css',
+  './css/legal.css',
   './css/responsive.css',
   './css/style.css',
+  './languages/de.json',
+  './languages/en.json',
+  './languages/es.json',
+  './languages/fr.json',
+  './languages/it.json',
+  './languages/ja.json',
+  './languages/pt.json',
+  './languages/zh.json',
+  './img/icons/icon.svg',
+  './img/icons/icon_192x.png',
+  './img/icons/icon_512x.png',
+  './img/album.png',
+  './img/album.svg',
+  './img/album_dark.png',
+  './img/album_dark.svg',
+  './img/album-1.png',
+  './img/album-1.svg',
+  './img/album_dark-1.png',
+  './img/album_dark-1.svg',
+  './img/artist.png',
+  './img/artist.svg',
+  './img/artist_dark.png',
+  './img/artist_dark.svg',
+  './img/download.png',
+  './img/download.svg',
+  './img/download_dark.png',
+  './img/download_dark.svg',
+  './img/explore.png',
+  './img/explore.svg',
+  './img/explore_dark.png',
+  './img/explore_dark.svg',
+  './img/favorite.png',
+  './img/favorite.svg',
+  './img/favorite_dark.png',
+  './img/favorite_dark.svg',
+  './img/podcast.png',
+  './img/podcast.svg',
+  './img/podcast_dark.png',
+  './img/podcast_dark.svg',
+  './img/radio.png',
+  './img/radio.svg',
+  './img/radio_dark.png',
+  './img/radio_dark.svg',
+  './img/search.png',
+  './img/search.svg',
+  './img/search_dark.png',
+  './img/search_dark.svg',
+  './img/song.png',
+  './img/song.svg',
+  './img/song_dark.png',
+  './img/song_dark.svg',
   './js/app.js',
   './js/login.js',
-  './js/auth-guard.js'
+  './js/auth-guard.js',
+  './js/i18n.js',
+  './js/pwa.js',
+  './js/privacy.js',
+  './js/terms.js',
+  './js/recommendations.js',
+  './js/jellyfin/auth.js',
+  './js/jellyfin/cache.js',
+  './js/jellyfin/cached.js',
+  './js/jellyfin/client.js',
+  './js/jellyfin/favorites.js',
+  './js/jellyfin/http.js',
+  './js/jellyfin/library.js',
+  './js/jellyfin/lyrics.js',
+  './js/jellyfin/media.js',
+  './js/jellyfin/offline.js',
+  './js/jellyfin/playback.js',
+  './js/jellyfin/playlists.js',
+  './js/jellyfin/podcasts.js',
+  './js/jellyfin/session.js',
+  './js/player/audio.js',
+  './js/player/background.js',
+  './js/player/likes.js',
+  './js/player/media-session.js',
+  './js/player/persistence.js',
+  './js/player/progress.js',
+  './js/player/queue.js',
+  './js/player/state.js',
+  './js/player/stream.js',
+  './js/podcasts/discovery.js',
+  './js/podcasts/rss.js',
+  './js/podcasts/storage.js',
+  './js/pwa/storage.js',
+  './js/pwa/wake-lock.js',
+  './js/ui/downloads.js',
+  './js/ui/header.js',
+  './js/ui/modals.js',
+  './js/ui/placeholders.js',
+  './js/ui/player.js',
+  './js/ui/theme.js',
+  './js/ui/views.js',
+  './js/ui/modals/index.js',
+  './js/ui/modals/lyrics.js',
+  './js/ui/modals/playlists.js',
+  './js/ui/modals/podcasts.js',
+  './js/ui/modals/queue.js',
+  './js/ui/modals/settings.js',
+  './js/ui/modals/shared.js',
+  './js/ui/views/albums.js',
+  './js/ui/views/artists.js',
+  './js/ui/views/common.js',
+  './js/ui/views/downloads.js',
+  './js/ui/views/home.js',
+  './js/ui/views/playlists.js',
+  './js/ui/views/podcasts.js',
+  './js/ui/views/search.js',
+  './js/ui/views/albums/detail-download.js',
+  './js/ui/views/albums/detail-selection.js',
+  './js/ui/views/albums/detail.js',
+  './js/ui/views/albums/index.js',
+  './js/ui/views/albums/list.js',
+  './js/ui/views/podcasts/carousels.js',
+  './js/ui/views/podcasts/detail.js',
+  './js/ui/views/podcasts/discovery.js',
+  './js/ui/views/podcasts/episodes.js',
+  './js/ui/views/podcasts/index.js',
+  './js/ui/views/podcasts/list.js'
 ];
 
 // Install Event: Safe pre-caching with Promise.allSettled
@@ -66,8 +191,16 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   if (!url.startsWith('http://') && !url.startsWith('https://')) return;
 
-  // 1. Handle Jellyfin Artwork Images with Stale-While-Revalidate
-  const isImageRequest = url.includes('/Images/') || url.includes('/Images');
+  // Ignore media streaming range requests so byte-range audio playback is unaffected
+  if (event.request.headers.has('range')) return;
+
+  // 1. Handle Images with Stale-While-Revalidate (Jellyfin artwork, podcast covers, icons, placeholders)
+  const isImageRequest =
+    event.request.destination === 'image' ||
+    url.includes('/Images/') ||
+    url.includes('/Images') ||
+    /\.(png|jpe?g|svg|webp|gif|ico)(\?.*)?$/i.test(url);
+
   if (isImageRequest) {
     event.respondWith(
       caches.open(IMAGE_CACHE_NAME).then((cache) => {
@@ -82,8 +215,11 @@ self.addEventListener('fetch', (event) => {
             return cachedResponse;
           });
 
-          // Return cached image immediately if available; revalidate in background
-          return cachedResponse || fetchPromise;
+          if (cachedResponse) {
+            event.waitUntil(fetchPromise);
+            return cachedResponse;
+          }
+          return fetchPromise;
         });
       })
     );
@@ -109,8 +245,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // 2b. Bypass all cross-origin requests (Jellyfin API, iTunes discovery directory, RSS feeds, remote artwork).
-  //     These are dynamic API calls that differ by query string; caching them breaks them (e.g. ignoreSearch
-  //     matches every iTunes search to the same cached response).
+  //     These are dynamic API calls that differ by query string; caching them breaks them.
   if (new URL(url).origin !== self.location.origin) {
     return;
   }
@@ -120,13 +255,14 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
       if (cachedResponse) {
         // Return cached immediately; update cache in background
-        fetch(event.request)
+        const updatePromise = fetch(event.request)
           .then((networkResponse) => {
             if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque')) {
-              caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse).catch(() => {}));
+              return caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse).catch(() => {}));
             }
           })
           .catch(() => {/* Ignore network errors during background update */});
+        event.waitUntil(updatePromise);
         return cachedResponse;
       }
 
@@ -142,7 +278,11 @@ self.addEventListener('fetch', (event) => {
         // Offline HTML navigation fallback
         const acceptHeader = event.request.headers.get('accept') || '';
         if (acceptHeader.includes('text/html') || event.request.mode === 'navigate') {
-          return (await caches.match('./index.html'));
+          const directMatch = await caches.match(event.request, { ignoreSearch: true });
+          if (directMatch) return directMatch;
+          const downloadsMatch = await caches.match('./downloads.html');
+          if (downloadsMatch) return downloadsMatch;
+          return (await caches.match('./index.html')) || (await caches.match('index.html')) || (await caches.match('./'));
         }
       });
     })

@@ -1,18 +1,128 @@
 {
+  "id": "/",
   "name": "Melo",
   "short_name": "Melo",
-  "version": "0.7.0",
+  "version": "1.0.0",
   "description": "Melo - A Music Player powered by Jellyfin",
   "start_url": "./index.html",
+  "scope": "./",
+  "dir": "auto",
+  "lang": "en",
   "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
   "background_color": "#0e1117",
   "theme_color": "#0e1117",
+  "categories": [
+    "music",
+    "entertainment",
+    "audio"
+  ],
+  "prefer_related_applications": false,
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
+  },
+  "scope_extensions": [
+    {
+      "type": "origin",
+      "origin": "https://melo.francofantomius.com"
+    }
+  ],
+  "url_handlers": [
+    {
+      "origin": "https://melo.francofantomius.com"
+    }
+  ],
   "icons": [
     {
       "src": "./img/icons/icon.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "./img/icons/icon_192x.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./img/icons/icon_512x.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Search",
+      "short_name": "Search",
+      "description": "Search artists, albums, tracks, and podcasts",
+      "url": "./search.html",
+      "icons": [
+        {
+          "src": "./img/search.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "short_name": "Favorites",
+      "description": "View your favorite songs, albums, and artists",
+      "url": "./index.html#favorites",
+      "icons": [
+        {
+          "src": "./img/favorite.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Downloaded Music",
+      "short_name": "Downloads",
+      "description": "Listen to your downloaded music offline",
+      "url": "./downloads.html",
+      "icons": [
+        {
+          "src": "./img/download.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Podcasts",
+      "short_name": "Podcasts",
+      "description": "Browse and listen to your podcast subscriptions",
+      "url": "./podcasts.html",
+      "icons": [
+        {
+          "src": "./img/podcast.png",
+          "sizes": "512x512",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "./podcasts.html",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

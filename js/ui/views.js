@@ -1,5 +1,4 @@
 import { getSession } from '../jellyfin/session.js';
-import { renderLoginView } from './views/login.js';
 import { renderHomeView } from './views/home.js';
 import { renderAlbumsView, renderAlbumDetailView, openAlbum } from './views/albums.js';
 import { renderArtistsView, renderArtistDetailView, openArtist } from './views/artists.js';
@@ -37,7 +36,7 @@ export function handleUrlRouting() {
   const artistParam = urlParams.get('artist') || urlParams.get('artistId');
   const podcastParam = urlParams.get('podcast') || urlParams.get('show');
 
-  const searchInput = document.getElementById('global-search-input');
+  const searchInput = document.getElementById('global-search-bar') || document.getElementById('global-search-input');
   if (searchQuery !== null && searchInput) {
     searchInput.value = searchQuery;
   }
@@ -59,20 +58,37 @@ export function handleUrlRouting() {
 }
 
 export function initViews() {
-  const navItems = document.querySelectorAll('[data-view]');
-  navItems.forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.preventDefault();
-      const targetView = item.getAttribute('data-view');
-      const href = item.getAttribute('href') || (targetView === 'home' ? 'index.html' : `${targetView}.html`);
-      if (targetView) {
-        const cleanHref = href.replace('./', '');
-        if (window.location.search !== '' || !window.location.pathname.endsWith(cleanHref)) {
-          window.history.pushState({ view: targetView }, '', href);
-        }
-        switchView(targetView);
+  const handleNavClick = (e, item) => {
+    e.preventDefault();
+    const targetView = item.getAttribute('data-view') || item.value;
+    const href = item.getAttribute('href') || (targetView === 'home' ? 'index.html' : `${targetView}.html`);
+    if (targetView) {
+      const cleanHref = href.replace('./', '');
+      if (window.location.search !== '' || !window.location.pathname.endsWith(cleanHref)) {
+        window.history.pushState({ view: targetView }, '', href);
       }
-    });
+      switchView(targetView);
+    }
+  };
+
+  const navItems = document.querySelectorAll('md-navigation-drawer-item, md-navigation-rail-item, md-navigation-bar-item, [data-view]');
+  navItems.forEach(item => {
+    item.addEventListener('click', (e) => handleNavClick(e, item));
+    item.addEventListener('item-click', (e) => handleNavClick(e, item));
+  });
+
+  const rail = document.getElementById('main-sidebar-rail');
+  rail?.addEventListener('change', (e) => {
+    if (e.detail?.item) {
+      handleNavClick(e, e.detail.item);
+    }
+  });
+
+  const bottomNav = document.getElementById('mobile-bottom-nav');
+  bottomNav?.addEventListener('change', (e) => {
+    if (e.detail?.item) {
+      handleNavClick(e, e.detail.item);
+    }
   });
 
   window.addEventListener('popstate', () => {
@@ -86,35 +102,89 @@ export function initViews() {
 export function switchView(viewName, viewData = null) {
   const session = getSession();
 
-  // If user is not logged in, redirect to login page view
-  if (!session.isLoggedIn && viewName !== 'login') {
-    viewName = 'login';
+  // If user is not logged in, redirect to login page
+  if (!session.isLoggedIn) {
+    window.location.href = './login.html';
+    return;
   }
 
   currentView = viewName;
   document.body.setAttribute('data-page', viewName);
 
-  // Update nav highlight for desktop sidebar & mobile bottom bar
-  document.querySelectorAll('.nav-item, .mobile-nav-item').forEach(item => {
-    const navView = item.getAttribute('data-view') || item.querySelector('a')?.getAttribute('data-view');
-    if (navView === viewName ||
-        (viewName === 'album-detail' && navView === 'albums') ||
-        (viewName === 'playlist-detail' && navView === 'playlists') ||
-        (viewName === 'artist-detail' && navView === 'artists') ||
-        (viewName === 'podcast-detail' && navView === 'podcasts')) {
+  // Update nav highlight for desktop sidebar drawer, retracted railbar & mobile bottom bar
+  const allNavItems = document.querySelectorAll('md-navigation-drawer-item, md-navigation-rail-item, md-navigation-bar-item, .nav-item, .mobile-nav-item');
+  allNavItems.forEach(item => {
+    const navView = item.getAttribute('data-view') || item.value || item.querySelector('a')?.getAttribute('data-view');
+    const isActive = (
+      navView === viewName ||
+      (viewName === 'album-detail' && navView === 'albums') ||
+      (viewName === 'playlist-detail' && navView === 'playlists') ||
+      (viewName === 'artist-detail' && navView === 'artists') ||
+      (viewName === 'podcast-detail' && navView === 'podcasts')
+    );
+
+    if (isActive) {
+      item.active = true;
+      item.selected = true;
+      item.setAttribute('active', '');
+      item.setAttribute('selected', '');
       item.classList.add('active');
+
+      // Fill the selected/active icon in light DOM and shadow DOM
+      const lightIcon = item.querySelector('md-icon');
+      if (lightIcon) {
+        lightIcon.filled = true;
+        lightIcon.setAttribute('filled', '');
+      }
+      const shadowIcon = item.shadowRoot?.querySelector('md-icon');
+      if (shadowIcon) {
+        shadowIcon.filled = true;
+        shadowIcon.setAttribute('filled', '');
+      }
     } else {
+      item.active = false;
+      item.selected = false;
+      item.removeAttribute('active');
+      item.removeAttribute('selected');
       item.classList.remove('active');
+
+      // Unfill inactive icon in light DOM and shadow DOM
+      const lightIcon = item.querySelector('md-icon');
+      if (lightIcon) {
+        lightIcon.filled = false;
+        lightIcon.removeAttribute('filled');
+      }
+      const shadowIcon = item.shadowRoot?.querySelector('md-icon');
+      if (shadowIcon) {
+        shadowIcon.filled = false;
+        shadowIcon.removeAttribute('filled');
+      }
     }
   });
+
+  // Synchronize active index for Navigation Rail and Navigation Bar
+  const rail = document.getElementById('main-sidebar-rail');
+  if (rail) {
+    const railItems = Array.from(rail.querySelectorAll('md-navigation-rail-item, md-nav-rail-item'));
+    const activeRailIndex = railItems.findIndex(i => i.active);
+    if (activeRailIndex !== -1) {
+      rail.activeIndex = activeRailIndex;
+    }
+  }
+
+  const bottomNav = document.getElementById('mobile-bottom-nav');
+  if (bottomNav && bottomNav.tagName.toLowerCase() === 'md-navigation-bar') {
+    const barItems = Array.from(bottomNav.querySelectorAll('md-navigation-bar-item, md-nav-bar-item'));
+    const activeBarIndex = barItems.findIndex(i => i.active);
+    if (activeBarIndex !== -1) {
+      bottomNav.activeIndex = activeBarIndex;
+    }
+  }
 
   const contentArea = document.getElementById('view-container');
   if (!contentArea) return;
 
   switch (viewName) {
-    case 'login':
-      renderLoginView(contentArea);
-      break;
     case 'home':
       renderHomeView(contentArea);
       break;
@@ -162,5 +232,4 @@ export { openArtist, renderArtistsView, renderArtistDetailView } from './views/a
 export { openPlaylist, renderPlaylistsView, renderPlaylistDetailView } from './views/playlists.js';
 export { renderSearchView } from './views/search.js';
 export { renderHomeView } from './views/home.js';
-export { renderLoginView } from './views/login.js';
 

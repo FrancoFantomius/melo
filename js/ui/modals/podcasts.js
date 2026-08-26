@@ -7,14 +7,17 @@ export function initAddPodcastModal() {
   });
 }
 
-export function openAddPodcastModal() {
+export function openAddPodcastModal(prefillUrl = '') {
   const modal = document.getElementById('add-podcast-modal');
   if (!modal) return;
   const input = document.getElementById('podcast-rss-url');
   const errEl = document.getElementById('podcast-add-error');
-  if (input) input.value = '';
+  if (input) input.value = prefillUrl || '';
   if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
   modal.style.display = 'flex';
+  if (prefillUrl && input) {
+    input.focus();
+  }
 }
 
 export function closeAddPodcastModal() {

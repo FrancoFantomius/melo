@@ -1,9 +1,14 @@
-// Shared state for the playback engine. Kept in a tiny module so the feature
-// modules (stream, persistence, media-session, background) can reference the
-// single <audio> element and live flags without introducing import cycles.
-export const audio = new Audio();
+// Shared state for the playback engine. Dual <audio> elements (audioA and audioB)
+// allow seamless track transitions and background prebuffering so that the browser
+// does not revoke background playback exemptions.
+export const audioA = new Audio();
+export const audioB = new Audio();
 
 export const state = {
+  activeAudio: audioA,
+  standbyAudio: audioB,
+  preloadedTrackId: null,
+  preloadedStreamUrl: null,
   isPlaying: false,
   // Server-side seek offset: when we request a stream starting at e.g. 160s,
   // audio.currentTime starts at 0 but the real position is seekOffset + audio.currentTime.
@@ -20,3 +25,27 @@ export const state = {
   podcastProxyBlobUrl: null,
   onStateChangeCallback: null
 };
+
+export function getActiveAudio() {
+  return state.activeAudio;
+}
+
+export function getStandbyAudio() {
+  return state.standbyAudio;
+}
+
+// Transparent proxy to always target the currently active <audio> element.
+export const audio = new Proxy({}, {
+  get(_target, prop) {
+    const active = state.activeAudio;
+    const value = active[prop];
+    if (typeof value === 'function') {
+      return value.bind(active);
+    }
+    return value;
+  },
+  set(_target, prop, value) {
+    state.activeAudio[prop] = value;
+    return true;
+  }
+});

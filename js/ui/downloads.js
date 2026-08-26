@@ -1,4 +1,5 @@
 import { downloadTrack, isTrackDownloaded } from '../jellyfin/offline.js';
+import { getTranslation } from '../i18n.js';
 
 const ICONS = {
   idle: 'download',
@@ -12,7 +13,29 @@ export function setDownloadButtonState(button, state, title = '') {
   if (icon) icon.textContent = ICONS[state] || ICONS.idle;
   button.classList.toggle('downloading', state === 'downloading');
   button.classList.toggle('downloaded', state === 'downloaded');
-  if (title) button.title = title;
+  if (title) {
+    const translated = getTranslation(title);
+    button.setAttribute('aria-label', translated);
+    if (button.id) {
+      const tooltip = document.querySelector(`md-tooltip[for="${button.id}"]`);
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = title;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        button.title = translated;
+      }
+    } else {
+      const tooltip = button.nextElementSibling && button.nextElementSibling.tagName === 'MD-TOOLTIP' ? button.nextElementSibling : null;
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = title;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        button.title = translated;
+      }
+    }
+  }
 }
 
 export function setDownloadButtonProgress(button, progress) {
@@ -20,7 +43,28 @@ export function setDownloadButtonProgress(button, progress) {
   const pct = Math.max(0, Math.min(100, Math.round(progress * 100)));
   button.style.setProperty('--download-progress', `${pct}%`);
   if (button.classList.contains('downloading')) {
-    button.title = pct >= 100 ? 'Downloading...' : `${pct}%`;
+    const titleKey = pct >= 100 ? 'Downloading...' : `${pct}%`;
+    const translated = pct >= 100 ? getTranslation('Downloading...') : `${pct}%`;
+    button.setAttribute('aria-label', translated);
+    if (button.id) {
+      const tooltip = document.querySelector(`md-tooltip[for="${button.id}"]`);
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = titleKey;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        button.title = translated;
+      }
+    } else {
+      const tooltip = button.nextElementSibling && button.nextElementSibling.tagName === 'MD-TOOLTIP' ? button.nextElementSibling : null;
+      if (tooltip) {
+        tooltip.dataset.i18nValueEn = titleKey;
+        tooltip.value = translated;
+        tooltip.setAttribute('value', translated);
+      } else {
+        button.title = translated;
+      }
+    }
   }
 }
 
