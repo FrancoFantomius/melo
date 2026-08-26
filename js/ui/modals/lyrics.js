@@ -2,6 +2,7 @@ import { getArtworkUrl, getLyrics } from '../../jellyfin/client.js';
 import { getCurrentTrack } from '../../player/queue.js';
 import { seekTo } from '../../player/audio.js';
 import { escapeHtml } from './shared.js';
+import { requestScreenWakeLock, releaseScreenWakeLock } from '../../pwa/wake-lock.js';
 
 let currentLyricsTrackId = null;
 let currentLyricsLines = [];
@@ -36,6 +37,9 @@ export async function openLyricsModalInternal(track = null) {
   btnLyrics?.classList.add('active');
   empBtnLyrics?.classList.add('active');
   lyricsView.style.display = 'flex';
+
+  // Request screen wake lock to keep screen on while lyrics view is active
+  requestScreenWakeLock().catch(() => {});
 
   if (bgArtEl) {
     bgArtEl.src = getArtworkUrl(currentTrack, 'Primary', 600);
@@ -113,6 +117,7 @@ export function closeLyricsModalInternal() {
   if (lyricsView) lyricsView.style.display = 'none';
   document.getElementById('player-btn-lyrics')?.classList.remove('active');
   document.getElementById('emp-btn-lyrics')?.classList.remove('active');
+  releaseScreenWakeLock().catch(() => {});
 }
 
 export function toggleLyricsModal(track = null) {

@@ -17,6 +17,10 @@ const ASSETS_TO_CACHE = [
   './img/icons/icon.svg',
   './img/icons/icon_192x.png',
   './img/icons/icon_512x.png',
+  './img/search.png',
+  './img/favorite.png',
+  './img/download.png',
+  './img/podcast.png',
   './img/album.svg',
   './img/album_dark.svg',
   './img/album-1.svg',
@@ -188,6 +192,10 @@ self.addEventListener('fetch', (event) => {
         // Offline HTML navigation fallback
         const acceptHeader = event.request.headers.get('accept') || '';
         if (acceptHeader.includes('text/html') || event.request.mode === 'navigate') {
+          const directMatch = await caches.match(event.request, { ignoreSearch: true });
+          if (directMatch) return directMatch;
+          const downloadsMatch = await caches.match('./downloads.html');
+          if (downloadsMatch) return downloadsMatch;
           return (await caches.match('./index.html')) || (await caches.match('index.html')) || (await caches.match('./'));
         }
       });

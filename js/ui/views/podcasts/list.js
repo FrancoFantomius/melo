@@ -63,8 +63,39 @@ export function bindAddPodcastForm() {
   });
 }
 
+function checkAndHandleWebShareTarget() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const sharedUrl = params.get('url') || '';
+    const sharedText = params.get('text') || '';
+
+    let candidate = '';
+    const urlRegex = /(https?:\/\/[^\s]+)/i;
+    if (sharedUrl && urlRegex.test(sharedUrl)) {
+      candidate = sharedUrl.match(urlRegex)[0];
+    } else if (sharedText && urlRegex.test(sharedText)) {
+      candidate = sharedText.match(urlRegex)[0];
+    } else if (sharedUrl) {
+      candidate = sharedUrl;
+    } else if (sharedText && sharedText.startsWith('http')) {
+      candidate = sharedText;
+    }
+
+    if (candidate) {
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+      setTimeout(() => {
+        openAddPodcastModal(candidate);
+      }, 150);
+    }
+  } catch (err) {
+    console.warn('[PWA Share Target] Error checking params:', err);
+  }
+}
+
 export async function renderPodcastsView(container, viewData = 'all') {
   bindAddPodcastForm();
+  checkAndHandleWebShareTarget();
   let activeCategory = typeof viewData === 'string' ? viewData : (viewData?.tab || 'all');
   if (activeCategory === 'in-progress') activeCategory = 'continue';
 

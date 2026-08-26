@@ -1,3 +1,14 @@
+import { requestPersistentStorage, isStoragePersisted, getStorageEstimate } from './pwa/storage.js';
+import { requestScreenWakeLock, releaseScreenWakeLock } from './pwa/wake-lock.js';
+
+export {
+  requestPersistentStorage,
+  isStoragePersisted,
+  getStorageEstimate,
+  requestScreenWakeLock,
+  releaseScreenWakeLock
+};
+
 export function initPWA() {
   if ('serviceWorker' in navigator) {
     if (import.meta.env.DEV) {
@@ -16,6 +27,9 @@ export function initPWA() {
       }
       return;
     }
+
+    // Request storage persistence to protect offline downloads and caches in production
+    requestPersistentStorage().catch(() => {});
 
     let refreshing = false;
 
