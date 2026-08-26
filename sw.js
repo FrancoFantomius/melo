@@ -15,6 +15,8 @@ const ASSETS_TO_CACHE = [
   './privacy.html',
   './manifest.json',
   './img/icons/icon.svg',
+  './img/icons/icon_192x.png',
+  './img/icons/icon_512x.png',
   './img/album.svg',
   './img/album_dark.svg',
   './img/album-1.svg',
