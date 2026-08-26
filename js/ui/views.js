@@ -1,5 +1,4 @@
 import { getSession } from '../jellyfin/session.js';
-import { renderLoginView } from './views/login.js';
 import { renderHomeView } from './views/home.js';
 import { renderAlbumsView, renderAlbumDetailView, openAlbum } from './views/albums.js';
 import { renderArtistsView, renderArtistDetailView, openArtist } from './views/artists.js';
@@ -103,9 +102,10 @@ export function initViews() {
 export function switchView(viewName, viewData = null) {
   const session = getSession();
 
-  // If user is not logged in, redirect to login page view
-  if (!session.isLoggedIn && viewName !== 'login') {
-    viewName = 'login';
+  // If user is not logged in, redirect to login page
+  if (!session.isLoggedIn) {
+    window.location.href = './login.html';
+    return;
   }
 
   currentView = viewName;
@@ -185,9 +185,6 @@ export function switchView(viewName, viewData = null) {
   if (!contentArea) return;
 
   switch (viewName) {
-    case 'login':
-      renderLoginView(contentArea);
-      break;
     case 'home':
       renderHomeView(contentArea);
       break;
@@ -235,5 +232,4 @@ export { openArtist, renderArtistsView, renderArtistDetailView } from './views/a
 export { openPlaylist, renderPlaylistsView, renderPlaylistDetailView } from './views/playlists.js';
 export { renderSearchView } from './views/search.js';
 export { renderHomeView } from './views/home.js';
-export { renderLoginView } from './views/login.js';
 
