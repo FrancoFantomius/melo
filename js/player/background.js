@@ -4,6 +4,41 @@ import { setupMediaSessionMetadata } from './media-session.js';
 import { savePlayerState } from './persistence.js';
 import { audio, state } from './state.js';
 
+// Minimal 44-byte silent WAV data URI to keep the mobile OS audio session open
+// during network buffering and track transitions without audible sound.
+const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+let keepaliveAudio = null;
+
+function getKeepaliveAudio() {
+  if (!keepaliveAudio) {
+    keepaliveAudio = new Audio(SILENT_WAV);
+    keepaliveAudio.loop = true;
+    keepaliveAudio.volume = 0.0001;
+  }
+  return keepaliveAudio;
+}
+
+export function startKeepaliveAnchor() {
+  try {
+    const el = getKeepaliveAudio();
+    if (el && el.paused) {
+      el.play().catch(() => {});
+    }
+  } catch (e) {
+    // Ignored in restricted environments
+  }
+}
+
+export function stopKeepaliveAnchor() {
+  try {
+    if (keepaliveAudio && !keepaliveAudio.paused) {
+      keepaliveAudio.pause();
+    }
+  } catch (e) {
+    // Ignored
+  }
+}
+
 /* If the browser rejected play() while the screen was off or backgrounded,
    retry as soon as the app returns to the foreground. */
 export function armAutoAdvanceRetry(notifyUI) {
@@ -13,10 +48,11 @@ export function armAutoAdvanceRetry(notifyUI) {
   const retryPlay = () => {
     state.pendingAutoRetry = false;
     const track = getCurrentTrack();
-    if (!track || !audio.paused || !audio.src) return;
+    if (!track || !audio.paused) return;
 
     audio.play().then(() => {
       state.isPlaying = true;
+      startKeepaliveAnchor();
       if (track.Id) reportPlaybackStart(track.Id, Math.floor((state.seekOffset + Math.max(0, audio.currentTime)) * 10000000));
       setupMediaSessionMetadata(track);
       savePlayerState();
@@ -45,9 +81,10 @@ export function initBackgroundKeepalive(notifyUI) {
 
     if (state.pausedWhileHidden) {
       state.pausedWhileHidden = false;
-      if (audio.src && getCurrentTrack()) {
+      if (getCurrentTrack()) {
         audio.play().then(() => {
           state.isPlaying = true;
+          startKeepaliveAnchor();
           if (notifyUI) notifyUI();
         }).catch((err) => {
           console.warn('[Audio Engine] Resume playback interrupted:', err);

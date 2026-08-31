@@ -68,3 +68,28 @@ export function getAudioStreamUrl(itemId, options = {}) {
   url.searchParams.append('EnableRemoteMedia', 'false');
   return url.toString();
 }
+
+export function getAudioHlsStreamUrl(itemId, options = {}) {
+  const session = getSession();
+  if (!session.serverUrl || !itemId) return '';
+
+  const { maxStreamingBitrate, startTimeTicks = 0 } = options;
+
+  const url = new URL(`${session.serverUrl}/Audio/${itemId}/master.m3u8`);
+  url.searchParams.append('api_key', session.accessToken);
+  url.searchParams.append('UserId', session.userId);
+  url.searchParams.append('DeviceId', session.deviceId);
+  url.searchParams.append('MediaSourceId', itemId);
+  url.searchParams.append('AudioCodec', 'aac,mp3');
+  url.searchParams.append('TranscodingContainer', 'ts');
+  url.searchParams.append('TranscodingProtocol', 'hls');
+  url.searchParams.append('SegmentLength', '3');
+  url.searchParams.append('MinSegments', '2');
+  if (maxStreamingBitrate && maxStreamingBitrate !== 'Direct') {
+    url.searchParams.append('MaxStreamingBitrate', maxStreamingBitrate);
+  }
+  if (startTimeTicks > 0) {
+    url.searchParams.append('StartTimeTicks', startTimeTicks);
+  }
+  return url.toString();
+}

@@ -1,15 +1,16 @@
-// Shared state for the playback engine. Dual <audio> elements (audioA and audioB)
-// allow seamless track transitions and background prebuffering so that the browser
-// does not revoke background playback exemptions.
-export const audioA = new Audio();
-export const audioB = new Audio();
+// Unified persistent audio engine state. A single persistent <audio> element
+// is maintained across the entire session to prevent mobile browsers (iOS/Android)
+// from revoking background playback permissions during track transitions.
+export const audio = new Audio();
+audio.preload = 'auto';
 
 export const state = {
-  activeAudio: audioA,
-  standbyAudio: audioB,
+  activeAudio: audio,
+  isPlaying: false,
+  isHls: false,
+  streamType: 'direct', // 'hls' | 'direct' | 'blob'
   preloadedTrackId: null,
   preloadedStreamUrl: null,
-  isPlaying: false,
   // Server-side seek offset: when we request a stream starting at e.g. 160s,
   // audio.currentTime starts at 0 but the real position is seekOffset + audio.currentTime.
   seekOffset: 0,
@@ -27,25 +28,9 @@ export const state = {
 };
 
 export function getActiveAudio() {
-  return state.activeAudio;
+  return audio;
 }
 
 export function getStandbyAudio() {
-  return state.standbyAudio;
+  return null;
 }
-
-// Transparent proxy to always target the currently active <audio> element.
-export const audio = new Proxy({}, {
-  get(_target, prop) {
-    const active = state.activeAudio;
-    const value = active[prop];
-    if (typeof value === 'function') {
-      return value.bind(active);
-    }
-    return value;
-  },
-  set(_target, prop, value) {
-    state.activeAudio[prop] = value;
-    return true;
-  }
-});
