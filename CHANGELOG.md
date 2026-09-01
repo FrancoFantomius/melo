@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1] - 2026-09-01
+
+### Added
+- **HLS Audio Streaming**: integrated `hls.js` for adaptive bitrate audio streaming with Jellyfin HLS endpoints (`master.m3u8`), automatic error recovery, and direct stream fallback.
+
+### Changed
+- **Audio Engine & Playback Stability**: unified persistent single `<audio>` element across the session to prevent mobile browsers from revoking background playback exemptions during track transitions.
+- **Podcast Episodes & Queue Handling**: fixed podcast episode selection and improved queue operations for podcast feeds.
+- **Theme & Header Styling**: enhanced theme switching with dynamic `<meta name="theme-color">` synchronization, dark/light root document classes, and inline initialization to prevent theme flickering on page load.
+- Version bumped to `1.0.1`.
+
 ## [1.0.0] - 2026-08-26
 
 ### Added

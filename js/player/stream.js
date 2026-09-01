@@ -1,5 +1,5 @@
 import { getSession } from '../jellyfin/session.js';
-import { getAudioStreamUrl } from '../jellyfin/client.js';
+import { getAudioStreamUrl, getAudioHlsStreamUrl } from '../jellyfin/client.js';
 import { isTrackDownloadedSync, getDownloadedBlobUrlSync } from '../jellyfin/offline.js';
 import { cleanAudioUrl } from '../podcasts/rss.js';
 import { state } from './state.js';
@@ -18,6 +18,23 @@ export function resolveCurrentBitrate() {
   const selected = isMobile ? session.qualityMobile : session.qualityWifi;
   state.currentBitrateMode = session.forceTranscode && selected === 'Direct' ? '320000' : selected;
   return state.currentBitrateMode;
+}
+
+export function isHlsEligible(track) {
+  if (!track || !track.Id) return false;
+  if (track.isPodcastEpisode || track.enclosureUrl) return false;
+  const key = track.Id || track.id;
+  if (key && isTrackDownloadedSync(key)) return false;
+  return true;
+}
+
+export function resolveHlsStreamUrl(track, startTimeTicks = 0) {
+  if (!isHlsEligible(track)) return '';
+  const bitrate = resolveCurrentBitrate();
+  return getAudioHlsStreamUrl(track.Id, {
+    maxStreamingBitrate: bitrate,
+    startTimeTicks
+  });
 }
 
 export function resolveStreamUrl(track, startTimeTicks = 0) {

@@ -21,7 +21,7 @@ export {
   removeTrackFromPlaylist
 } from './playlists.js';
 export { reportPlaybackStart, reportPlaybackProgress, reportPlaybackStopped } from './playback.js';
-export { getArtworkUrl, getAudioStreamUrl } from './media.js';
+export { getArtworkUrl, getAudioStreamUrl, getAudioHlsStreamUrl } from './media.js';
 export { getLyrics } from './lyrics.js';
 export { getPodcastFeedUrls, savePodcastFeedUrl, removePodcastFeedUrl } from './podcasts.js';
 export {

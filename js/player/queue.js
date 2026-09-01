@@ -4,6 +4,23 @@ let currentIndex = -1;
 let shuffle = false;
 let repeat = 'none'; // 'none' | 'all' | 'one'
 
+function getTrackId(track) {
+  if (!track) return null;
+  if (track.Id !== undefined && track.Id !== null) return track.Id;
+  if (track.id !== undefined && track.id !== null) return track.id;
+  return null;
+}
+
+function isSameTrack(t1, t2) {
+  if (!t1 || !t2) return false;
+  const id1 = getTrackId(t1);
+  const id2 = getTrackId(t2);
+  if (id1 !== null && id2 !== null) {
+    return String(id1) === String(id2);
+  }
+  return t1 === t2;
+}
+
 export function restoreQueueState(savedState) {
   if (!savedState) return;
   if (Array.isArray(savedState.queue)) queue = savedState.queue;
@@ -19,7 +36,7 @@ export function setQueue(tracks, startIndex = 0) {
     queue = shuffleArray([...tracks]);
     // Find selected track in shuffled queue and place it first
     const selected = tracks[startIndex];
-    const newIdx = queue.findIndex(t => t.Id === selected?.Id);
+    const newIdx = queue.findIndex(t => isSameTrack(t, selected));
     if (newIdx > -1) {
       const temp = queue[0];
       queue[0] = queue[newIdx];
@@ -49,7 +66,11 @@ export function setCurrentIndex(index) {
 
 export function setCurrentTrack(track) {
   if (!track) return null;
-  const idx = queue.findIndex(t => t.Id === track.Id);
+  const current = getCurrentTrack();
+  if (current && isSameTrack(current, track)) {
+    return current;
+  }
+  const idx = queue.findIndex(t => isSameTrack(t, track));
   if (idx > -1) {
     currentIndex = idx;
     return queue[currentIndex];
@@ -109,7 +130,7 @@ export function toggleShuffle() {
   if (shuffle) {
     queue = shuffleArray([...originalQueue]);
     if (currentTrack) {
-      const idx = queue.findIndex(t => t.Id === currentTrack.Id);
+      const idx = queue.findIndex(t => isSameTrack(t, currentTrack));
       if (idx > -1) {
         queue.splice(idx, 1);
         queue.unshift(currentTrack);
@@ -119,7 +140,10 @@ export function toggleShuffle() {
   } else {
     queue = [...originalQueue];
     if (currentTrack) {
-      currentIndex = queue.findIndex(t => t.Id === currentTrack.Id);
+      const idx = queue.findIndex(t => isSameTrack(t, currentTrack));
+      if (idx > -1) {
+        currentIndex = idx;
+      }
     }
   }
   return shuffle;
@@ -147,7 +171,7 @@ export function removeFromQueue(index) {
   if (typeof index !== 'number' || index < 0 || index >= queue.length) return false;
   const removedTrack = queue[index];
   queue.splice(index, 1);
-  const origIdx = originalQueue.indexOf(removedTrack);
+  const origIdx = originalQueue.findIndex(t => isSameTrack(t, removedTrack));
   if (origIdx > -1) originalQueue.splice(origIdx, 1);
 
   if (index < currentIndex) {
