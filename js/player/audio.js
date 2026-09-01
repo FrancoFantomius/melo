@@ -32,11 +32,16 @@ import {
 } from './hls-engine.js';
 
 let preloadedUrlKey = null;
+let preloadAbortController = null;
 
 export function preloadNextTrack() {
   const next = peekNextTrack(true);
   if (!next) {
     preloadedUrlKey = null;
+    if (preloadAbortController) {
+      preloadAbortController.abort();
+      preloadAbortController = null;
+    }
     return;
   }
 
@@ -44,12 +49,18 @@ export function preloadNextTrack() {
   if (preloadedUrlKey === nextId) return;
   preloadedUrlKey = nextId;
 
+  if (preloadAbortController) {
+    preloadAbortController.abort();
+  }
+  preloadAbortController = new AbortController();
+  const signal = preloadAbortController.signal;
+
   // Warm up connection/transcoding cache for the upcoming track
   try {
     if (isHlsEligible(next) && (isHlsSupported() || isNativeHlsSupported(audio))) {
       const hlsUrl = resolveHlsStreamUrl(next, 0);
       if (hlsUrl) {
-        fetch(hlsUrl, { method: 'GET', mode: 'cors' }).catch(() => {});
+        fetch(hlsUrl, { method: 'GET', mode: 'cors', signal }).catch(() => {});
       }
     } else {
       const streamUrl = resolveStreamUrl(next, 0);
@@ -57,7 +68,8 @@ export function preloadNextTrack() {
         fetch(streamUrl, {
           method: 'GET',
           headers: { Range: 'bytes=0-32768' },
-          mode: 'cors'
+          mode: 'cors',
+          signal
         }).catch(() => {});
       }
     }
@@ -88,7 +100,9 @@ function playDirectStream(track, startPositionSec = 0) {
 }
 
 function executeAudioPlay(track, startPositionSec = 0) {
-  startKeepaliveAnchor();
+  setupMediaSessionMetadata(track);
+  preloadNextTrack();
+  notifyUI();
 
   const playPromise = audio.play();
   if (playPromise !== undefined) {
@@ -97,23 +111,20 @@ function executeAudioPlay(track, startPositionSec = 0) {
       if (track && track.Id) {
         reportPlaybackStart(track.Id, Math.floor(startPositionSec * 10000000));
       }
-      setupMediaSessionMetadata(track);
       savePlayerState();
-      preloadNextTrack();
-      notifyUI();
+      updateMediaSessionState();
     }).catch((err) => {
       console.warn('[Audio Engine] Autoplay interrupted:', err);
       savePlayerState();
       armAutoAdvanceRetry(notifyUI);
     });
   }
-
-  setupMediaSessionMetadata(track);
-  preloadNextTrack();
-  notifyUI();
 }
 
 export function playTrack(trackOverride = null) {
+  // Always start keepalive immediately to bridge any latency during stream transition
+  startKeepaliveAnchor();
+
   if (trackOverride) {
     setCurrentTrack(trackOverride);
   }
@@ -229,7 +240,7 @@ export async function seekTo(seconds) {
     seconds = Math.max(0, totalDuration - 0.5);
   }
 
-  // If playing via HLS, Hls.js allows seeking across the timeline directly
+  // If playing via HLS, Hls.js manages seeking across timeline directly
   if (state.isHls) {
     audio.currentTime = seconds;
     if (track.Id) reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
@@ -341,6 +352,7 @@ function attachAudioListeners(audioEl) {
 
   audioEl.addEventListener('error', (e) => {
     console.error('[Audio Engine] Playback error:', e);
+    destroyHls();
     state.isPlaying = false;
     notifyUI();
 

@@ -3,9 +3,12 @@ import { reportPlaybackStart } from '../jellyfin/client.js';
 import { setupMediaSessionMetadata } from './media-session.js';
 import { savePlayerState } from './persistence.js';
 import { audio, state } from './state.js';
+import { resumeOnVisible } from './hls-engine.js';
 
 // Minimal 44-byte silent WAV data URI to keep the mobile OS audio session open
 // during network buffering and track transitions without audible sound.
+// Volume is set to 0.0001 (inaudible compromise): setting volume to 0 (muted) often triggers
+// browser background power-management suspensions, while > 0 keeps the OS audio pipeline open.
 const SILENT_WAV = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
 let keepaliveAudio = null;
 
@@ -14,6 +17,10 @@ function getKeepaliveAudio() {
     keepaliveAudio = new Audio(SILENT_WAV);
     keepaliveAudio.loop = true;
     keepaliveAudio.volume = 0.0001;
+    // Prevent keepalive audio from requesting media controls / remote routes
+    if ('disableRemotePlayback' in keepaliveAudio) {
+      keepaliveAudio.disableRemotePlayback = true;
+    }
   }
   return keepaliveAudio;
 }
@@ -31,6 +38,8 @@ export function startKeepaliveAnchor() {
 
 export function stopKeepaliveAnchor() {
   try {
+    // Do not stop keepalive if the screen/app is currently hidden to prevent OS suspension
+    if (document.visibilityState === 'hidden') return;
     if (keepaliveAudio && !keepaliveAudio.paused) {
       keepaliveAudio.pause();
     }
@@ -74,10 +83,13 @@ export function armAutoAdvanceRetry(notifyUI) {
   }
 }
 
-/* On unlock or tab refocus, resume playback if it was paused while hidden. */
+/* On unlock or tab refocus, resume playback and HLS loading if needed. */
 export function initBackgroundKeepalive(notifyUI) {
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
+
+    // Resume HLS segment loading if it stalled while the tab was hidden
+    resumeOnVisible();
 
     if (state.pausedWhileHidden) {
       state.pausedWhileHidden = false;

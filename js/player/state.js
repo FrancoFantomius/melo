@@ -9,9 +9,7 @@ export const state = {
   isPlaying: false,
   isHls: false,
   streamType: 'direct', // 'hls' | 'direct' | 'blob'
-  preloadedTrackId: null,
-  preloadedStreamUrl: null,
-  // Server-side seek offset: when we request a stream starting at e.g. 160s,
+  // Server-side seek offset: when we request a direct stream starting at e.g. 160s,
   // audio.currentTime starts at 0 but the real position is seekOffset + audio.currentTime.
   seekOffset: 0,
   currentBitrateMode: 'Direct',

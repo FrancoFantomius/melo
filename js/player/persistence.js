@@ -1,6 +1,7 @@
 import { getCurrentTrack, getQueueState, restoreQueueState } from './queue.js';
 import { isTrackDownloaded, getDownloadedBlobUrl } from '../jellyfin/offline.js';
-import { resolveStreamUrl } from './stream.js';
+import { resolveStreamUrl, resolveHlsStreamUrl, isHlsEligible } from './stream.js';
+import { loadHlsStream, isHlsSupported, isNativeHlsSupported } from './hls-engine.js';
 import { audio, state } from './state.js';
 
 const PLAYER_STATE_KEY = 'melo_player_state';
@@ -66,6 +67,8 @@ export async function restorePlayerState() {
         if (downloaded) {
           const blobUrl = await getDownloadedBlobUrl(trackKey);
           if (blobUrl) {
+            state.isHls = false;
+            state.streamType = 'blob';
             state.seekOffset = 0;
             audio.src = blobUrl;
             if (savedPos > 0) audio.currentTime = savedPos;
@@ -73,6 +76,18 @@ export async function restorePlayerState() {
           }
         }
 
+        const eligibleHls = isHlsEligible(track) && (isHlsSupported() || isNativeHlsSupported(audio));
+        if (eligibleHls) {
+          state.isHls = true;
+          state.streamType = 'hls';
+          state.seekOffset = 0;
+          const hlsUrl = resolveHlsStreamUrl(track, 0);
+          loadHlsStream(audio, hlsUrl, savedPos).catch(() => {});
+          return saved;
+        }
+
+        state.isHls = false;
+        state.streamType = 'direct';
         state.seekOffset = savedPos;
         const startTicks = Math.floor(savedPos * 10000000);
         audio.src = resolveStreamUrl(track, startTicks);
