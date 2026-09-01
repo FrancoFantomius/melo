@@ -5,3 +5,4 @@ The following are the rules on how to write this application. They take preceden
 - always prefer local assets instead of ones you get from cdns.
 - when exploring a project do not run npm run build.
 - when implementing changes do not bother to update all the translations.
+- when asked to check if the translations are synced, use the scripts/check-translations.js code. Run it with node and use its result as a guide. Do not write additional code

@@ -6,7 +6,7 @@ export function startProgressReporting() {
   stopProgressReporting();
   state.updateProgressTimer = setInterval(() => {
     const track = getCurrentTrack();
-    if (track && !audio.paused && isFinite(audio.currentTime)) {
+    if (track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl && !audio.paused && isFinite(audio.currentTime)) {
       const realPosition = state.seekOffset + audio.currentTime;
       reportPlaybackProgress(track.Id, Math.floor(realPosition * 10000000), false);
     }

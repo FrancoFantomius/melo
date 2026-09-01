@@ -108,8 +108,8 @@ function executeAudioPlay(track, startPositionSec = 0) {
   if (playPromise !== undefined) {
     playPromise.then(() => {
       state.isPlaying = true;
-      if (track && track.Id) {
-        reportPlaybackStart(track.Id, Math.floor(startPositionSec * 10000000));
+      if (track && (track.Id || track.id) && !track.isPodcastEpisode && !track.enclosureUrl) {
+        reportPlaybackStart(track.Id || track.id, Math.floor(startPositionSec * 10000000));
       }
       savePlayerState();
       updateMediaSessionState();
@@ -137,7 +137,7 @@ export function playTrack(trackOverride = null) {
 
   let startPositionSec = 0;
   if (track.isPodcastEpisode || track.enclosureUrl) {
-    const epState = getEpisodeState(track.id);
+    const epState = getEpisodeState(track.id || track.Id);
     if (epState && epState.position > 5 && !epState.isPlayed) {
       startPositionSec = epState.position;
     }
@@ -224,7 +224,7 @@ export async function seekTo(seconds) {
   const trackKey = track.Id || track.id;
   if (trackKey && await isTrackDownloaded(trackKey)) {
     audio.currentTime = Math.max(0, seconds);
-    reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
+    if (track.Id && !track.isPodcastEpisode && !track.enclosureUrl) reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
     notifyUI();
     return;
   }
@@ -243,7 +243,7 @@ export async function seekTo(seconds) {
   // If playing via HLS, Hls.js manages seeking across timeline directly
   if (state.isHls) {
     audio.currentTime = seconds;
-    if (track.Id) reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
+    if (track.Id && !track.isPodcastEpisode && !track.enclosureUrl) reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
     notifyUI();
     savePlayerState();
     return;
@@ -257,7 +257,7 @@ export async function seekTo(seconds) {
     relativeTarget <= audio.seekable.end(0)
   ) {
     audio.currentTime = relativeTarget;
-    if (track.Id) reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
+    if (track.Id && !track.isPodcastEpisode && !track.enclosureUrl) reportPlaybackProgress(track.Id, Math.floor(seconds * 10000000), audio.paused);
     notifyUI();
     return;
   }
@@ -272,7 +272,7 @@ export async function seekTo(seconds) {
       console.warn('[Audio Engine] Seek autoplay interrupted:', err);
     });
   }
-  if (track.Id) reportPlaybackProgress(track.Id, startTicks, wasPaused);
+  if (track.Id && !track.isPodcastEpisode && !track.enclosureUrl) reportPlaybackProgress(track.Id, startTicks, wasPaused);
   notifyUI();
   savePlayerState();
 }
@@ -322,9 +322,9 @@ function attachAudioListeners(audioEl) {
 
   audioEl.addEventListener('ended', () => {
     const track = getCurrentTrack();
-    if (track && track.Id) {
+    if (track && (track.Id || track.id) && !track.isPodcastEpisode && !track.enclosureUrl) {
       const realPosition = state.seekOffset + audioEl.currentTime;
-      reportPlaybackStopped(track.Id, Math.floor(realPosition * 10000000));
+      reportPlaybackStopped(track.Id || track.id, Math.floor(realPosition * 10000000));
     }
     savePlayerState();
     playNextTrack(true);
@@ -332,8 +332,8 @@ function attachAudioListeners(audioEl) {
 
   audioEl.addEventListener('timeupdate', () => {
     const track = getCurrentTrack();
-    if (track && track.isPodcastEpisode) {
-      saveEpisodeProgress(track.id, audioEl.currentTime, audioEl.duration || track.duration || 0);
+    if (track && (track.isPodcastEpisode || track.enclosureUrl)) {
+      saveEpisodeProgress(track.id || track.Id, audioEl.currentTime, audioEl.duration || track.duration || 0);
     }
     if (audioEl.duration && (audioEl.duration - audioEl.currentTime <= 30)) {
       preloadNextTrack();
@@ -358,8 +358,9 @@ function attachAudioListeners(audioEl) {
 
     // Fall back to a CORS proxy blob for podcast hosts that don't answer with CORS
     const track = getCurrentTrack();
-    if (track && (track.isPodcastEpisode || track.enclosureUrl) && track.id !== state.podcastProxyTrackKey) {
-      state.podcastProxyTrackKey = track.id;
+    const trackKey = track ? (track.id || track.Id) : null;
+    if (track && (track.isPodcastEpisode || track.enclosureUrl) && trackKey !== state.podcastProxyTrackKey) {
+      state.podcastProxyTrackKey = trackKey;
       resolvePodcastProxyBlobUrl(cleanAudioUrl(track.enclosureUrl)).then((blobUrl) => {
         if (!blobUrl) return;
         if (state.podcastProxyBlobUrl) URL.revokeObjectURL(state.podcastProxyBlobUrl);

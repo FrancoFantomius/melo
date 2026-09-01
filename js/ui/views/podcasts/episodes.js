@@ -83,6 +83,20 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
     container.innerHTML = `<div class="episode-list">${itemsHtml}</div>`;
   }
 
+  container.querySelectorAll('.episode-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('.episode-play-btn') || e.target.closest('.btn-toggle-notes') || e.target.closest('.btn-track-add-queue') || e.target.closest('.btn-track-download') || e.target.closest('.btn-toggle-played') || e.target.closest('.episode-show-notes') || e.target.closest('md-tooltip')) {
+        return;
+      }
+      const index = parseInt(item.getAttribute('data-index'), 10);
+      const ep = episodes[index];
+      if (ep) {
+        setQueue(episodes, index);
+        playTrack(ep);
+      }
+    });
+  });
+
   container.querySelectorAll('.episode-play-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();

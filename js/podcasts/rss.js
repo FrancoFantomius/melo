@@ -141,9 +141,11 @@ export async function fetchAndParseFeed(feedUrl) {
 
     return {
       id: epGuid,
+      Id: epGuid,
       feedUrl: url,
       showTitle: showTitle,
       title: epTitle,
+      Name: epTitle,
       pubDate: epPubDate ? new Date(epPubDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '',
       pubDateRaw: epPubDate ? new Date(epPubDate).getTime() : 0,
       duration: durationSec,

@@ -62,7 +62,7 @@ export function armAutoAdvanceRetry(notifyUI) {
     audio.play().then(() => {
       state.isPlaying = true;
       startKeepaliveAnchor();
-      if (track.Id) reportPlaybackStart(track.Id, Math.floor((state.seekOffset + Math.max(0, audio.currentTime)) * 10000000));
+      if (track.Id && !track.isPodcastEpisode && !track.enclosureUrl) reportPlaybackStart(track.Id, Math.floor((state.seekOffset + Math.max(0, audio.currentTime)) * 10000000));
       setupMediaSessionMetadata(track);
       savePlayerState();
       if (notifyUI) notifyUI();
