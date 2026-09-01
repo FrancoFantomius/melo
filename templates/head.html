@@ -27,13 +27,30 @@
   <meta name="twitter:image" content="./img/icons/icon.svg">
 
   <!-- Mobile & PWA Specific -->
-  <meta name="theme-color" content="#0e1117">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+  <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Melo">
   <link rel="apple-touch-icon" sizes="192x192" href="./img/icons/icon_192x.png">
   <link rel="apple-touch-icon" sizes="512x512" href="./img/icons/icon_512x.png">
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem('theme') || 'system';
+        var effective = saved === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : (saved === 'light' ? 'light' : 'dark');
+        var color = effective === 'light' ? '#ffffff' : '#000000';
+        document.documentElement.setAttribute('data-theme', effective);
+        document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+          m.setAttribute('content', color);
+        });
+      } catch (e) {}
+    })();
+  </script>
 
   <!-- Favicon & Web App Manifest -->
   <link rel="icon" type="image/svg+xml" href="./img/icons/icon.svg">

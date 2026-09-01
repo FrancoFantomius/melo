@@ -3,6 +3,7 @@ md-top-app-bar.main-header {
   grid-area: header;
   z-index: 50;
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
   --md-top-app-bar-container-color: var(--bg-secondary);
   --md-top-app-bar-on-container-color: var(--text-primary);
 }
