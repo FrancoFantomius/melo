@@ -6,6 +6,7 @@ import { renderAlbumCardHTML, bindAlbumCards, bindArtistCards, renderTrackRowHTM
 import { registerTracksFavoriteStatus } from '../../player/likes.js';
 import { getTranslation } from '../../i18n.js';
 import { getPlaceholder } from '../placeholders.js';
+import { escapeHtml } from '../modals/shared.js';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/icon';
@@ -38,9 +39,9 @@ export async function renderArtistsView(container) {
         grid.innerHTML = `<div style="color: var(--text-secondary);" data-i18n>No artists found.</div>`;
       } else {
         grid.innerHTML = res.Items.map(artist => `
-          <div class="media-card" data-artist-id="${artist.Id}">
-            <img src="${getArtworkUrl(artist, 'Primary', 300, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="card-thumb" style="border-radius: 50%;" alt="${artist.Name}">
-            <div class="card-title" style="text-align: center;">${artist.Name}</div>
+          <div class="media-card" data-artist-id="${escapeHtml(artist.Id)}">
+            <img src="${getArtworkUrl(artist, 'Primary', 300, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="card-thumb" style="border-radius: 50%;" alt="${escapeHtml(artist.Name || 'Artist')}">
+            <div class="card-title" style="text-align: center;">${escapeHtml(artist.Name || '')}</div>
             <div class="card-subtitle" style="text-align: center;" data-i18n>Artist</div>
           </div>
         `).join('');
@@ -55,7 +56,7 @@ export async function renderArtistsView(container) {
   } catch (err) {
     const grid = document.getElementById('artists-grid');
     if (!grid || !grid.querySelector('.media-card')) {
-      container.innerHTML = `<div style="color: var(--danger);">${getTranslation('An error occurred')}: ${err.message}</div>`;
+      container.innerHTML = `<div style="color: var(--danger);">${getTranslation('An error occurred')}: ${escapeHtml(err.message)}</div>`;
     }
   }
 }
@@ -68,10 +69,10 @@ export async function renderArtistDetailView(container, artistOrId) {
   container.innerHTML = `
     <div class="view-section">
       <div class="album-detail-banner">
-        <img id="artist-detail-cover" src="${getArtworkUrl(artist, 'Primary', 400, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="album-cover-lg" style="border-radius: 50%;" alt="${artist.Name || 'Artist'}">
+        <img id="artist-detail-cover" src="${getArtworkUrl(artist, 'Primary', 400, 'artist')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('artist') : '${getPlaceholder('artist')}';" data-placeholder-type="artist" class="album-cover-lg" style="border-radius: 50%;" alt="${escapeHtml(artist.Name || 'Artist')}">
         <div class="album-info-meta">
           <span class="album-detail-type" data-i18n>Artist</span>
-          <h1 id="artist-detail-name" class="album-detail-title">${artist.Name || 'Loading...'}</h1>
+          <h1 id="artist-detail-name" class="album-detail-title">${escapeHtml(artist.Name || 'Loading...')}</h1>
           <div class="album-detail-actions">
             <md-button id="btn-play-artist-all" variant="filled">
               <md-icon slot="icon" name="play_arrow" filled></md-icon>
@@ -103,6 +104,11 @@ export async function renderArtistDetailView(container, artistOrId) {
       </div>
     </div>
   `;
+
+  const initialNameEl = document.getElementById('artist-detail-name');
+  const initialCoverEl = document.getElementById('artist-detail-cover');
+  if (initialNameEl && artist.Name) initialNameEl.textContent = artist.Name;
+  if (initialCoverEl && artist.Name) initialCoverEl.alt = artist.Name;
 
   // Fetch full artist item if needed
   try {

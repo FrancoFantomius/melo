@@ -202,7 +202,11 @@ export async function renderSearchView(container, query) {
     if (latestSearchQuery === query) {
       const searchResultsList = document.getElementById('search-results-list');
       if (searchResultsList) {
-        searchResultsList.innerHTML = `<div style="color: var(--danger);">Search failed: ${err.message}</div>`;
+        searchResultsList.innerHTML = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.style.color = 'var(--danger)';
+        errorDiv.textContent = `Search failed: ${err.message}`;
+        searchResultsList.appendChild(errorDiv);
       }
     }
   }
@@ -217,23 +221,52 @@ function renderRecentSearches(resultsContainer) {
         ${recentSearches.length > 0 ? `<button id="btn-clear-all-recent" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-weight: 600;" data-i18n>Clear all</button>` : ''}
       </div>
       ${recentSearches.length > 0 ? `
-        <div class="recent-searches-list">
-          ${recentSearches.map(term => `
-            <div class="recent-search-item" data-query="${encodeURIComponent(term)}">
-              <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-muted);">history</span>
-              <span class="recent-search-text">${term}</span>
-              <button class="btn-remove-recent" data-term="${encodeURIComponent(term)}" title="Remove from history">
-                <span class="material-symbols-outlined" style="font-size: 18px;">close</span>
-              </button>
-            </div>
-          `).join('')}
-        </div>
+        <div class="recent-searches-list"></div>
       ` : `
         <div style="color: var(--text-secondary); font-size: 14px; margin-top: 8px;" data-i18n>No recent searches. Search for artists, songs, or podcasts above!</div>
       `}
     </div>
   `;
   resultsContainer.innerHTML = html;
+
+  if (recentSearches.length > 0) {
+    const listEl = resultsContainer.querySelector('.recent-searches-list');
+    if (listEl) {
+      recentSearches.forEach(term => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'recent-search-item';
+        itemEl.setAttribute('data-query', encodeURIComponent(term));
+
+        const iconEl = document.createElement('span');
+        iconEl.className = 'material-symbols-outlined';
+        iconEl.style.fontSize = '20px';
+        iconEl.style.color = 'var(--text-muted)';
+        iconEl.textContent = 'history';
+
+        const textEl = document.createElement('span');
+        textEl.className = 'recent-search-text';
+        textEl.textContent = term;
+
+        const btnEl = document.createElement('button');
+        btnEl.className = 'btn-remove-recent';
+        btnEl.setAttribute('data-term', encodeURIComponent(term));
+        btnEl.title = 'Remove from history';
+
+        const closeIconEl = document.createElement('span');
+        closeIconEl.className = 'material-symbols-outlined';
+        closeIconEl.style.fontSize = '18px';
+        closeIconEl.textContent = 'close';
+
+        btnEl.appendChild(closeIconEl);
+        itemEl.appendChild(iconEl);
+        itemEl.appendChild(textEl);
+        itemEl.appendChild(btnEl);
+
+        listEl.appendChild(itemEl);
+      });
+    }
+  }
+
   bindRecentSearchesControls(resultsContainer);
 }
 

@@ -1,7 +1,27 @@
-import { getSession } from './session.js';
+import { getSession, clearSession } from './session.js';
 import pkg from '../../package.json';
 
 export const APP_VERSION = pkg.version || '0.5.1';
+
+let isHandlingUnauthorized = false;
+
+export function handleUnauthorized() {
+  if (isHandlingUnauthorized) return;
+  isHandlingUnauthorized = true;
+
+  console.warn('[Jellyfin] Session expired or unauthorized (HTTP 401). Clearing session and redirecting to login...');
+  clearSession(true);
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('melo-auth-unauthorized'));
+
+    const currentPath = window.location.pathname.toLowerCase();
+    const isLoginPage = currentPath.endsWith('/login.html') || currentPath.endsWith('/login');
+    if (!isLoginPage) {
+      window.location.href = './login.html?expired=1';
+    }
+  }
+}
 
 export function getAuthHeader() {
   const session = getSession();
@@ -56,6 +76,9 @@ export async function jellyfinFetch(endpoint, { method = 'GET', params = {}, bod
   });
 
   if (response.status === 401 || response.status === 403) {
+    if (response.status === 401) {
+      handleUnauthorized();
+    }
     throw buildApiError(`Unauthorized (HTTP ${response.status}). Please re-authenticate.`, response.status);
   }
 

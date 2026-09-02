@@ -1,4 +1,5 @@
 import Hls from 'hls.js';
+import { handleUnauthorized } from '../jellyfin/http.js';
 
 let hlsInstance = null;
 let currentHlsUrl = null;
@@ -85,6 +86,15 @@ export function loadHlsStream(audioEl, hlsUrl, startTimeSec = 0, callbacks = {})
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
         console.warn('[HlsEngine] HLS error event:', data.type, data.details, data.fatal);
+
+        if (data.response?.code === 401 || data.response?.status === 401) {
+          console.error('[HlsEngine] Received HTTP 401 Unauthorized from streaming server.');
+          destroyHls();
+          handleUnauthorized();
+          if (callbacks.onFallback) callbacks.onFallback(data);
+          resolve(false);
+          return;
+        }
 
         if (data.fatal) {
           switch (data.type) {

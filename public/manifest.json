@@ -2,7 +2,7 @@
   "id": "/",
   "name": "Melo",
   "short_name": "Melo",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Melo - A Music Player powered by Jellyfin",
   "start_url": "./index.html",
   "scope": "./",

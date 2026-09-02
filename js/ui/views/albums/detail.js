@@ -11,6 +11,7 @@ import { DISCOVER_DAILY_PLAYLIST, LIKED_SONGS_PLAYLIST, HOME_LIMITS, getRecommen
 import { getPlaceholder } from '../../placeholders.js';
 import { setupTrackSelection } from './detail-selection.js';
 import { setupDownloadAllButton } from './detail-download.js';
+import { escapeHtml } from '../../modals/shared.js';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/icon';
@@ -21,6 +22,38 @@ let discoverDailyRefreshCount = 0;
 function getDiscoverDailySeed() {
   const day = new Date().toISOString().slice(0, 10);
   return discoverDailyRefreshCount > 0 ? `${day}#${discoverDailyRefreshCount}` : day;
+}
+
+function renderArtistLinksToElement(artistEl, artistsInfo) {
+  artistEl.textContent = '';
+  if (artistsInfo && artistsInfo.length > 0) {
+    artistsInfo.forEach((artist, index) => {
+      if (index > 0) {
+        artistEl.appendChild(document.createTextNode(', '));
+      }
+      const span = document.createElement('span');
+      span.className = 'artist-link';
+      if (artist.id) span.setAttribute('data-artist-id', artist.id);
+      if (artist.name) span.setAttribute('data-artist-name', artist.name);
+      span.style.color = 'var(--text-secondary)';
+      span.style.textDecoration = 'none';
+      span.style.cursor = 'pointer';
+      span.style.fontWeight = '500';
+      span.addEventListener('mouseover', () => {
+        span.style.color = 'var(--accent)';
+        span.style.textDecoration = 'underline';
+      });
+      span.addEventListener('mouseout', () => {
+        span.style.color = 'var(--text-secondary)';
+        span.style.textDecoration = 'none';
+      });
+      span.textContent = artist.name || '';
+      artistEl.appendChild(span);
+    });
+    bindArtistLinks(artistEl);
+  } else {
+    artistEl.textContent = getTranslation('Unknown Artist');
+  }
 }
 
 export function openAlbum(albumId, albumObj = null) {
@@ -64,27 +97,24 @@ export async function renderAlbumDetailView(container, albumOrId) {
   }
 
   const initialArtistsInfo = (isLikedSongs || isDiscoverDaily) ? [] : getAlbumArtistsInfo(album);
-  const initialArtistHTML = isLikedSongs
-    ? getTranslation('Your favorite tracks')
-    : (isDiscoverDaily
-      ? getTranslation('20 fresh picks updated every day')
-      : (initialArtistsInfo.length > 0 ? renderArtistLinksHTML(initialArtistsInfo) : (isPlaylist ? '' : getTranslation('Unknown Artist'))));
+  const albumTitle = album.Name || (isLikedSongs ? 'Liked Songs' : (isPlaylist ? 'Playlist' : 'Album'));
+  const albumTypeDisplay = isPlaylist ? 'Playlist' : (formatItemType(album.Type) || 'Album');
 
   const placeholderType = isPlaylist ? 'playlist' : 'album';
   const coverHTML = isLikedSongs
     ? `<img id="album-detail-cover" src="${LIKED_SONGS_PLAYLIST.CoverUrl}" data-placeholder-type="favorite" class="album-cover-lg" alt="Liked Songs">`
     : (isDiscoverDaily
       ? `<img id="album-detail-cover" src="${DISCOVER_DAILY_PLAYLIST.CoverUrl}" data-placeholder-type="explore" class="album-cover-lg" alt="Discover Daily">`
-      : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400, placeholderType)}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="album-cover-lg" alt="${album.Name || (isPlaylist ? 'Playlist' : 'Album')}">`);
+      : `<img id="album-detail-cover" src="${getArtworkUrl(album, 'Primary', 400, placeholderType)}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="album-cover-lg" alt="${escapeHtml(albumTitle)}">`);
 
   container.innerHTML = `
     <div class="view-section album-detail-section">
       <div class="album-detail-banner">
         ${coverHTML}
         <div class="album-info-meta">
-          <span id="album-detail-type" class="album-detail-type">${isPlaylist ? 'Playlist' : formatItemType(album.Type) || 'Album'}</span>
-          <h1 id="album-detail-title" class="album-detail-title">${album.Name || (isLikedSongs ? 'Liked Songs' : (isPlaylist ? 'Playlist' : 'Album'))}</h1>
-          <span id="album-detail-artist" class="album-detail-artist">${initialArtistHTML}</span>
+          <span id="album-detail-type" class="album-detail-type">${escapeHtml(albumTypeDisplay)}</span>
+          <h1 id="album-detail-title" class="album-detail-title">${escapeHtml(albumTitle)}</h1>
+          <span id="album-detail-artist" class="album-detail-artist"></span>
           <div class="album-detail-actions">
             <md-button id="btn-play-album-all" variant="filled">
               <md-icon slot="icon" name="play_arrow" filled></md-icon>
@@ -156,8 +186,34 @@ export async function renderAlbumDetailView(container, albumOrId) {
     </div>
   `;
 
-  if (!isLikedSongs && !isDiscoverDaily && initialArtistsInfo.length > 0) {
-    bindArtistLinks(container);
+  const titleEl = container.querySelector('#album-detail-title');
+  if (titleEl) {
+    titleEl.textContent = albumTitle;
+  }
+
+  const typeEl = container.querySelector('#album-detail-type');
+  if (typeEl) {
+    typeEl.textContent = albumTypeDisplay;
+  }
+
+  const artistEl = container.querySelector('#album-detail-artist');
+  if (artistEl) {
+    if (isLikedSongs) {
+      artistEl.textContent = getTranslation('Your favorite tracks');
+    } else if (isDiscoverDaily) {
+      artistEl.textContent = getTranslation('20 fresh picks updated every day');
+    } else if (initialArtistsInfo.length > 0) {
+      renderArtistLinksToElement(artistEl, initialArtistsInfo);
+    } else if (isPlaylist) {
+      artistEl.textContent = '';
+    } else {
+      artistEl.textContent = getTranslation('Unknown Artist');
+    }
+  }
+
+  const coverEl = container.querySelector('#album-detail-cover');
+  if (coverEl && coverEl.tagName === 'IMG') {
+    coverEl.alt = albumTitle;
   }
 
   const btnEdit = container.querySelector('#btn-edit-playlist');
@@ -215,13 +271,11 @@ export async function renderAlbumDetailView(container, albumOrId) {
     if (artistEl) {
       const artistsInfo = getAlbumArtistsInfo(data);
       if (artistsInfo && artistsInfo.length > 0) {
-        artistEl.innerHTML = renderArtistLinksHTML(artistsInfo);
-        bindArtistLinks(artistEl);
+        renderArtistLinksToElement(artistEl, artistsInfo);
       } else if (isPlaylist || data.Type === 'Playlist') {
         artistEl.textContent = '';
       } else {
-        artistEl.innerHTML = renderArtistLinksHTML(artistsInfo);
-        bindArtistLinks(artistEl);
+        artistEl.textContent = getTranslation('Unknown Artist');
       }
     }
     if (typeEl) typeEl.textContent = formatItemType(data.Type) || (isPlaylist ? 'Playlist' : 'Album');
@@ -229,6 +283,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
       const pType = isPlaylist || data.Type === 'Playlist' ? 'playlist' : 'album';
       coverEl.src = getArtworkUrl(data, 'Primary', 400, pType);
       coverEl.setAttribute('data-placeholder-type', pType);
+      if (data.Name) coverEl.alt = data.Name;
     }
   };
 
@@ -332,7 +387,11 @@ export async function renderAlbumDetailView(container, albumOrId) {
     console.error('[Views] Failed to fetch tracks:', err);
     const songsList = document.getElementById('album-songs-list');
     if (songsList) {
-      songsList.innerHTML = `<div style="color: var(--danger);">Failed to load tracks: ${err.message}</div>`;
+      songsList.innerHTML = '';
+      const errDiv = document.createElement('div');
+      errDiv.style.color = 'var(--danger)';
+      errDiv.textContent = `Failed to load tracks: ${err?.message || err}`;
+      songsList.appendChild(errDiv);
     }
   }
 }

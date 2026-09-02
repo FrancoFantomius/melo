@@ -26,6 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (serverInput) serverInput.value = session.serverUrl || '';
   if (usernameInput) usernameInput.value = session.username || '';
 
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('expired') === '1' && statusEl) {
+    statusEl.textContent = 'Your session has expired. Please enter your password to log in again.';
+    statusEl.style.color = 'var(--md-sys-color-error, var(--danger, #ff6b6b))';
+    if (passwordInput) passwordInput.focus();
+  }
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const serverUrl = serverInput.value;

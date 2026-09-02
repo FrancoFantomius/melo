@@ -56,7 +56,7 @@ export async function getCachedApiData(key) {
       };
     });
   } catch (err) {
-    console.warn(`[Cache] getCachedApiData error for ${key}:`, err);
+    console.warn('[Cache] getCachedApiData error for %s:', key, err);
     return null;
   }
 }
@@ -77,7 +77,7 @@ export async function setCachedApiData(key, data) {
       request.onerror = () => resolve(false);
     });
   } catch (err) {
-    console.warn(`[Cache] setCachedApiData error for ${key}:`, err);
+    console.warn('[Cache] setCachedApiData error for %s:', key, err);
   }
 }
 
@@ -113,7 +113,7 @@ export async function deleteCachedApiData(key) {
       request.onerror = () => resolve(false);
     });
   } catch (err) {
-    console.warn(`[Cache] deleteCachedApiData error for ${key}:`, err);
+    console.warn('[Cache] deleteCachedApiData error for %s:', key, err);
   }
 }
 
@@ -134,13 +134,13 @@ export async function fetchWithCache(cacheKey, fetchFn, onFreshData = null) {
         try {
           onFreshData(freshData);
         } catch (e) {
-          console.warn(`[Cache] Error in onFreshData callback for ${cacheKey}:`, e);
+          console.warn('[Cache] Error in onFreshData callback for %s:', cacheKey, e);
         }
       }
     }
     return freshData;
   }).catch((err) => {
-    console.warn(`[Cache] Background fetch failed for ${cacheKey}:`, err);
+    console.warn('[Cache] Background fetch failed for %s:', cacheKey, err);
     if (!cached) throw err;
     return cached;
   });

@@ -4,7 +4,12 @@ const DEVICE_ID_KEY = 'melo_device_id';
 function getOrCreateDeviceId() {
   let deviceId = localStorage.getItem(DEVICE_ID_KEY);
   if (!deviceId) {
-    deviceId = 'pwa-' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const array = new Uint8Array(16);
+    const cryptoObj = typeof crypto !== 'undefined' ? crypto : (typeof window !== 'undefined' ? window.crypto : null);
+    if (cryptoObj && typeof cryptoObj.getRandomValues === 'function') {
+      cryptoObj.getRandomValues(array);
+    }
+    deviceId = 'pwa-' + Array.from(array, b => b.toString(16).padStart(2, '0')).join('');
     localStorage.setItem(DEVICE_ID_KEY, deviceId);
   }
   return deviceId;
@@ -63,13 +68,14 @@ export function saveSession(sessionData) {
   return updated;
 }
 
-export function clearSession() {
+export function clearSession(preserveCredentials = true) {
   const current = getSession();
   const cleared = {
     ...current,
-    username: '',
+    username: preserveCredentials ? (current.username || '') : '',
     accessToken: '',
     userId: '',
+    userPrimaryImageTag: '',
     isLoggedIn: false
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(cleared));

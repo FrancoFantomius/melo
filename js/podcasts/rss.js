@@ -73,7 +73,7 @@ export async function fetchAndParseFeed(feedUrl) {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     xmlText = await response.text();
   } catch (err) {
-    console.warn(`[RSS Parser] Direct fetch failed for ${url}, trying CORS proxy fallback...`, err);
+    console.warn('[RSS Parser] Direct fetch failed for %s, trying CORS proxy fallback...', url, err);
     const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
     const proxyResp = await fetch(proxyUrl);
     if (!proxyResp.ok) throw new Error(`Failed to fetch RSS feed via proxy (${proxyResp.status})`);

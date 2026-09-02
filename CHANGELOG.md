@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.2] - 2026-09-02
+
+### Security
+- **XSS Sanitization**: comprehensive HTML escaping and safe DOM construction across search results, recent search history, quick-search dropdown, album details, artist details, and podcast discovery views to prevent cross-site scripting vulnerabilities.
+- **Cryptographic Device ID Generation**: replaced pseudo-random `Math.random()` device identifier generation with cryptographically secure random values via Web Crypto API (`crypto.getRandomValues`).
+- **Session Expiration & Unauthorized Handling**: added automated session clearance and redirect handling (`handleUnauthorized`) on Jellyfin HTTP 401 responses, notifying users and prompting for re-authentication on `login.html?expired=1`.
+- **Authentication Guard Hardening**: strengthened route authentication checks in `auth-guard.js` to strictly verify valid `accessToken` presence alongside login status.
+- **Safe Logging & Error Formatting**: replaced unescaped template string interpolations in console warning outputs with parameterized logging arguments to prevent potential log injection and accidental object disclosure.
+
+### Changed
+- Version bumped to `1.0.2`.
+- Service worker cache upgraded to `melo-v1.0.2`.
+
 ## [1.0.1] - 2026-09-01
 
 ### Added

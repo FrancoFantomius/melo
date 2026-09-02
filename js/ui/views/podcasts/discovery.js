@@ -5,6 +5,7 @@ import { saveCachedFeed } from '../../../podcasts/storage.js';
 import { openPodcastShow } from './list.js';
 import { getTranslation } from '../../../i18n.js';
 import { getPlaceholder } from '../../placeholders.js';
+import { escapeHtml } from '../../modals/shared.js';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/chip';
 import '@francofantomius/material-components/icon';
@@ -80,6 +81,26 @@ export async function renderDiscoverTabContent(container, subscribedFeedUrls = [
     const q = e.detail?.value !== undefined ? e.detail.value : (e.target?.value || '');
     handleDiscoverySearch(q);
   });
+  searchInput?.addEventListener('search', async (e) => {
+    const q = (e.detail?.value !== undefined ? e.detail.value : (searchInput.value || '')).trim();
+    if (!q || !resultsGrid) return;
+    if (debounceTimer) clearTimeout(debounceTimer);
+    if (typeof searchInput.close === 'function') searchInput.close();
+    chips.forEach(c => { c.selected = false; });
+
+    resultsGrid.innerHTML = '';
+    const loadingDiv = document.createElement('div');
+    loadingDiv.style.cssText = 'text-align: center; grid-column: 1/-1; padding: 40px; color: var(--text-secondary);';
+    const span = document.createElement('span');
+    span.setAttribute('data-i18n', '');
+    span.textContent = getTranslation('Searching directory...');
+    loadingDiv.appendChild(span);
+    loadingDiv.appendChild(document.createTextNode(` "${q}"...`));
+    resultsGrid.appendChild(loadingDiv);
+
+    const results = await searchPodcastDirectory(q, 24);
+    renderDiscoveryGrid(resultsGrid, results, subscribedFeedUrls);
+  });
   searchInput?.addEventListener('clear', () => {
     handleDiscoverySearch('');
   });
@@ -114,15 +135,20 @@ export function renderDiscoveryGrid(gridEl, items, subscribedUrls = []) {
 
   gridEl.innerHTML = items.map((item, idx) => {
     const isSubscribed = subscribedUrls.includes(item.feedUrl);
+    const feedUrl = encodeURIComponent(item.feedUrl || '');
+    const title = escapeHtml(item.title || '');
+    const author = escapeHtml(item.author || '');
+    const genre = escapeHtml(item.genre || 'Podcast');
+    const image = escapeHtml(item.image || getPlaceholder('podcast'));
     return `
-      <div class="media-card discovery-show-card" data-feed-url="${encodeURIComponent(item.feedUrl)}">
-        <img src="${item.image || getPlaceholder('podcast')}" class="card-thumb" alt="${item.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
+      <div class="media-card discovery-show-card" data-feed-url="${feedUrl}">
+        <img src="${image}" class="card-thumb" alt="${title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
         <div style="display: flex; flex-direction: column; gap: 4px; flex-grow: 1; padding-right: 36px;">
-          <div class="card-title" title="${item.title}">${item.title}</div>
-          <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.author}</div>
-          <div style="font-size: 11px; color: var(--accent); margin-top: 2px;">${item.genre || 'Podcast'}</div>
+          <div class="card-title" title="${title}">${title}</div>
+          <div style="font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${author}</div>
+          <div style="font-size: 11px; color: var(--accent); margin-top: 2px;">${genre}</div>
         </div>
-        <md-icon-button class="btn-card-subscribe" data-feed-url="${encodeURIComponent(item.feedUrl)}" data-idx="${idx}" variant="${isSubscribed ? 'tonal' : 'filled'}" icon="${isSubscribed ? 'check' : 'add'}" aria-label="${isSubscribed ? getTranslation('Subscribed') : getTranslation('Subscribe')}" title="${isSubscribed ? getTranslation('Subscribed') : getTranslation('Subscribe')}" ${isSubscribed ? 'disabled' : ''}></md-icon-button>
+        <md-icon-button class="btn-card-subscribe" data-feed-url="${feedUrl}" data-idx="${idx}" variant="${isSubscribed ? 'tonal' : 'filled'}" icon="${isSubscribed ? 'check' : 'add'}" aria-label="${isSubscribed ? getTranslation('Subscribed') : getTranslation('Subscribe')}" title="${isSubscribed ? getTranslation('Subscribed') : getTranslation('Subscribe')}" ${isSubscribed ? 'disabled' : ''}></md-icon-button>
       </div>
     `;
   }).join('');

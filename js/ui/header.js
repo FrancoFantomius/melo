@@ -10,6 +10,7 @@ import { formatItemType } from './views/common.js';
 import { toggleTheme, updateThemeUI } from './theme.js';
 import { getRecentSearches, removeRecentSearch, clearRecentSearches, addRecentSearch } from './views/search.js';
 import { getPlaceholder } from './placeholders.js';
+import { escapeHtml } from './modals/shared.js';
 
 export function initHeader() {
   const btnSyncLogin = document.getElementById('btn-sync-login');
@@ -73,7 +74,7 @@ export function initHeader() {
         <div class="search-dropdown-item search-dropdown-recent-item" data-query="${encodeURIComponent(term)}">
           <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-secondary); flex-shrink: 0;">history</span>
           <div class="search-dropdown-info">
-            <div class="search-dropdown-title">${term.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+            <div class="search-dropdown-title">${escapeHtml(term)}</div>
           </div>
           <button class="btn-remove-header-recent" data-term="${encodeURIComponent(term)}" title="Remove" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%;">
             <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
@@ -154,10 +155,10 @@ export function initHeader() {
         const artist = track.AlbumArtist || track.Artists?.join(', ') || track.Album || 'Unknown Artist';
         return `
           <div class="search-dropdown-item search-dropdown-suggested-track" data-track-index="${idx}">
-            <img src="${artwork}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : '${getPlaceholder('song')}';" data-placeholder-type="song" class="search-dropdown-thumb" alt="${track.Name}">
+            <img src="${artwork}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : '${getPlaceholder('song')}';" data-placeholder-type="song" class="search-dropdown-thumb" alt="${escapeHtml(track.Name || '')}">
             <div class="search-dropdown-info">
-              <div class="search-dropdown-title">${track.Name}</div>
-              <div class="search-dropdown-subtitle">${artist}</div>
+              <div class="search-dropdown-title">${escapeHtml(track.Name || '')}</div>
+              <div class="search-dropdown-subtitle">${escapeHtml(artist)}</div>
             </div>
             <span class="material-symbols-outlined" style="color: var(--accent); font-size: 20px; flex-shrink: 0; margin-left: auto;">play_circle</span>
           </div>
@@ -247,7 +248,11 @@ export function initHeader() {
         const podcastItems = podcastsRes || [];
 
         if (jellyfinItems.length === 0 && podcastItems.length === 0) {
-          searchDropdown.innerHTML = `<div style="padding: 12px 16px; font-size: 13px; color: var(--text-secondary);">No results found for "${query}"</div>`;
+          searchDropdown.innerHTML = '';
+          const noResults = document.createElement('div');
+          noResults.style.cssText = 'padding: 12px 16px; font-size: 13px; color: var(--text-secondary);';
+          noResults.textContent = `No results found for "${query}"`;
+          searchDropdown.appendChild(noResults);
           searchDropdown.style.display = 'flex';
           return;
         }
@@ -263,10 +268,10 @@ export function initHeader() {
 
           return `
             <div class="search-dropdown-item" data-item-id="${item.Id}" data-item-type="${typeStr}">
-              <img src="${artwork}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="${thumbClass}" alt="${item.Name}">
+              <img src="${artwork}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="${thumbClass}" alt="${escapeHtml(item.Name || '')}">
               <div class="search-dropdown-info">
-                <div class="search-dropdown-title">${item.Name}</div>
-                <div class="search-dropdown-subtitle">${subtitle}</div>
+                <div class="search-dropdown-title">${escapeHtml(item.Name || '')}</div>
+                <div class="search-dropdown-subtitle">${escapeHtml(subtitle)}</div>
               </div>
               <span class="search-dropdown-type">${formatItemType(typeStr)}</span>
             </div>
@@ -276,23 +281,28 @@ export function initHeader() {
         if (podcastItems.length > 0) {
           itemsHTML += podcastItems.slice(0, 2).map(pod => `
             <div class="search-dropdown-item" data-feed-url="${encodeURIComponent(pod.feedUrl)}" data-item-type="Podcast">
-              <img src="${pod.image || getPlaceholder('podcast')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast" class="search-dropdown-thumb" alt="${pod.title}">
+              <img src="${pod.image || getPlaceholder('podcast')}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast" class="search-dropdown-thumb" alt="${escapeHtml(pod.title || '')}">
               <div class="search-dropdown-info">
-                <div class="search-dropdown-title">${pod.title}</div>
-                <div class="search-dropdown-subtitle">${pod.author || 'Podcast'}</div>
+                <div class="search-dropdown-title">${escapeHtml(pod.title || '')}</div>
+                <div class="search-dropdown-subtitle">${escapeHtml(pod.author || 'Podcast')}</div>
               </div>
               <span class="search-dropdown-type" style="color: var(--accent);">Podcast</span>
             </div>
           `).join('');
         }
 
-        itemsHTML += `
-          <div class="search-dropdown-view-all" id="btn-search-dropdown-all">
-            View all results for "${query}"
-          </div>
-        `;
-
         searchDropdown.innerHTML = itemsHTML;
+
+        const viewAllBtn = document.createElement('div');
+        viewAllBtn.className = 'search-dropdown-view-all';
+        viewAllBtn.id = 'btn-search-dropdown-all';
+        viewAllBtn.textContent = `View all results for "${query}"`;
+        viewAllBtn.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          executeSearchRedirect(query);
+        });
+        searchDropdown.appendChild(viewAllBtn);
+
         searchDropdown.style.display = 'flex';
 
         // Bind dropdown item clicks
@@ -317,11 +327,6 @@ export function initHeader() {
               executeSearchRedirect(query);
             }
           });
-        });
-
-        document.getElementById('btn-search-dropdown-all')?.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          executeSearchRedirect(query);
         });
       } catch (err) {
         console.warn('[Header] Quick search error:', err);

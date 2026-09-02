@@ -8,13 +8,15 @@ export function requireAuth() {
     currentPath.endsWith('/terms.html') || currentPath.endsWith('/terms') ||
     currentPath.endsWith('/privacy.html') || currentPath.endsWith('/privacy');
 
-  if (!session.isLoggedIn && !isPublicPage) {
+  const hasValidAuth = Boolean(session.isLoggedIn && session.accessToken);
+
+  if (!hasValidAuth && !isPublicPage) {
     console.log('[AuthGuard] User not logged in, redirecting to login.html');
     window.location.href = './login.html';
     return false;
   }
 
-  if (session.isLoggedIn && isLoginPage) {
+  if (hasValidAuth && isLoginPage) {
     console.log('[AuthGuard] User already logged in, redirecting to index.html');
     window.location.href = './index.html';
     return false;
