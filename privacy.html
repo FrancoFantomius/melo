@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> head }}
+
+<body class="legal-page-body">
+
+  <div class="legal-page-layout">
+    <md-card variant="outlined" class="legal-card">
+      
+      <div slot="header" class="legal-header">
+        <div class="legal-header-brand">
+          <img src="./img/icons/icon.svg" class="legal-logo" alt="Melo Logo">
+          <div class="legal-header-text">
+            <h1 class="legal-title" data-i18n>Privacy Policy</h1>
+            <span class="legal-subtitle" data-i18n>Melo Client & Services</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="legal-body">
+        <!-- Anti-Piracy & User Liability Notice Banner -->
+        <div class="legal-notice-banner">
+          <div class="legal-notice-title">
+            <span data-i18n>Anti-Piracy & Content Responsibility</span>
+          </div>
+          <p class="legal-notice-body" data-i18n>
+            <strong>Melo strictly prohibits illegal streaming and piracy of copyrighted media.</strong>
+            Melo operates purely as a front-end client interface. We do not provide, collect, index, or store media files. The user is entirely responsible for the audio content stored on their Jellyfin server or accessed via podcast subscriptions.
+          </p>
+        </div>
+
+        <div class="legal-sections">
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>1. Information We Do Not Collect</h2>
+            <p data-i18n>Melo does not harvest, sell, or collect personal data, listening habits, login credentials, or server URLs. We do not run third-party tracking scripts, analytics tools, or advertising networks.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>2. Server Communication & Connection</h2>
+            <p data-i18n>When you log in to your self-hosted Jellyfin server through Melo, authentication requests and API calls are sent directly from your browser to your designated Jellyfin server endpoint. No credentials or server tokens are ever routed through external third-party servers managed by Melo.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>3. Local Data Storage</h2>
+            <p data-i18n>Melo utilizes your web browser's <code>localStorage</code> and <code>IndexedDB</code> to save your user preferences (such as light/dark theme preference, sidebar state, server URL, authentication tokens, and cached podcast data). This data remains strictly stored on your local device and can be cleared at any time through your browser settings or by signing out.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>4. External Podcast Feeds</h2>
+            <p data-i18n>If you choose to subscribe to or search for podcasts within Melo, direct HTTPS requests are made to public podcast feed URLs and iTunes Search APIs to retrieve show artwork and audio enclosures. These third-party services operate under their respective privacy policies.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>5. User Liability</h2>
+            <p data-i18n>Users are solely liable for ensuring that all content accessed through their self-hosted server or external audio streams complies with relevant copyright laws and licensing requirements in their jurisdiction.</p>
+          </section>
+        </div>
+      </div>
+
+      <div slot="actions" class="legal-actions">
+        <md-button variant="outlined" href="./terms.html">
+          <span data-i18n>Terms of Service</span>
+        </md-button>
+        <md-button variant="filled" href="./index.html">
+          <span data-i18n>Go back to App</span>
+        </md-button>
+      </div>
+
+    </md-card>
+  </div>
+
+  <script type="module" src="./js/privacy.js"></script>
+</body>
+</html>

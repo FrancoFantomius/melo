@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> head }}
+<body data-page="artists">
+  <div id="app-layout">
+    {{> sidebar }}
+    {{> header }}
+
+    <!-- Main Content Area -->
+    <main id="view-container" class="main-content"></main>
+
+    {{> player }}
+    {{> bottom-nav }}
+  </div>
+
+  {{> modals }}
+
+  <script type="module" src="./js/app.js" data-page="artists"></script>
+</body>
+</html>

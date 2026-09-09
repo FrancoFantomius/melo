@@ -1,0 +1,541 @@
+# @francofantomius/jellyfin
+
+> A lightweight, modular, and type-safe Jellyfin SDK for Node.js and the Browser.
+
+`@francofantomius/jellyfin` is a universal TypeScript client library for interacting with [Jellyfin](https://jellyfin.org) media servers. Designed with zero production dependencies, it operates seamlessly across Node.js (18+), Bun, Deno, and modern web browsers (vanilla, React, Vue, Svelte, Electron, Tauri).
+
+It targets both Jellyfin 10.x and Jellyfin 12.x server architectures with automatic version negotiation, modular sub-clients, full TypeScript definitions, progressive and adaptive (HLS) streaming, trickplay thumbnail scrubbing, chapter & intro/credits skipping, IndexedDB offline media caching, real-time WebSockets, and remote session control.
+
+---
+
+## Table of Contents
+
+- [Package Metadata & Installation](#package-metadata--installation)
+- [Architecture & Design Principles](#architecture--design-principles)
+- [Quickstart](#quickstart)
+- [Client Core: JellyfinClient](#client-core-jellyfinclient)
+  - [Constructor & Options](#constructor--options)
+  - [Authentication & Session Restore](#authentication--session-restore)
+  - [Lifecycle Events](#lifecycle-events)
+  - [Pluggable Storage & Caching](#pluggable-storage--caching)
+- [Modules & API Reference](#modules--api-reference)
+  - [Auth & System (client.auth, client.system)](#auth--system-clientauth-clientsystem)
+  - [Media Library Browsing (client.library)](#media-library-browsing-clientlibrary)
+  - [Media, Streaming & Artwork (client.media)](#media-streaming--artwork-clientmedia)
+  - [Playback Reporting & Transcode Management (client.playback, client.transcode)](#playback-reporting--transcode-management-clientplayback-clienttranscode)
+  - [Search (client.search)](#search-clientsearch)
+  - [In-Progress & Dynamic Feeds (client.resume, client.nextUp, client.latest)](#in-progress--dynamic-feeds-clientresume-clientnextup-clientlatest)
+  - [Playlists, Lyrics & Favorites (client.playlists, client.lyrics, client.favorites)](#playlists-lyrics--favorites-clientplaylists-clientlyrics-clientfavorites)
+  - [Trickplay & Scrubbing Previews (client.trickplay)](#trickplay--scrubbing-previews-clienttrickplay)
+  - [Chapters & Intro/Credits Skipping (client.chapters)](#chapters--introcredits-skipping-clientchapters)
+  - [Genres, Studios & Collections (client.genres, client.collections)](#genres-studios--collections-clientgenres-clientcollections)
+  - [Display Preferences (client.displayPreferences)](#display-preferences-clientdisplaypreferences)
+  - [Remote Session Control (client.sessions)](#remote-session-control-clientsessions)
+  - [Real-Time WebSocket Events (client.websocket)](#real-time-websocket-events-clientwebsocket)
+  - [Quick Connect Device Pairing (client.quickConnect)](#quick-connect-device-pairing-clientquickconnect)
+  - [Offline Storage Manager (client.offline)](#offline-storage-manager-clientoffline)
+- [Quality Presets & Utilities](#quality-presets--utilities)
+- [Error Handling](#error-handling)
+- [Documentation Index](#documentation-index)
+
+---
+
+## Package Metadata & Installation
+
+- **Package Name**: `@francofantomius/jellyfin`
+- **Version**: `0.4.0`
+- **Runtime Support**: Node.js 18+, Bun, Deno, modern web browsers
+- **Module Formats**: Native ESM (`dist/index.js`), CommonJS (`dist/index.cjs`), TypeScript Declarations (`dist/index.d.ts`)
+- **Dependencies**: 0 production dependencies (zero bloat)
+
+```bash
+# npm
+npm install @francofantomius/jellyfin
+
+# pnpm
+pnpm add @francofantomius/jellyfin
+
+# yarn
+yarn add @francofantomius/jellyfin
+
+# bun
+bun add @francofantomius/jellyfin
+```
+
+---
+
+## Architecture & Design Principles
+
+1. **Modular Domain Clients**: All server endpoints are grouped logically into dedicated modules accessible on the root `JellyfinClient` instance (e.g. `client.library`, `client.media`, `client.trickplay`).
+2. **Version Negotiation**: Seamlessly switches between Jellyfin 10.x and 12.x endpoints (e.g. `/Sessions/Capabilities` vs `/Sessions/Capabilities/Full`, playlist creation schemas).
+3. **Pluggable Persistence & Cache**: Supports `LocalStorageAdapter` for browsers, `MemoryStorage` for Node.js, and `IndexedDBCacheAdapter` for persistent browser response caching using Stale-While-Revalidate (`fetchWithCache`).
+4. **Isomorphic HTTP Transport**: Uses native `fetch` with automatic URL normalization, query serialization, and standard authorization headers (`X-Emby-Authorization` / `MediaBrowser Token`).
+5. **Type Safety**: Comprehensive TypeScript types exported for all Jellyfin DTOs, stream parameters, filter queries, and event payloads.
+
+---
+
+## Quickstart
+
+```typescript
+import { JellyfinClient } from '@francofantomius/jellyfin';
+
+// 1. Initialize client
+const client = new JellyfinClient({
+  serverUrl: 'https://jellyfin.example.com',
+  clientInfo: {
+    name: 'My Media App',
+    version: '1.0.0',
+    device: 'Web Browser'
+  }
+});
+
+// 2. Authenticate
+const auth = await client.authenticate('alice', 'password123');
+console.log(`Logged in as ${auth.User.Name} (ID: ${auth.User.Id})`);
+
+// 3. Query movies
+const movies = await client.library.getMovies({ limit: 10, sortBy: 'PremiereDate', sortOrder: 'Descending' });
+console.log('Recent Movies:', movies.Items.map(m => m.Name));
+
+// 4. Generate video stream URL
+const firstMovie = movies.Items[0];
+const streamUrl = client.media.getVideoStreamUrl(firstMovie.Id, {
+  quality: '1080p'
+});
+console.log('Stream URL:', streamUrl);
+```
+
+---
+
+## Client Core: JellyfinClient
+
+### Constructor & Options
+
+```typescript
+new JellyfinClient(options: JellyfinClientOptions)
+```
+
+`JellyfinClientOptions`:
+- `serverUrl` (`string`, required): Jellyfin server base URL (trailing slashes are auto-trimmed).
+- `accessToken` (`string`, optional): Pre-existing authorization token.
+- `userId` (`string`, optional): Authenticated Jellyfin user ID.
+- `clientInfo` (`ClientInfo`, optional): Client metadata:
+  - `name`: Application name (default: `'Jellyfin SDK'`).
+  - `version`: Application version (default: SDK version).
+  - `device`: Device name (e.g. `'Living Room TV'`, `'Chrome on Windows'`).
+  - `deviceId`: Unique persistent device ID (auto-generated if omitted).
+- `storage` (`StorageAdapter`, optional): Storage implementation for tokens/device IDs (defaults to `getDefaultStorage()`).
+- `cache` (`CacheAdapter`, optional): Cache adapter for Stale-While-Revalidate caching (defaults to `MemoryCacheAdapter`).
+
+### Authentication & Session Restore
+
+```typescript
+// Login with credentials (auto-stores token and user ID, reports capabilities)
+const authResult = await client.authenticate('username', 'password');
+
+// Restore previously saved session
+const savedClient = new JellyfinClient({
+  serverUrl: 'https://jellyfin.example.com',
+  accessToken: localStorage.getItem('jellyfin_token') || undefined,
+  userId: localStorage.getItem('jellyfin_user_id') || undefined
+});
+
+// Logout (clears tokens and emits 'logout')
+await client.logout();
+```
+
+### Lifecycle Events
+
+`JellyfinClient` implements `on(event, listener)` and `off(event, listener)`:
+
+```typescript
+// Emitted after successful login or session token update
+client.on('authenticated', (authResult) => {
+  console.log('Authenticated:', authResult.User.Name);
+});
+
+// Emitted when any server request fails with 401 or 403
+client.on('unauthorized', () => {
+  console.warn('Session expired. Redirect to login.');
+});
+
+// Emitted upon calling client.logout()
+client.on('logout', () => {
+  console.log('Session terminated.');
+});
+```
+
+### Pluggable Storage & Caching
+
+- `StorageAdapter`: Interface with `getItem`, `setItem`, `removeItem`.
+  - `LocalStorageAdapter`: Browser `window.localStorage`.
+  - `MemoryStorage`: Ephemeral in-memory `Map` (ideal for Node.js).
+  - `getDefaultStorage()`: Auto-selects `LocalStorageAdapter` in browsers, `MemoryStorage` in Node.js.
+  - `generateDeviceId()`: Generates random hex/base36 device identifiers.
+- `CacheAdapter`: Interface with `get<T>`, `set<T>`, `delete`, `clear`.
+  - `MemoryCacheAdapter`: Fast in-memory TTL map.
+  - `IndexedDBCacheAdapter`: Persistent browser IndexedDB cache.
+  - `fetchWithCache(cache, key, fetchFn, onFreshData)`: Stale-While-Revalidate executor.
+
+---
+
+## Modules & API Reference
+
+### Auth & System (`client.auth`, `client.system`)
+
+Documented in: `docs/api/auth-and-system.md`
+
+#### `client.auth`
+- `authenticateByName(username, password)`: Authenticates against `/Users/AuthenticateByName`.
+- `reportCapabilities(capabilities?)`: Reports client playback capabilities (supports Jellyfin 12 `/Sessions/Capabilities/Full` and Jellyfin 10 `/Sessions/Capabilities`).
+- `getUserImageUrl(userId?, options?)`: Generates user profile avatar URL.
+- `logout()`: Clears credentials and active user session.
+- `getUserId()` / `setUserId(id)`: Read or change current active user ID.
+
+#### `client.system`
+- `getPublicInfo()`: Unauthenticated server metadata (`GET /System/Info/Public`).
+- `getInfo()`: Full server system information (`GET /System/Info`, requires auth).
+- `detectVersion()`: Probes server version and sets internal version flag. Returns `Promise<boolean>` (`true` if Jellyfin 12+).
+- `isV12()`: Synchronously checks if server is 12.0+.
+- `isVersionAtLeast(major, minor?, patch?)`: Checks minimum semantic version threshold.
+- `parseSemVer(versionString)`: Parses version strings into `{ major, minor, patch }`.
+
+---
+
+### Media Library Browsing (`client.library`)
+
+Documented in: `docs/api/library.md`
+
+#### Views & Folders
+- `getVideoLibraries()`: Retrieves top-level video libraries (Movies, TV, Home Videos).
+- `getMusicLibraries()`: Retrieves top-level music views.
+
+#### Movies & TV Shows
+- `getMovies(options?)`: Retrieves movie items with filtering (`genres`, `years`, `sortBy`, `sortOrder`, `limit`, `startIndex`).
+- `getSeries(options?)`: Queries TV series.
+- `getSeasons(seriesId, options?)`: Retrieves seasons for a TV series (`GET /Shows/{seriesId}/Seasons`).
+- `getEpisodes(seriesId, seasonId?, options?)`: Retrieves episodes for a show or specific season (`GET /Shows/{seriesId}/Episodes`).
+- `getVideos(options?)`: Queries generic video files (home videos, music videos).
+
+#### Music
+- `getAlbums(options?)`: Queries music albums.
+- `getArtists(options?)`: Queries artists.
+- `getSongs(options?)`: Queries individual audio tracks (`albumId`, `artistId`, etc.).
+- `getFavoriteSongs(options?)`: Queries user favorite audio tracks.
+
+#### Item Details & Stream Negotiation
+- `getItem(itemId)`: Full metadata for a single item (`BaseItemDto`).
+- `getPlaybackInfo(itemId, options?)`: POST to `/Items/{itemId}/PlaybackInfo` to negotiate direct play compatibility, transcode profiles, audio track selection, and bitrate constraints.
+
+---
+
+### Media, Streaming & Artwork (`client.media`)
+
+Documented in: `docs/api/media.md`, `docs/guides/streaming-and-media.md`
+
+#### Progressive & Adaptive Streams
+- `getVideoStreamUrl(itemId, options?)`: Direct play (`static: true`) or progressive transcode stream URL (`/Videos/{itemId}/stream`). Supports `quality`, `audioStreamIndex`, `subtitleStreamIndex`, `subtitleMethod` (`'Encode' | 'Embed' | 'External'`).
+- `getVideoHlsStreamUrl(itemId, options?)`: Master HLS playlist URL (`/Videos/{itemId}/master.m3u8`) with `segmentLength` and quality presets.
+- `getAudioStreamUrl(itemId, options?)`: Progressive audio stream URL (`/Audio/{itemId}/stream`) with container and bitrate settings.
+- `getAudioHlsStreamUrl(itemId, options?)`: Adaptive audio HLS URL (`/Audio/{itemId}/master.m3u8`).
+
+#### Subtitle Extraction & Streaming
+- `getSubtitleTracks(item)`: Normalizes subtitle tracks from `item.MediaStreams` into structured `SubtitleTrackInfo` objects (`index`, `language`, `displayTitle`, `codec`, `isDefault`, `isForced`, `url`).
+- `getSubtitleUrl(itemId, mediaSourceId, index, options?)`: Constructs URL for WebVTT/SRT stream.
+- `getSubtitles(itemId, mediaSourceId, index, options?)`: Fetches raw subtitle plain text.
+
+#### Responsive Artwork
+- `getArtworkUrl(itemOrId, options?)`: Builds image URLs with `type` (`'Primary' | 'Art' | 'Backdrop' | 'Banner' | 'Logo' | 'Thumb' | 'Disc'`), `maxWidth`, `maxHeight`, `quality`, and `fallbackUrl`.
+
+#### File Downloads
+- `getDownloadUrl(itemId, options?)`: Direct download URL for the original source file.
+- `downloadFile(itemId, options?)`: Downloads file to in-memory `Blob` with progress callback (`onProgress: (fraction: number) => void`).
+
+---
+
+### Playback Reporting & Transcode Management (`client.playback`, `client.transcode`)
+
+Documented in: `docs/api/playback-and-transcode.md`
+
+- `client.playback.reportStart(itemId, positionTicks?, options?)`: Notifies server that playback started (`/Sessions/Playing`).
+- `client.playback.reportProgress(itemId, positionTicks?, isPaused?, options?)`: Reports ongoing playback progress (`/Sessions/Playing/Progress`).
+- `client.playback.reportStopped(itemId, positionTicks?, options?)`: Reports playback ended (`/Sessions/Playing/Stopped`). When `playSessionId` is included in `options`, automatically calls `client.transcode.stopActiveEncoding(playSessionId)`.
+- `client.transcode.stopActiveEncoding(playSessionId, deviceId?)` (alias `client.transcode.stop`): Explicitly terminates server-side FFmpeg transcoding process via `DELETE /Videos/ActiveEncodings`.
+
+---
+
+### Search (`client.search`)
+
+Documented in: `docs/api/search.md`
+
+- `search(query, options?)`: Universal search across all media types.
+- `searchInLibrary(parentId, query, options?)`: Search scoped to a specific library folder.
+- **Typed Shortcuts**:
+  - `searchMovies(query, options?)`
+  - `searchSeries(query, options?)`
+  - `searchEpisodes(query, options?)`
+  - `searchSongs(query, options?)`
+  - `searchAlbums(query, options?)`
+  - `searchArtists(query, options?)`
+- Supported `SearchOptions`: `parentId`, `includeItemTypes`, `mediaTypes`, `genres`, `years`, `isFavorite`, `sortBy`, `sortOrder`, `limit`, `startIndex`, `fields`, `recursive`.
+
+---
+
+### In-Progress & Dynamic Feeds (`client.resume`, `client.nextUp`, `client.latest`)
+
+#### Resume (`client.resume`)
+- `getResumeItems(options?)` (alias `getItems`): Items currently in progress for the user (`GET /UserItems/Resume`). Supports `limit`, `startIndex`, `parentId`, `mediaTypes`.
+
+#### Next Up (`client.nextUp`)
+- `getNextUp(options?)` (alias `getEpisodes`): Next unplayed episodes for followed series (`GET /Shows/NextUp`). Supports `seriesId`, `limit`, `disableFirstEpisode`.
+
+#### Recently Added (`client.latest`)
+- `getLatest(options?)`: Recent media items (`GET /Users/{userId}/Items/Latest`).
+- `getLatestMovies(options?)`: Convenience shortcut for recent movies.
+- `getLatestEpisodes(options?)`: Convenience shortcut for recent episodes.
+- `getLatestAlbums(options?)`: Convenience shortcut for recent music albums.
+
+---
+
+### Playlists, Lyrics & Favorites (`client.playlists`, `client.lyrics`, `client.favorites`)
+
+Documented in: `docs/api/playlists-lyrics-favorites.md`
+
+#### Playlists (`client.playlists`)
+- `createPlaylist(options)`: Creates playlist (handles both Jellyfin 12 POST JSON and Jellyfin 10 query params).
+- `getPlaylists()`: Lists all user playlists.
+- `getPlaylistItems(playlistId, options?)`: Items in a playlist.
+- `deletePlaylist(playlistId)`: Deletes a playlist.
+- `addTracks(playlistId, trackIds)`: Appends tracks to a playlist.
+- `removeTrack(playlistId, trackId)`: Removes item by track item ID.
+- `removePlaylistItem(playlistId, playlistItemId)`: Removes item by unique playlist entry ID.
+- `uploadPlaylistImage(playlistId, base64Data, mimeType)`: Uploads custom playlist cover art.
+
+#### Lyrics (`client.lyrics`)
+- `getLyrics(itemId)`: Retrieves synced or unsynced song lyrics (`GET /Audio/{itemId}/Lyrics`). Returns `{ Lyrics: [{ Start: number, Text: string }] }`.
+
+#### Favorites (`client.favorites`)
+- `markFavorite(itemId)`: Marks an item as favorite (`POST /UserFavoriteItems/{itemId}`).
+- `unmarkFavorite(itemId)`: Unmarks an item as favorite (`DELETE /UserFavoriteItems/{itemId}`).
+
+---
+
+### Trickplay & Scrubbing Previews (`client.trickplay`)
+
+Documented in: `docs/api/trickplay.md`
+
+Provides seekbar thumbnail previews (Jellyfin 10.9+ Trickplay tile sheets):
+
+- `getTilesHlsUrl(itemId, width, options?)`: Returns `tiles.m3u8` HLS playlist URL.
+- `getTileImageUrl(itemId, width, index, options?)`: Direct URL for a specific tile sprite sheet.
+- `getTrickplayManifest(itemId, width, options?)`: Fetches and parses `tiles.m3u8` into structured tile definitions.
+- `getAvailableResolutions(item, mediaSourceId?)`: Discovers available thumbnail widths from item metadata (e.g. `[320, 640]`).
+- `getTrickplayInfo(item, width?, mediaSourceId?)`: Retrieves `TrickplayInfoDto` (sheet dimensions, thumbnail interval, tile counts).
+- `getThumbnailForTimestamp({ item, timestampMs, width })`: Computes exact sprite coordinates (`x`, `y`, `width`, `height`, `tileIndex`, `imageUrl`) for any playback timestamp.
+
+---
+
+### Chapters & Intro/Credits Skipping (`client.chapters`)
+
+Documented in: `docs/api/chapters-and-markers.md`
+
+- `extractChapters(item)`: Extracts chapter markers from existing `BaseItemDto`.
+- `getChapters(itemId)`: Fetches chapters from server (`Fields=Chapters`).
+- `getChapterImageUrl(itemId, chapterIndex, options?)`: Generates chapter thumbnail URL (`/Items/{itemId}/Images/Chapter/{chapterIndex}`).
+- `getMediaSegments(itemId, options?)`: Typed media segments (`Intro`, `Outro`, `Commercial`, `Recap`) via `GET /MediaSegments` (Jellyfin 10.10+).
+- `getIntroCredits(itemOrChaptersOrId)`: Resolves intro/outro boundaries via MediaSegments or chapter title heuristics.
+- `findCurrentSegment(positionTicks, markers)`: Determines if current playback position is inside an intro or credits segment.
+- `getSkipPosition(positionTicks, markers)`: Calculates target timestamp ticks to skip over an intro or credits block.
+
+---
+
+### Genres, Studios & Collections (`client.genres`, `client.collections`)
+
+Documented in: `docs/api/genres-and-collections.md`
+
+#### Genres & Studios (`client.genres`)
+- `getGenres(options?)` / `getGenre(name, options?)`: Browse video genres.
+- `getMusicGenres(options?)` / `getMusicGenre(name, options?)`: Browse music genres.
+- `getStudios(options?)` / `getStudio(name, options?)`: Browse production studios.
+
+#### BoxSet Collections (`client.collections`)
+- `getCollections(options?)`: Lists all BoxSet collections.
+- `getCollectionItems(collectionId, options?)`: Queries items inside a BoxSet.
+- `createCollection(options)`: Creates a new BoxSet (`POST /Collections`).
+- `addToCollection(collectionId, itemIds)`: Adds items to an existing BoxSet.
+- `removeFromCollection(collectionId, itemIds)`: Removes items from a BoxSet.
+
+---
+
+### Display Preferences (`client.displayPreferences`)
+
+Documented in: `docs/api/display-preferences.md`
+
+Persists user view layouts and sorting across sessions via `/DisplayPreferences/{id}`:
+
+- `getDisplayPreferences(id, options?)`: Retrieves display settings for a view/folder.
+- `updateDisplayPreferences(id, preferences, options?)`: Saves updated view preferences.
+- `setCustomPreference(id, key, value, options?)`: Stores custom client-specific key-value pairs in `CustomPrefs`.
+- `setSortPreferences(id, sortBy, sortOrder, options?)`: Updates sort field and direction.
+- `setViewType(id, viewType, options?)`: Updates presentation layout (`'Poster'`, `'Thumb'`, `'Banner'`, `'List'`).
+
+---
+
+### Remote Session Control (`client.sessions`)
+
+Documented in: `docs/api/sessions-and-remote.md`, `docs/guides/realtime-and-remote.md`
+
+Controls secondary devices and active players across the local network:
+
+- `getSessions(options?)`: Queries active sessions on the server.
+- `play(sessionId, itemIds, options?)`: Instructs remote player to play items (`PlayNow`, `PlayNext`, `PlayLast`).
+- `playPause(sessionId)` / `pause(sessionId)` / `unpause(sessionId)` / `stop(sessionId)`.
+- `seek(sessionId, positionTicks)`: Seeks remote player (1 sec = 10,000,000 ticks).
+- `nextTrack(sessionId)` / `previousTrack(sessionId)`.
+- `setVolume(sessionId, volume)`: Volume from `0` to `100`.
+- `mute(sessionId)` / `unmute(sessionId)` / `toggleMute(sessionId)`.
+- `setAudioStreamIndex(sessionId, index)` / `setSubtitleStreamIndex(sessionId, index)` (`-1` turns off subtitles).
+- `sendMessage(sessionId, options)`: Displays modal dialog alert on remote screen.
+- `viewItem(sessionId, itemType, itemId, itemName)`: Commands remote client to navigate to an item's details view.
+
+---
+
+### Real-Time WebSocket Events (`client.websocket`)
+
+Documented in: `docs/api/websocket.md`, `docs/guides/realtime-and-remote.md`
+
+- `connect(options?)`: Connects to `/socket` with `autoReconnect`, `reconnectIntervalMs`, `keepAliveIntervalMs`.
+- `disconnect()`: Closes socket connection cleanly.
+- `isConnected`: Boolean getter for connection state.
+- **Subscriptions**:
+  - `startSessionsSubscription(intervalMs?)` / `stopSessionsSubscription()`
+  - `startScheduledTasksSubscription(intervalMs?)` / `stopScheduledTasksSubscription()`
+  - `startActivityLogSubscription(intervalMs?)` / `stopActivityLogSubscription()`
+- **Event Listeners (`client.websocket.on`)**:
+  - `'open'`: Connected.
+  - `'close'`: Disconnected.
+  - `'error'`: Socket error.
+  - `'message'`: Raw incoming WebSocket message.
+  - `'libraryChanged'`: Library content created, updated, or deleted (`ItemsAdded`, `ItemsUpdated`, `ItemsRemoved`).
+  - `'userDataChanged'`: User watch status, progress ticks, or favorite toggles updated.
+  - `'sessions'`: Active server playback sessions.
+  - `'restartRequired'` / `'serverShuttingDown'`: Server lifecycle events.
+
+---
+
+### Quick Connect Device Pairing (`client.quickConnect`)
+
+Documented in: `docs/api/quick-connect.md`, `docs/guides/realtime-and-remote.md`
+
+Passwordless pairing flow for Smart TVs and game consoles:
+
+1. **Initiating Device (TV / Console)**:
+   - `isEnabled()`: Checks if Quick Connect is enabled on server.
+   - `initiate()`: Returns `{ Code, Secret }`. Display `Code` on screen.
+   - `poll(secret, options?)`: Polls until authenticated, returning access token and user ID.
+2. **Authorizing Device (Phone / PC already logged in)**:
+   - `authorize(code, userId?)`: Approves code entered by user.
+
+---
+
+### Offline Storage Manager (`client.offline`)
+
+Documented in: `docs/api/offline.md`, `docs/guides/offline-and-downloads.md`
+
+Browser IndexedDB media caching for offline audio and video playback:
+
+- `isSupported()`: Checks if IndexedDB is available in the current environment.
+- `downloadItem(item, onProgress?, options?)`: Downloads media file blob, artwork, and metadata into IndexedDB with progress callback (`fraction: 0..1`).
+- `downloadItems(items, onProgress?, options?)`: Batch downloads items with aggregated progress tracking.
+- `isItemDownloaded(itemId)`: Verifies if item is cached offline.
+- `getDownloadedBlob(itemId)`: Retrieves raw media `Blob`.
+- `getDownloadedBlobUrl(itemId)`: Creates object URL (`blob:...`) for HTML5 `<video>` or `<audio>` elements.
+- `getAllDownloads()`: Lists all stored records with file size and metadata.
+- `removeDownload(itemId)`: Deletes item from IndexedDB.
+- `clearAllDownloads()`: Clears all offline items.
+
+---
+
+## Quality Presets & Utilities
+
+Exported directly from root package:
+
+### Video Quality Presets (`VIDEO_QUALITY_PRESETS`)
+- `4k`: 40 Mbps, 3840x2160
+- `1080p-high`: 20 Mbps, 1920x1080
+- `1080p`: 10 Mbps, 1920x1080
+- `720p-high`: 8 Mbps, 1280x720
+- `720p`: 4 Mbps, 1280x720
+- `480p`: 2 Mbps, 720x480
+- `360p`: 1 Mbps, 640x360
+- `240p`: 500 kbps, 426x240
+- `direct`: Original source bitrate and resolution (no transcode cap)
+
+### Audio Quality Presets (`AUDIO_QUALITY_PRESETS`)
+- `320k`: 320 kbps
+- `256k`: 256 kbps
+- `192k`: 192 kbps
+- `128k`: 128 kbps
+- `64k`: 64 kbps
+
+### Helper Functions
+- `resolveVideoQuality(presetOrOptions)`: Resolves preset key or custom options into `{ maxBitrate, maxWidth, maxHeight }`.
+- `resolveAudioQuality(presetOrOptions)`: Resolves audio preset into `{ maxBitrate }`.
+- `formatBitrate(bitrate)`: Formats numeric bitrates into human-readable strings (e.g. `10_000_000` -> `"10 Mbps"`, `320_000` -> `"320 kbps"`).
+
+---
+
+## Error Handling
+
+All SDK errors inherit from standard TypeScript Error classes:
+
+- `JellyfinError`: Base class for all SDK runtime errors.
+- `JellyfinApiError`: Thrown on non-2xx HTTP responses from Jellyfin server.
+  - `status`: HTTP response status code (e.g. `400`, `404`, `500`).
+  - `endpoint`: API route that produced the error.
+- `JellyfinAuthError`: Subclass of `JellyfinApiError` thrown on authentication failures (`401` / `403`).
+
+```typescript
+import { JellyfinError, JellyfinApiError, JellyfinAuthError } from '@francofantomius/jellyfin';
+
+try {
+  await client.authenticate('admin', 'wrong-password');
+} catch (error) {
+  if (error instanceof JellyfinAuthError) {
+    console.error('Invalid username or password!');
+  } else if (error instanceof JellyfinApiError) {
+    console.error(`API error [${error.status}] at ${error.endpoint}:`, error.message);
+  } else if (error instanceof JellyfinError) {
+    console.error('SDK error:', error.message);
+  }
+}
+```
+
+---
+
+## Documentation Index
+
+For in-depth guides and detailed API signatures, see the `docs/` directory:
+
+- **Guides**:
+  - Getting Started: `docs/guides/getting-started.md`
+  - Streaming, Playback & Artwork: `docs/guides/streaming-and-media.md`
+  - Offline Storage & Downloads: `docs/guides/offline-and-downloads.md`
+  - Real-Time WebSockets & Remote Control: `docs/guides/realtime-and-remote.md`
+- **API Reference**:
+  - Core Client (`JellyfinClient`): `docs/api/client.md`
+  - Auth & System (`client.auth`, `client.system`): `docs/api/auth-and-system.md`
+  - Library Browsing (`client.library`): `docs/api/library.md`
+  - Media & Streaming (`client.media`): `docs/api/media.md`
+  - Playback & Transcoding (`client.playback`, `client.transcode`): `docs/api/playback-and-transcode.md`
+  - Search (`client.search`): `docs/api/search.md`
+  - Playlists, Lyrics & Favorites (`client.playlists`, `client.lyrics`, `client.favorites`): `docs/api/playlists-lyrics-favorites.md`
+  - Trickplay Scrubbing Previews (`client.trickplay`): `docs/api/trickplay.md`
+  - Chapters & Media Markers (`client.chapters`): `docs/api/chapters-and-markers.md`
+  - Genres, Studios & Collections (`client.genres`, `client.collections`): `docs/api/genres-and-collections.md`
+  - User Display Preferences (`client.displayPreferences`): `docs/api/display-preferences.md`
+  - Remote Sessions (`client.sessions`): `docs/api/sessions-and-remote.md`
+  - Real-Time WebSocket (`client.websocket`): `docs/api/websocket.md`
+  - Quick Connect (`client.quickConnect`): `docs/api/quick-connect.md`
+  - Offline IndexedDB Storage (`client.offline`): `docs/api/offline.md`
+

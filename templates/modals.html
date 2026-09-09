@@ -1,0 +1,349 @@
+<!-- Desktop Queue Side Sheet -->
+<md-side-sheet id="desktop-queue-sheet" class="queue-sheet queue-side-sheet" type="modal" side="end" divider>
+  <div slot="headline" class="queue-sheet-headline">
+    <md-icon name="queue_music" class="queue-headline-icon"></md-icon>
+    <span data-i18n>Play Queue</span>
+    <span id="desktop-queue-count" class="queue-count-badge"></span>
+  </div>
+  <div slot="header-actions">
+    <button id="desktop-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
+      <span class="material-symbols-outlined">delete_sweep</span>
+    </button>
+  </div>
+  <div id="desktop-queue-tracks-list" class="queue-tracks-list"></div>
+</md-side-sheet>
+
+<!-- Mobile Queue Bottom Sheet -->
+<md-bottom-sheet id="mobile-queue-sheet" class="queue-sheet queue-bottom-sheet" type="modal" divider>
+  <div slot="headline" class="queue-sheet-headline">
+    <md-icon name="queue_music" class="queue-headline-icon"></md-icon>
+    <span data-i18n>Play Queue</span>
+    <span id="mobile-queue-count" class="queue-count-badge"></span>
+  </div>
+  <div slot="header-actions">
+    <button id="mobile-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
+      <span class="material-symbols-outlined">delete_sweep</span>
+    </button>
+  </div>
+  <div id="mobile-queue-tracks-list" class="queue-tracks-list"></div>
+</md-bottom-sheet>
+
+<!-- Settings & Transcode Quality Modal -->
+<div id="settings-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">settings</span>
+        <span data-i18n>App Settings</span>
+      </h2>
+      <button id="btn-settings-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="input-group">
+      <label for="setting-language" data-i18n>Language</label>
+      <select id="setting-language">
+        <option value="auto" data-i18n>Auto (Browser Default)</option>
+        <option value="en">English</option>
+        <option value="it">Italiano</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="pt">Português</option>
+        <option value="zh">中文</option>
+        <option value="ja">日本語</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label for="setting-quality-wifi" data-i18n>WiFi Streaming Quality</label>
+      <select id="setting-quality-wifi">
+        <option value="Direct" data-i18n>Direct Play (Lossless/Original)</option>
+        <option value="320000" data-i18n>320 kbps (High Quality MP3)</option>
+        <option value="256000" data-i18n>256 kbps (Medium Quality)</option>
+        <option value="128000" data-i18n>128 kbps (Data Saver)</option>
+        <option value="64000" data-i18n>64 kbps (Low Bandwidth)</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label for="setting-quality-mobile" data-i18n>Mobile Data Streaming Quality</label>
+      <select id="setting-quality-mobile">
+        <option value="Direct" data-i18n>Direct Play (Lossless/Original)</option>
+        <option value="320000" data-i18n>320 kbps (High Quality MP3)</option>
+        <option value="256000" data-i18n>256 kbps (Medium Quality)</option>
+        <option value="128000" selected data-i18n>128 kbps (Data Saver)</option>
+        <option value="64000" data-i18n>64 kbps (Low Bandwidth)</option>
+      </select>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
+      <input type="checkbox" id="setting-force-transcode"
+        style="width: 18px; height: 18px; accent-color: var(--accent);">
+      <label for="setting-force-transcode" style="font-size: 13px; font-weight: 600; cursor: pointer;" data-i18n>Force Audio Transcoding (MP3/AAC)</label>
+    </div>
+
+    <div
+      style="display: flex; align-items: center; gap: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; margin-top: 4px;">
+      <input type="checkbox" id="setting-search-podcasts"
+        style="width: 18px; height: 18px; accent-color: var(--accent);" checked>
+      <label for="setting-search-podcasts"
+        style="font-size: 13px; font-weight: 600; cursor: pointer; flex-grow: 1; color: var(--text-primary);" data-i18n>Search Podcasts in Searchbar</label>
+    </div>
+
+    <div class="input-group">
+      <label for="setting-theme" data-i18n>Theme Mode</label>
+      <select id="setting-theme">
+        <option value="system" selected data-i18n>System Theme</option>
+        <option value="dark" data-i18n>Dark Theme</option>
+        <option value="light" data-i18n>Light Theme</option>
+      </select>
+    </div>
+
+    <div class="input-group" style="margin-top: 4px;">
+      <label style="font-size: 13px; font-weight: 700;" data-i18n>Home Page Section Order</label>
+      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;" data-i18n>Reorder sections on your Home page:</p>
+      <div id="home-section-order-list" class="section-order-list"></div>
+    </div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
+      <button id="btn-save-settings" class="btn btn-primary" style="width: 100%;" data-i18n>Save Settings</button>
+    </div>
+
+    <div style="text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+      <a href="https://github.com/FrancoFantomius/melo" target="_blank" rel="noopener noreferrer"
+        style="font-size: 13px; color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <span class="material-symbols-outlined" style="font-size: 16px;">link</span>
+        <span data-i18n>View Project on GitHub</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Full-Screen Lyrics View Overlay -->
+<div id="lyrics-view" class="lyrics-view-container" style="display: none;">
+  <div class="lyrics-bg-art-container">
+    <img id="lyrics-bg-art" src="" alt="" class="lyrics-bg-art">
+    <div class="lyrics-bg-overlay"></div>
+  </div>
+
+  <div class="lyrics-view-header">
+    <div class="lyrics-track-info">
+      <div id="lyrics-track-title" class="lyrics-header-title" data-i18n>Lyrics</div>
+      <div id="lyrics-track-artist" class="lyrics-header-artist"></div>
+    </div>
+    <button id="btn-lyrics-close" class="btn-icon lyrics-close-btn" title="Close lyrics">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+
+  <div id="lyrics-view-body" class="lyrics-view-body">
+    <div class="lyrics-loading" style="color: var(--text-secondary); text-align: center; padding: 20px;" data-i18n>Loading lyrics...</div>
+  </div>
+</div>
+
+<!-- Add Podcast Modal -->
+<div id="add-podcast-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">podcasts</span>
+        <span data-i18n>Add Podcast</span>
+      </h2>
+      <md-icon-button id="btn-add-podcast-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
+    </div>
+
+    <form id="add-podcast-form">
+      <div class="input-group">
+        <label for="podcast-rss-url" data-i18n>Podcast RSS Feed URL</label>
+        <input type="url" id="podcast-rss-url" placeholder="https://example.com/podcast/rss.xml" required
+          style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+      </div>
+
+      <div id="podcast-add-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+        <md-button type="submit" id="btn-submit-add-podcast" variant="filled" style="width: 100%;"><span data-i18n>Add Podcast</span></md-button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Create Playlist Modal -->
+<div id="create-playlist-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <span data-i18n>Create Playlist</span>
+      </h2>
+      <button id="btn-create-playlist-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form id="create-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
+      <div class="input-group">
+        <label for="create-playlist-name" data-i18n>Playlist Name</label>
+        <input type="text" id="create-playlist-name" required placeholder="My Awesome Playlist">
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
+        <input type="checkbox" id="create-playlist-public" style="width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;">
+        <label for="create-playlist-public" style="font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-primary);" data-i18n>Visible to all users on this server</label>
+      </div>
+
+      <div class="input-group">
+        <label for="create-playlist-image" data-i18n>Cover Image (Optional)</label>
+        <input type="file" id="create-playlist-image" accept="image/png, image/jpeg, image/webp">
+      </div>
+
+      <div id="create-playlist-error" style="color: var(--danger); font-size: 13px; display: none;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" id="btn-cancel-create-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+        <button type="submit" id="btn-submit-create-playlist" class="btn btn-primary" data-i18n>Create</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Playlist Modal -->
+<div id="edit-playlist-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">edit</span>
+        <span data-i18n>Edit Playlist</span>
+      </h2>
+      <button id="btn-edit-playlist-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form id="edit-playlist-form">
+      <input type="hidden" id="edit-playlist-id">
+      <div class="input-group">
+        <label for="edit-playlist-name" data-i18n>Playlist Name</label>
+        <input type="text" id="edit-playlist-name" required
+          style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+      </div>
+
+      <div class="input-group" style="margin-top: 14px;">
+        <label for="edit-playlist-image" data-i18n>Change Cover Image (Optional)</label>
+        <input type="file" id="edit-playlist-image" accept="image/png, image/jpeg, image/webp"
+          style="width: 100%; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
+      </div>
+
+      <div id="edit-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-top: 10px;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" id="btn-cancel-edit-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+        <button type="submit" id="btn-save-edit-playlist" class="btn btn-primary" data-i18n>Save Changes</button>
+      </div>
+
+      <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+        <button type="button" id="btn-delete-playlist-in-edit" class="btn" style="width: 100%; background: transparent; color: var(--danger); border: 1px solid var(--danger);">
+          <span class="material-symbols-outlined">delete</span>
+          <span data-i18n>Delete Playlist</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Add Tracks to Playlist Modal -->
+<div id="add-tracks-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card" style="max-width: 520px; width: 90%;">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <span data-i18n>Add Tracks to Playlist</span>
+      </h2>
+      <button id="btn-add-tracks-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <input type="hidden" id="add-tracks-playlist-id">
+
+    <div style="margin-bottom: 14px;">
+      <input type="text" id="add-tracks-search-input" placeholder="Search tracks by name or artist..." data-i18n-placeholder autocomplete="off"
+        style="width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+    </div>
+
+    <div id="add-tracks-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
+      <div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;" data-i18n>Search your library to add tracks...</div>
+    </div>
+
+    <div id="add-tracks-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button type="button" id="btn-cancel-add-tracks" class="btn btn-secondary" data-i18n>Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Playlist Modal -->
+<div id="delete-playlist-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card" style="max-width: 400px;">
+    <div class="modal-header">
+      <h2 class="modal-title" style="color: var(--danger);">
+        <span class="material-symbols-outlined" style="color: var(--danger);">delete</span>
+        <span data-i18n>Delete Playlist</span>
+      </h2>
+      <button id="btn-delete-playlist-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <input type="hidden" id="delete-playlist-id">
+    <p style="font-size: 14px; color: var(--text-secondary); margin: 12px 0 20px 0;">
+      <span data-i18n>Are you sure you want to delete</span> <strong id="delete-playlist-name-text" style="color: var(--text-primary);"></strong>? <span data-i18n>This will permanently delete the playlist from Jellyfin.</span>
+    </p>
+
+    <div id="delete-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button type="button" id="btn-cancel-delete-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+      <button type="button" id="btn-confirm-delete-playlist" class="btn btn-danger" style="background: var(--danger); color: white; border: none;" data-i18n>Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Select Playlist Modal (Add track/album to playlist) -->
+<div id="select-playlist-modal" class="modal-overlay" style="display: none;">
+  <div class="modal-card" style="max-width: 440px; width: 90%;">
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <span data-i18n>Add to Playlist</span>
+      </h2>
+      <button id="btn-select-playlist-close" class="btn-icon" aria-label="Close modal">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div style="margin-bottom: 12px;">
+      <button id="btn-select-playlist-create-new" class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px;">
+        <span class="material-symbols-outlined" style="color: var(--accent);">add</span>
+        <span data-i18n>Create New Playlist</span>
+      </button>
+    </div>
+
+    <div id="select-playlist-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+      <div style="color: var(--text-muted); font-size: 13px; padding: 12px; text-align: center;" data-i18n>Loading playlists...</div>
+    </div>
+
+    <div id="select-playlist-status" style="font-size: 13px; text-align: center; display: none; margin-bottom: 8px;"></div>
+
+    <div style="display: flex; justify-content: flex-end; gap: 10px;">
+      <button type="button" id="btn-cancel-select-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+    </div>
+  </div>
+</div>

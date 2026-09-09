@@ -1,0 +1,317 @@
+/* ==========================================================================
+   Material Design 3 Queue Styles (Desktop Side-Sheet & Mobile Bottom-Sheet)
+   ========================================================================== */
+
+/* M3 Sheet Custom Properties & Theming Tokens */
+.queue-sheet {
+  --md-side-sheet-width: 420px;
+  --md-side-sheet-shape: 20px;
+  --md-side-sheet-container-color: var(--bg-secondary);
+  --md-side-sheet-on-container-color: var(--text-primary);
+  --md-side-sheet-headline-color: var(--text-primary);
+  --md-side-sheet-subhead-color: var(--text-secondary);
+  --md-side-sheet-divider-color: var(--border-color);
+  --md-side-sheet-scrim-color: rgba(0, 0, 0, 0.5);
+
+  --md-bottom-sheet-max-width: 680px;
+  --md-bottom-sheet-max-height: calc(100dvh - 56px);
+  --md-bottom-sheet-shape: 28px;
+  --md-bottom-sheet-container-color: var(--bg-secondary);
+  --md-bottom-sheet-on-container-color: var(--text-primary);
+  --md-bottom-sheet-headline-color: var(--text-primary);
+  --md-bottom-sheet-subhead-color: var(--text-secondary);
+  --md-bottom-sheet-divider-color: var(--border-color);
+  --md-bottom-sheet-drag-handle-color: var(--text-muted);
+  --md-bottom-sheet-scrim-color: rgba(0, 0, 0, 0.5);
+  z-index: 2500;
+}
+
+/* Header Slot Elements */
+.queue-sheet-headline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  user-select: none;
+}
+
+.queue-headline-icon {
+  font-size: 24px;
+  color: var(--accent);
+}
+
+.queue-count-badge {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.queue-clear-btn {
+  color: var(--text-secondary);
+  transition: color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.queue-clear-btn:hover {
+  color: var(--danger);
+  background-color: var(--bg-tertiary);
+}
+
+/* Queue Tracks List Container */
+.queue-tracks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+  padding-bottom: calc(24px + var(--sab));
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+
+/* Section Header (Now Playing, Up Next, Previously Played) */
+.queue-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  padding: 12px 8px 4px 8px;
+  margin-top: 8px;
+  user-select: none;
+}
+
+.queue-section-header:first-child {
+  margin-top: 0;
+}
+
+.queue-section-header.previous-section {
+  opacity: 0.65;
+}
+
+/* Empty Queue Placeholder */
+.queue-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.queue-empty-icon {
+  font-size: 48px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.queue-empty-text {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Queue Track Item */
+.queue-track-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: transparent;
+  transition: background-color var(--transition-speed), border-color var(--transition-speed);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.queue-track-item:hover {
+  background-color: var(--bg-tertiary);
+}
+
+.queue-track-item:active {
+  background-color: var(--bg-hover);
+}
+
+.queue-track-item.playing {
+  background-color: var(--accent-bg-glow);
+  border-left: 3px solid var(--accent);
+  padding-left: 8px;
+}
+
+/* Track Status / Number / Animated Indicator */
+.queue-track-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  min-width: 24px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.queue-track-num {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.playing-indicator {
+  font-size: 20px;
+  color: var(--accent);
+}
+
+/* Artwork Thumbnail */
+.queue-track-thumb-container {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-tertiary);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+}
+
+.queue-track-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.queue-playing-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.queue-playing-icon {
+  font-size: 22px;
+  color: var(--accent);
+  animation: pulse-eq 1.2s infinite ease-in-out alternate;
+}
+
+@keyframes pulse-eq {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  100% { transform: scale(1.15); opacity: 1; }
+}
+
+/* Track Details */
+.queue-track-details {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.queue-track-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.queue-track-item.playing .queue-track-title {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.queue-track-artist {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Trailing Track Action Buttons */
+.queue-track-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.btn-queue-action {
+  padding: 6px;
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: color var(--transition-speed), background-color var(--transition-speed);
+}
+
+.btn-queue-action:hover {
+  color: var(--accent);
+  background-color: var(--bg-hover);
+}
+
+.btn-queue-action.btn-queue-remove:hover {
+  color: var(--danger);
+}
+
+/* ==========================================================================
+   Responsive Display Modes (Desktop vs Mobile)
+   ========================================================================== */
+
+/* Desktop Breakpoint (> 768px) */
+@media (min-width: 769px) {
+  #mobile-queue-sheet {
+    display: none !important;
+  }
+
+  .queue-side-sheet {
+    display: block;
+  }
+}
+
+/* Mobile Breakpoint (<= 768px) */
+@media (max-width: 768px) {
+  #desktop-queue-sheet {
+    display: none !important;
+  }
+
+  .queue-bottom-sheet {
+    display: block;
+  }
+
+  .queue-sheet {
+    --md-bottom-sheet-max-width: 100vw;
+  }
+
+  .queue-track-item {
+    padding: 10px 12px;
+    margin-bottom: 2px;
+  }
+
+  .queue-track-title {
+    font-size: 15px;
+  }
+
+  .queue-track-artist {
+    font-size: 13px;
+  }
+
+  .queue-tracks-list {
+    padding-bottom: env(safe-area-inset-bottom, 32px);
+    -webkit-overflow-scrolling: touch;
+  }
+}

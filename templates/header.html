@@ -1,0 +1,67 @@
+<md-top-app-bar variant="small" id="main-top-app-bar" class="main-header">
+  <div slot="navigation" class="header-brand-area">
+    <md-icon-button id="btn-toggle-sidebar" icon="menu" aria-label="Toggle Sidebar" title="Toggle Sidebar"></md-icon-button>
+
+    <a href="./index.html" data-view="home" class="logo-area" style="text-decoration: none;">
+      <img src="./img/icons/icon.svg" alt="App Logo" class="app-logo">
+      <span class="app-title">Melo</span>
+    </a>
+  </div>
+
+  <div class="search-container">
+    <md-search-bar
+      id="global-search-bar"
+      size="small"
+      compact
+      placeholder="Search artists, albums, tracks..."
+      data-i18n-placeholder
+    >
+      <div slot="suggestions" id="search-dropdown-results" class="search-dropdown-results"></div>
+    </md-search-bar>
+  </div>
+
+  <div slot="actions" class="header-actions">
+    <!-- Theme Toggle Button -->
+    <md-icon-button id="btn-theme-toggle" icon="brightness_auto" aria-label="Theme: Device default" title="Theme: Device default"></md-icon-button>
+
+    <!-- App Drawer Menu -->
+    <md-app-drawer headline="My Apps" data-i18n>
+      <md-app-drawer-item label="Calculator" href="https://francofantomius.com/calculator/" target="_blank" src="https://francofantomius.com/calculator/img/calculator_x128.png"></md-app-drawer-item>
+      <md-app-drawer-item label="Melo" href="https://melo.francofantomius.com/" target="_blank" src="https://melo.francofantomius.com/img/icons/icon.svg"></md-app-drawer-item>
+      <md-app-drawer-item label="Noten" href="https://noten.francofantomius.com/" target="_blank" src="https://noten.francofantomius.com/noten_x512.png"></md-app-drawer-item>
+      <md-app-drawer-item label="Scriben" href="https://scriben.francofantomius.com/" target="_blank" src="https://scriben.francofantomius.com/icons/icon.svg"></md-app-drawer-item>
+      <md-app-drawer-item label="Maps" href="https://maps.francofantomius.com/" target="_blank" src="https://maps.francofantomius.com/img/icons/maps.png"></md-app-drawer-item>
+    </md-app-drawer>
+
+    <!-- Sign In Button (Logged Out state) -->
+    <md-button id="btn-sync-login" variant="filled">
+      <span data-i18n>Sign in</span>
+    </md-button>
+
+    <!-- Account Menu (Logged In state) -->
+    <md-account-menu
+      id="header-account-menu"
+      name="Jellyfin User"
+      email="http://server.example.com"
+      headline="Account"
+      manage-text="Settings"
+      show-tabs="false"
+      alignment="end"
+      pivot="right"
+      style="display: none;"
+    >
+      <div slot="overview"></div>
+      <div slot="footer" class="account-menu-custom-footer">
+        <button type="button" id="btn-account-signout" class="account-signout-btn">
+          <md-icon name="logout"></md-icon>
+          <span data-i18n>Sign out</span>
+        </button>
+        <div class="account-footer-links">
+          <a id="btn-dropdown-terms" href="./terms.html" data-i18n>Terms of Service</a>
+          <span class="footer-dot">&bull;</span>
+          <a id="btn-dropdown-privacy" href="./privacy.html" data-i18n>Privacy Policy</a>
+        </div>
+      </div>
+    </md-account-menu>
+  </div>
+</md-top-app-bar>

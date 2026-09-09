@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+{{> head }}
+
+<body class="legal-page-body">
+
+  <div class="legal-page-layout">
+    <md-card variant="outlined" class="legal-card">
+      
+      <div slot="header" class="legal-header">
+        <div class="legal-header-brand">
+          <img src="./img/icons/icon.svg" class="legal-logo" alt="Melo Logo">
+          <div class="legal-header-text">
+            <h1 class="legal-title" data-i18n>Terms of Service</h1>
+            <span class="legal-subtitle" data-i18n>Melo Client & Services</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="legal-body">
+        <!-- Anti-Piracy & User Liability Notice Banner -->
+        <div class="legal-notice-banner">
+          <div class="legal-notice-title">
+            <span data-i18n>Anti-Piracy & Content Liability Disclaimer</span>
+          </div>
+          <p class="legal-notice-body" data-i18n>
+            <strong>Melo does not host, provide, encourage, or endorse piracy or the unauthorized sharing of copyrighted songs and audio media.</strong>
+            This application acts strictly as a web client interface designed to connect to your own self-hosted Jellyfin media server or public RSS podcast feeds. You, as the user, are solely responsible and legally liable for all content, music, audio files, and media accessed, streamed, or stored through your server or client instance.
+          </p>
+        </div>
+
+        <div class="legal-sections">
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>1. Acceptance of Terms</h2>
+            <p data-i18n>By accessing or using the Melo application, you agree to comply with and be bound by these Terms of Service. If you do not agree to these terms, you should not use this application.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>2. Description of Service</h2>
+            <p data-i18n>Melo is a client-side Progressive Web Application (PWA) that allows users to stream audio from their personal, self-hosted Jellyfin servers and listen to podcast RSS feeds. Melo does not provide media libraries, subscription music streams, or hosted audio files.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>3. Copyright & Intellectual Property</h2>
+            <p data-i18n>All trademarks, logos, and brand names are the property of their respective owners. Melo respects intellectual property rights and expects users to do the same. Users must ensure that they have the necessary rights, licenses, or legal permission to stream any audio files stored on their media servers.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>4. User Responsibilities & Liability</h2>
+            <p data-i18n>You agree to use Melo in compliance with all applicable local, national, and international laws. You are exclusively liable for any illegal, unauthorized, or infringing content transmitted through your personal server setup. The developers of Melo assume no liability for misuse of the software or copyright violations committed by users.</p>
+          </section>
+
+          <md-divider></md-divider>
+
+          <section class="legal-section">
+            <h2 class="legal-section-title" data-i18n>5. Limitation of Liability</h2>
+            <p data-i18n>Melo is provided "as is" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.</p>
+          </section>
+        </div>
+      </div>
+
+      <div slot="actions" class="legal-actions">
+        <md-button variant="outlined" href="./privacy.html">
+          <span data-i18n>Privacy Policy</span>
+        </md-button>
+        <md-button variant="filled" href="./index.html">
+          <span data-i18n>Go back to App</span>
+        </md-button>
+      </div>
+
+    </md-card>
+  </div>
+
+  <script type="module" src="./js/terms.js"></script>
+</body>
+</html>
