@@ -1,6 +1,6 @@
 import { fetchAndParseFeed } from '../../../podcasts/rss.js';
 import { getCachedFeeds, saveCachedFeed } from '../../../podcasts/storage.js';
-import { getPodcastFeedUrls, savePodcastFeedUrl } from '../../../jellyfin/client.js';
+import { getPodcastFeedUrls, savePodcastFeedUrl } from '../../../podcasts/sync.js';
 import { openAddPodcastModal, closeAddPodcastModal } from '../../modals.js';
 import { switchView } from '../../views.js';
 import { renderSubscribedCarousel, renderContinuePlayingCarousel, renderLatestEpisodesGrid } from './carousels.js';

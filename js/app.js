@@ -23,8 +23,7 @@ import { initModals } from './ui/modals.js';
 import { initViews } from './ui/views.js';
 import { initPlayerUI } from './ui/player.js';
 import { requireAuth } from './auth-guard.js';
-import { initCacheDB } from './jellyfin/cache.js';
-import { reportCapabilities } from './jellyfin/client.js';
+import { initCacheDB, reportCapabilities } from './jellyfin/client.js';
 import { initI18n } from './i18n.js';
 
 document.addEventListener('DOMContentLoaded', () => {

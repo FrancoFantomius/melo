@@ -1,6 +1,6 @@
 import { fetchAndParseFeed } from '../../../podcasts/rss.js';
 import { getCachedFeeds, saveCachedFeed } from '../../../podcasts/storage.js';
-import { getPodcastFeedUrls, removePodcastFeedUrl, savePodcastFeedUrl } from '../../../jellyfin/client.js';
+import { getPodcastFeedUrls, removePodcastFeedUrl, savePodcastFeedUrl } from '../../../podcasts/sync.js';
 import { switchView } from '../../views.js';
 import { getTranslation } from '../../../i18n.js';
 import { renderEpisodeListHtml } from './episodes.js';

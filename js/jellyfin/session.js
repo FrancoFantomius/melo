@@ -61,10 +61,20 @@ export function getSession() {
   }
 }
 
+const sessionListeners = new Set();
+
+export function onSessionChange(fn) {
+  sessionListeners.add(fn);
+  return () => sessionListeners.delete(fn);
+}
+
 export function saveSession(sessionData) {
   const current = getSession();
   const updated = { ...current, ...sessionData };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(updated));
+  sessionListeners.forEach(fn => {
+    try { fn(updated); } catch (e) { console.warn('[Session] Listener error:', e); }
+  });
   return updated;
 }
 
@@ -79,5 +89,8 @@ export function clearSession(preserveCredentials = true) {
     isLoggedIn: false
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(cleared));
+  sessionListeners.forEach(fn => {
+    try { fn(cleared); } catch (e) { console.warn('[Session] Listener error:', e); }
+  });
   return cleared;
 }

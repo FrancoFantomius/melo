@@ -1,6 +1,7 @@
-import { getAlbumsCached, getArtistsCached, getSongsCached, getPlaylistsCached, getPodcastFeedUrls, getArtworkUrl } from '../../jellyfin/client.js';
+import { getAlbumsCached, getArtistsCached, getSongsCached, getPlaylistsCached, getArtworkUrl } from '../../jellyfin/client.js';
 import { getSession } from '../../jellyfin/session.js';
 import { fetchAndParseFeed } from '../../podcasts/rss.js';
+import { getPodcastFeedUrls } from '../../podcasts/sync.js';
 import { getCachedFeeds, saveCachedFeed } from '../../podcasts/storage.js';
 import { openPodcastShow } from './podcasts.js';
 import { switchView } from '../views.js';

@@ -1,6 +1,6 @@
 import { getEpisodeState, markEpisodePlayed } from '../../../podcasts/storage.js';
 import { formatSeconds } from '../../../podcasts/rss.js';
-import { removePodcastFeedUrl } from '../../../jellyfin/client.js';
+import { removePodcastFeedUrl } from '../../../podcasts/sync.js';
 import { setQueue, addToQueue } from '../../../player/queue.js';
 import { playTrack } from '../../../player/audio.js';
 import { getTranslation } from '../../../i18n.js';
