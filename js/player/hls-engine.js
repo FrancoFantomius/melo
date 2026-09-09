@@ -1,5 +1,5 @@
 import Hls from 'hls.js';
-import { handleUnauthorized } from '../jellyfin/client.js';
+import { handleUnauthorized } from '../jellyfin/http.js';
 
 let hlsInstance = null;
 let currentHlsUrl = null;
