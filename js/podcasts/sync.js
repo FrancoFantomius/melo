@@ -1,5 +1,4 @@
-import { getSession } from './session.js';
-import { jellyfinFetch } from './http.js';
+import { getClient } from '../jellyfin/client.js';
 
 const PODCAST_LOCAL_STORAGE_KEY = 'melo_podcast_feed_urls';
 
@@ -21,33 +20,32 @@ function saveLocalPodcastFeedUrls(urls) {
 }
 
 async function savePodcastPrefs(current) {
-  const session = getSession();
-  if (!session.serverUrl || !session.userId) return;
+  const client = getClient();
+  if (!client || !client.serverUrl || !client.userId) return;
+
   try {
-    await jellyfinFetch('/DisplayPreferences/melo_podcasts', {
-      method: 'POST',
-      params: { userId: session.userId, client: 'Melo PWA' },
-      body: {
-        Id: 'melo_podcasts',
-        CustomPrefs: { podcastUrls: JSON.stringify(current) }
-      }
-    });
+    await client.displayPreferences.setCustomPreference(
+      'melo_podcasts',
+      'podcastUrls',
+      JSON.stringify(current),
+      { client: 'Melo PWA' }
+    );
   } catch (e) {
     console.warn('[Podcast Sync] Remote save error:', e);
   }
 }
 
 export async function getPodcastFeedUrls() {
-  const session = getSession();
+  const client = getClient();
   let localUrls = getLocalPodcastFeedUrls();
 
-  if (!session.serverUrl || !session.userId) {
+  if (!client || !client.serverUrl || !client.userId) {
     return localUrls;
   }
 
   try {
-    const prefs = await jellyfinFetch('/DisplayPreferences/melo_podcasts', {
-      params: { userId: session.userId, client: 'Melo PWA' }
+    const prefs = await client.displayPreferences.getDisplayPreferences('melo_podcasts', {
+      client: 'Melo PWA'
     });
 
     if (prefs && prefs.CustomPrefs && prefs.CustomPrefs.podcastUrls) {
@@ -90,3 +88,4 @@ export async function removePodcastFeedUrl(feedUrl) {
 
   return current;
 }
+

@@ -1,6 +1,7 @@
-import { getAlbumsCached, getArtistsCached, getSongsCached, getPlaylistsCached, getPodcastFeedUrls, getArtworkUrl } from '../../jellyfin/client.js';
+import { getAlbumsCached, getArtistsCached, getSongsCached, getPlaylistsCached, getArtworkUrl } from '../../jellyfin/client.js';
 import { getSession } from '../../jellyfin/session.js';
 import { fetchAndParseFeed } from '../../podcasts/rss.js';
+import { getPodcastFeedUrls } from '../../podcasts/sync.js';
 import { getCachedFeeds, saveCachedFeed } from '../../podcasts/storage.js';
 import { openPodcastShow } from './podcasts.js';
 import { switchView } from '../views.js';
@@ -184,13 +185,29 @@ export async function renderHomeView(container) {
   });
 
   // Bind Category Filter Chips
+  const categoryPillsContainer = container.querySelector('#home-category-pills');
   const chipButtons = container.querySelectorAll('#home-category-pills md-chip');
   const sections = container.querySelectorAll('.home-section');
+
+  categoryPillsContainer?.addEventListener('wheel', (e) => {
+    if (e.deltaY !== 0 && e.deltaX === 0) {
+      const maxScroll = categoryPillsContainer.scrollWidth - categoryPillsContainer.clientWidth;
+      if (maxScroll > 0) {
+        const canScrollRight = e.deltaY > 0 && categoryPillsContainer.scrollLeft < maxScroll;
+        const canScrollLeft = e.deltaY < 0 && categoryPillsContainer.scrollLeft > 0;
+        if (canScrollRight || canScrollLeft) {
+          e.preventDefault();
+          categoryPillsContainer.scrollLeft += e.deltaY;
+        }
+      }
+    }
+  }, { passive: false });
 
   chipButtons.forEach(chip => {
     chip.addEventListener('click', () => {
       chipButtons.forEach(c => { c.selected = false; });
       chip.selected = true;
+      chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
 
       const selectedCategory = chip.getAttribute('data-category');
 

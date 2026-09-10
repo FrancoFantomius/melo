@@ -21,7 +21,7 @@ export function resolveCurrentBitrate() {
 }
 
 export function isHlsEligible(track) {
-  if (!track || !track.Id) return false;
+  if (!track || (!track.Id && !track.id)) return false;
   if (track.isPodcastEpisode || track.enclosureUrl) return false;
   const key = track.Id || track.id;
   if (key && isTrackDownloadedSync(key)) return false;
@@ -31,7 +31,10 @@ export function isHlsEligible(track) {
 export function resolveHlsStreamUrl(track, startTimeTicks = 0) {
   if (!isHlsEligible(track)) return '';
   const bitrate = resolveCurrentBitrate();
-  return getAudioHlsStreamUrl(track.Id, {
+  const trackId = track.Id || track.id;
+  const mediaSourceId = track.MediaSources?.[0]?.Id || trackId;
+  return getAudioHlsStreamUrl(trackId, {
+    mediaSourceId,
     maxStreamingBitrate: bitrate,
     startTimeTicks
   });
@@ -49,7 +52,9 @@ export function resolveStreamUrl(track, startTimeTicks = 0) {
   }
   const bitrate = resolveCurrentBitrate();
   const session = getSession();
-  return getAudioStreamUrl(track.Id, {
+  const mediaSourceId = track.MediaSources?.[0]?.Id || key;
+  return getAudioStreamUrl(key, {
+    mediaSourceId,
     maxStreamingBitrate: bitrate,
     forceTranscode: session.forceTranscode,
     startTimeTicks
@@ -60,7 +65,10 @@ export function resolveStreamUrl(track, startTimeTicks = 0) {
 export function buildSeekStreamUrl(track, startTimeTicks) {
   const bitrate = resolveCurrentBitrate();
   const session = getSession();
-  return getAudioStreamUrl(track.Id, {
+  const key = track.Id || track.id;
+  const mediaSourceId = track.MediaSources?.[0]?.Id || key;
+  return getAudioStreamUrl(key, {
+    mediaSourceId,
     maxStreamingBitrate: bitrate,
     forceTranscode: session.forceTranscode,
     startTimeTicks

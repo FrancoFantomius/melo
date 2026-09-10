@@ -76,6 +76,12 @@
     id="main-sidebar-rail"
     alignment="top"
     aria-label="Navigation rail"
+    {{#if isHome}}value="home" active-index="0"{{/if}}
+    {{#if isAlbums}}value="albums" active-index="1"{{/if}}
+    {{#if isArtists}}value="artists" active-index="2"{{/if}}
+    {{#if isPlaylists}}value="playlists" active-index="3"{{/if}}
+    {{#if isDownloads}}value="downloads" active-index="4"{{/if}}
+    {{#if isPodcasts}}value="podcasts" active-index="5"{{/if}}
   >
     <md-navigation-rail-item
       label="Home"

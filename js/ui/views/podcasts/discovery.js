@@ -1,5 +1,5 @@
 import { searchPodcastDirectory, getPopularPodcasts } from '../../../podcasts/discovery.js';
-import { savePodcastFeedUrl } from '../../../jellyfin/client.js';
+import { savePodcastFeedUrl } from '../../../podcasts/sync.js';
 import { fetchAndParseFeed } from '../../../podcasts/rss.js';
 import { saveCachedFeed } from '../../../podcasts/storage.js';
 import { openPodcastShow } from './list.js';

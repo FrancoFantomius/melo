@@ -2,7 +2,7 @@
   <div class="player-left">
     <img id="player-track-cover" src="./img/song.svg" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('song') : './img/song.svg';" data-placeholder-type="song" class="player-cover" alt="Cover">
     <div class="player-track-details">
-      <div id="player-track-title" class="player-track-title">No track selected</div>
+      <div id="player-track-title" class="player-track-title"><span class="title-marquee-inner">No track selected</span></div>
       <div id="player-track-artist" class="player-track-artist">Select a song to start playing</div>
     </div>
     <button id="player-btn-like" class="btn-icon btn-like" aria-label="Like" style="display: none; margin-left: 4px;">
@@ -21,7 +21,7 @@
       <button id="player-btn-shuffle" class="btn-icon" aria-label="Shuffle">
         <span class="material-symbols-outlined">shuffle</span>
       </button>
-      <button id="player-btn-skip-back" class="btn-icon btn-skip" aria-label="Rewind 15 seconds" style="display: none;">
+      <button id="player-btn-skip-back" class="btn-icon btn-skip" aria-label="Rewind 10 seconds" style="display: none;">
         <span class="material-symbols-outlined">replay_10</span>
       </button>
       <button id="player-btn-prev" class="btn-icon" aria-label="Previous Track">
@@ -93,7 +93,7 @@
     <div class="emp-main-content">
       <div class="emp-header-actions-row">
         <div class="emp-track-details">
-          <div id="emp-title" class="emp-track-title">No track selected</div>
+          <div id="emp-title" class="emp-track-title"><span class="title-marquee-inner">No track selected</span></div>
           <div id="emp-artist" class="emp-track-artist">Select a song to start playing</div>
         </div>
 
@@ -137,7 +137,7 @@
         <button id="emp-btn-shuffle" class="btn-icon emp-icon-btn" aria-label="Shuffle">
           <span class="material-symbols-outlined">shuffle</span>
         </button>
-        <button id="emp-btn-skip-back" class="btn-icon emp-icon-btn btn-skip" aria-label="Rewind 15 seconds" style="display: none;">
+        <button id="emp-btn-skip-back" class="btn-icon emp-icon-btn btn-skip" aria-label="Rewind 10 seconds" style="display: none;">
           <span class="material-symbols-outlined">replay_10</span>
         </button>
         <button id="emp-btn-prev" class="btn-icon emp-icon-btn" aria-label="Previous Track">
@@ -177,7 +177,7 @@
   <md-tooltip for="player-btn-add-playlist" id="player-tooltip-add-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
   <md-tooltip for="player-btn-download" id="player-tooltip-download" position="top" data-i18n-value="Download" value="Download"></md-tooltip>
   <md-tooltip for="player-btn-shuffle" id="player-tooltip-shuffle" position="top" data-i18n-value="Shuffle" value="Shuffle"></md-tooltip>
-  <md-tooltip for="player-btn-skip-back" id="player-tooltip-skip-back" position="top" data-i18n-value="Rewind 15 seconds" value="Rewind 15 seconds"></md-tooltip>
+  <md-tooltip for="player-btn-skip-back" id="player-tooltip-skip-back" position="top" data-i18n-value="Rewind 10 seconds" value="Rewind 10 seconds"></md-tooltip>
   <md-tooltip for="player-btn-prev" id="player-tooltip-prev" position="top" data-i18n-value="Previous Track" value="Previous Track"></md-tooltip>
   <md-tooltip for="player-btn-play" id="player-tooltip-play" position="top" data-i18n-value="Play" value="Play"></md-tooltip>
   <md-tooltip for="player-btn-next" id="player-tooltip-next" position="top" data-i18n-value="Next Track" value="Next Track"></md-tooltip>
@@ -199,7 +199,7 @@
   <md-tooltip for="emp-btn-lyrics" id="emp-tooltip-lyrics" position="top" data-i18n-value="Lyrics" value="Lyrics"></md-tooltip>
   <md-tooltip for="emp-speed-badge" id="emp-tooltip-speed-badge" position="top" data-i18n-value="Playback Speed" value="Playback Speed"></md-tooltip>
   <md-tooltip for="emp-btn-shuffle" id="emp-tooltip-shuffle" position="top" data-i18n-value="Shuffle" value="Shuffle"></md-tooltip>
-  <md-tooltip for="emp-btn-skip-back" id="emp-tooltip-skip-back" position="top" data-i18n-value="Rewind 15 seconds" value="Rewind 15 seconds"></md-tooltip>
+  <md-tooltip for="emp-btn-skip-back" id="emp-tooltip-skip-back" position="top" data-i18n-value="Rewind 10 seconds" value="Rewind 10 seconds"></md-tooltip>
   <md-tooltip for="emp-btn-prev" id="emp-tooltip-prev" position="top" data-i18n-value="Previous Track" value="Previous Track"></md-tooltip>
   <md-tooltip for="emp-btn-play" id="emp-tooltip-play" position="top" data-i18n-value="Play" value="Play"></md-tooltip>
   <md-tooltip for="emp-btn-next" id="emp-tooltip-next" position="top" data-i18n-value="Next Track" value="Next Track"></md-tooltip>

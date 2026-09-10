@@ -166,9 +166,12 @@ export function renderTrackRowHTML(track, index) {
   const artistsInfo = getAlbumArtistsInfo(track);
   const artistHTML = renderArtistLinksHTML(artistsInfo);
   const durationSec = Math.floor((track.RunTimeTicks || 0) / 10000000);
-  const mins = Math.floor(durationSec / 60);
+  const hours = Math.floor(durationSec / 3600);
+  const mins = Math.floor((durationSec % 3600) / 60);
   const secs = durationSec % 60;
-  const timeStr = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  const timeStr = hours > 0
+    ? `${hours}:${mins < 10 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`
+    : `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   const isLiked = isTrackLiked(track.Id);
   const trackKey = track.Id || track.id;
 
