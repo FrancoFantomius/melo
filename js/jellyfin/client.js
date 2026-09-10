@@ -80,6 +80,23 @@ client.on('unauthorized', () => {
   handleUnauthorized();
 });
 
+export async function validateSession() {
+  const session = getSession();
+  if (!session.isLoggedIn || !session.accessToken || !session.serverUrl) {
+    return false;
+  }
+  try {
+    const info = await client.system.getInfo();
+    return Boolean(info);
+  } catch (err) {
+    if (err?.status === 401 || err?.statusCode === 401) {
+      handleUnauthorized();
+      return false;
+    }
+    return true;
+  }
+}
+
 // 4. Authentication & Capabilities
 export async function authenticateServer(serverUrl, username, password) {
   const cleanServer = cleanUrl(serverUrl);
@@ -91,6 +108,11 @@ export async function authenticateServer(serverUrl, username, password) {
   const userPrimaryImageTag = data.User?.PrimaryImageTag || data.User?.ImageTags?.Primary || '';
 
   await clearApiCache();
+  try {
+    localStorage.removeItem('melo_player_state');
+  } catch (e) {
+    // Ignore storage issues
+  }
 
   saveSession({
     serverUrl: cleanServer,

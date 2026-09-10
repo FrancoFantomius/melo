@@ -2,6 +2,8 @@ The following are the rules on how to write this application. They take preceden
 - the style should adhear to material design 3 expecially with respect to the choice of components and styles.
 - prefer @francofantomius\material-components to home-made elements/components.
 - read "node_modules@francofantomius\material-components\llms.txt" for the component explanation and how to implement them.
+- Note that jellyfin now is on version 12. You need to support both version 10.xx.xx and version 12, the jellyfin-sdk is built just for this.
+- The jellyfin-sdk has its documentation in "node_modules@francofantomius\material-components\llms.txt"
 - always prefer local assets instead of ones you get from cdns.
 - when exploring a project do not run npm run build.
 - when implementing changes do not bother to update all the translations.

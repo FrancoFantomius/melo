@@ -82,7 +82,16 @@ export async function restorePlayerState() {
           state.streamType = 'hls';
           state.seekOffset = 0;
           const hlsUrl = resolveHlsStreamUrl(track, 0);
-          loadHlsStream(audio, hlsUrl, savedPos).catch(() => {});
+          loadHlsStream(audio, hlsUrl, savedPos, {
+            onFallback: () => {
+              console.warn('[Audio Engine] Restored HLS stream failed, falling back to direct stream...');
+              state.isHls = false;
+              state.streamType = 'direct';
+              state.seekOffset = savedPos;
+              const startTicks = Math.floor(savedPos * 10000000);
+              audio.src = resolveStreamUrl(track, startTicks);
+            }
+          }).catch(() => {});
           return saved;
         }
 

@@ -3,6 +3,10 @@
   id="mobile-bottom-nav"
   label-mode="alwaysShow"
   aria-label="Mobile navigation"
+  {{#if isHome}}value="home" active-index="0"{{/if}}
+  {{#if isSearch}}value="search" active-index="1"{{/if}}
+  {{#if isPlaylists}}value="playlists" active-index="2"{{/if}}
+  {{#if isDownloads}}value="downloads" active-index="3"{{/if}}
 >
   <md-navigation-bar-item
     label="Home"

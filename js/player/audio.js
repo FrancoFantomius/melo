@@ -1,7 +1,8 @@
 import {
   reportPlaybackStart,
   reportPlaybackProgress,
-  reportPlaybackStopped
+  reportPlaybackStopped,
+  handleUnauthorized
 } from '../jellyfin/client.js';
 import { getCurrentTrack, nextTrack, prevTrack, peekNextTrack, getQueueState, setCurrentTrack } from './queue.js';
 import { getEpisodeState, saveEpisodeProgress, getSavedPlaybackSpeed, savePlaybackSpeed } from '../podcasts/storage.js';
@@ -60,7 +61,11 @@ export function preloadNextTrack() {
     if (isHlsEligible(next) && (isHlsSupported() || isNativeHlsSupported(audio))) {
       const hlsUrl = resolveHlsStreamUrl(next, 0);
       if (hlsUrl) {
-        fetch(hlsUrl, { method: 'GET', mode: 'cors', signal }).catch(() => {});
+        fetch(hlsUrl, { method: 'GET', mode: 'cors', signal })
+          .then(res => {
+            if (res.status === 401) handleUnauthorized();
+          })
+          .catch(() => {});
       }
     } else {
       const streamUrl = resolveStreamUrl(next, 0);
@@ -70,7 +75,11 @@ export function preloadNextTrack() {
           headers: { Range: 'bytes=0-32768' },
           mode: 'cors',
           signal
-        }).catch(() => {});
+        })
+          .then(res => {
+            if (res.status === 401) handleUnauthorized();
+          })
+          .catch(() => {});
       }
     }
   } catch (e) {
@@ -356,8 +365,19 @@ function attachAudioListeners(audioEl) {
     state.isPlaying = false;
     notifyUI();
 
-    // Fall back to a CORS proxy blob for podcast hosts that don't answer with CORS
+    // Check if the stream error was caused by an unauthorized (401) session
     const track = getCurrentTrack();
+    if (track && !track.isPodcastEpisode && !track.enclosureUrl && audioEl.src && !audioEl.src.startsWith('blob:')) {
+      fetch(audioEl.src, { method: 'GET', headers: { Range: 'bytes=0-1' } })
+        .then(res => {
+          if (res.status === 401) {
+            handleUnauthorized();
+          }
+        })
+        .catch(() => {});
+    }
+
+    // Fall back to a CORS proxy blob for podcast hosts that don't answer with CORS
     const trackKey = track ? (track.id || track.Id) : null;
     if (track && (track.isPodcastEpisode || track.enclosureUrl) && trackKey !== state.podcastProxyTrackKey) {
       state.podcastProxyTrackKey = trackKey;

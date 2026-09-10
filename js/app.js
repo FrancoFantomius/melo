@@ -23,12 +23,15 @@ import { initModals } from './ui/modals.js';
 import { initViews } from './ui/views.js';
 import { initPlayerUI } from './ui/player.js';
 import { requireAuth } from './auth-guard.js';
-import { initCacheDB, reportCapabilities } from './jellyfin/client.js';
+import { initCacheDB, reportCapabilities, validateSession } from './jellyfin/client.js';
 import { initI18n } from './i18n.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 0. Run Auth Guard (Redirects unauthenticated users to login.html)
   if (!requireAuth()) return;
+
+  // Validate session against server in background
+  validateSession();
 
   // 1. Initialize i18n, PWA & Cache DB
   initI18n();

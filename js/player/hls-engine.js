@@ -1,5 +1,5 @@
 import Hls from 'hls.js';
-import { handleUnauthorized } from '../jellyfin/client.js';
+import { getAuthHeader, handleUnauthorized } from '../jellyfin/client.js';
 
 let hlsInstance = null;
 let currentHlsUrl = null;
@@ -67,7 +67,17 @@ export function loadHlsStream(audioEl, hlsUrl, startTimeSec = 0, callbacks = {})
         enableWorker: true,
         lowLatencyMode: false,
         progressive: true,
-        autoStartLoad: true
+        autoStartLoad: true,
+        xhrSetup: (xhr) => {
+          try {
+            const authHeader = getAuthHeader();
+            if (authHeader) {
+              xhr.setRequestHeader('Authorization', authHeader);
+            }
+          } catch (err) {
+            console.warn('[HlsEngine] Failed to set auth header on xhr:', err);
+          }
+        }
       });
 
       hlsInstance = hls;
@@ -88,10 +98,9 @@ export function loadHlsStream(audioEl, hlsUrl, startTimeSec = 0, callbacks = {})
         console.warn('[HlsEngine] HLS error event:', data.type, data.details, data.fatal);
 
         if (data.response?.code === 401 || data.response?.status === 401) {
-          console.error('[HlsEngine] Received HTTP 401 Unauthorized from streaming server.');
+          console.warn('[HlsEngine] Received HTTP 401 Unauthorized from streaming server.');
           destroyHls();
           handleUnauthorized();
-          if (callbacks.onFallback) callbacks.onFallback(data);
           resolve(false);
           return;
         }

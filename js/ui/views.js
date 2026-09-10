@@ -124,38 +124,38 @@ export function switchView(viewName, viewData = null) {
     );
 
     if (isActive) {
-      item.active = true;
-      item.selected = true;
-      item.setAttribute('active', '');
-      item.setAttribute('selected', '');
+      if (!item.active) item.active = true;
+      if (!item.selected) item.selected = true;
+      if (!item.hasAttribute('active')) item.setAttribute('active', '');
+      if (!item.hasAttribute('selected')) item.setAttribute('selected', '');
       item.classList.add('active');
 
       // Fill the selected/active icon in light DOM and shadow DOM
       const lightIcon = item.querySelector('md-icon');
-      if (lightIcon) {
+      if (lightIcon && !lightIcon.filled) {
         lightIcon.filled = true;
         lightIcon.setAttribute('filled', '');
       }
       const shadowIcon = item.shadowRoot?.querySelector('md-icon');
-      if (shadowIcon) {
+      if (shadowIcon && !shadowIcon.filled) {
         shadowIcon.filled = true;
         shadowIcon.setAttribute('filled', '');
       }
     } else {
-      item.active = false;
-      item.selected = false;
-      item.removeAttribute('active');
-      item.removeAttribute('selected');
+      if (item.active) item.active = false;
+      if (item.selected) item.selected = false;
+      if (item.hasAttribute('active')) item.removeAttribute('active');
+      if (item.hasAttribute('selected')) item.removeAttribute('selected');
       item.classList.remove('active');
 
       // Unfill inactive icon in light DOM and shadow DOM
       const lightIcon = item.querySelector('md-icon');
-      if (lightIcon) {
+      if (lightIcon && lightIcon.filled) {
         lightIcon.filled = false;
         lightIcon.removeAttribute('filled');
       }
       const shadowIcon = item.shadowRoot?.querySelector('md-icon');
-      if (shadowIcon) {
+      if (shadowIcon && shadowIcon.filled) {
         shadowIcon.filled = false;
         shadowIcon.removeAttribute('filled');
       }
@@ -167,7 +167,7 @@ export function switchView(viewName, viewData = null) {
   if (rail) {
     const railItems = Array.from(rail.querySelectorAll('md-navigation-rail-item, md-nav-rail-item'));
     const activeRailIndex = railItems.findIndex(i => i.active);
-    if (activeRailIndex !== -1) {
+    if (activeRailIndex !== -1 && rail.activeIndex !== activeRailIndex) {
       rail.activeIndex = activeRailIndex;
     }
   }
@@ -176,7 +176,7 @@ export function switchView(viewName, viewData = null) {
   if (bottomNav && bottomNav.tagName.toLowerCase() === 'md-navigation-bar') {
     const barItems = Array.from(bottomNav.querySelectorAll('md-navigation-bar-item, md-nav-bar-item'));
     const activeBarIndex = barItems.findIndex(i => i.active);
-    if (activeBarIndex !== -1) {
+    if (activeBarIndex !== -1 && bottomNav.activeIndex !== activeBarIndex) {
       bottomNav.activeIndex = activeBarIndex;
     }
   }
