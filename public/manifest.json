@@ -9,14 +9,9 @@
   "dir": "auto",
   "lang": "en",
   "display": "standalone",
-  "display_override": [
-    "window-controls-overlay",
-    "standalone",
-    "minimal-ui"
-  ],
   "orientation": "any",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
   "categories": [
     "music",
     "entertainment",
@@ -24,12 +19,6 @@
   ],
   "prefer_related_applications": false,
   "handle_links": "preferred",
-  "launch_handler": {
-    "client_mode": [
-      "navigate-existing",
-      "auto"
-    ]
-  },
   "scope_extensions": [
     {
       "type": "origin",

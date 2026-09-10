@@ -21,7 +21,7 @@ export function resolveCurrentBitrate() {
 }
 
 export function isHlsEligible(track) {
-  if (!track || !track.Id) return false;
+  if (!track || (!track.Id && !track.id)) return false;
   if (track.isPodcastEpisode || track.enclosureUrl) return false;
   const key = track.Id || track.id;
   if (key && isTrackDownloadedSync(key)) return false;

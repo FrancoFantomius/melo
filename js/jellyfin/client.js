@@ -12,7 +12,7 @@ import {
 import { getSession, clearSession, saveSession, onSessionChange } from './session.js';
 import { getPlaceholder } from '../ui/placeholders.js';
 
-export const APP_VERSION = '1.0.2';
+export const APP_VERSION = '1.0.3';
 export { cleanUrl, JellyfinApiError, JellyfinAuthError, JellyfinError };
 
 export function buildApiError(message, status) {
@@ -110,6 +110,8 @@ export async function authenticateServer(serverUrl, username, password) {
   await clearApiCache();
   try {
     localStorage.removeItem('melo_player_state');
+    const idbState = new IndexedDBCacheAdapter('MeloPlayerStorage', 1, 'player_state');
+    idbState.clear().catch(() => {});
   } catch (e) {
     // Ignore storage issues
   }

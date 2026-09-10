@@ -885,4 +885,62 @@ input[type="range"]::-moz-range-track {
   }
 }
 
+/* Title Marquee Animation for overflowing track titles */
+.player-track-title,
+.emp-track-title {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+  min-width: 0;
+}
 
+.title-marquee-inner {
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.player-track-title.is-overflowing,
+.emp-track-title.is-overflowing {
+  text-overflow: clip;
+}
+
+.emp-track-title.is-overflowing {
+  text-align: left !important;
+}
+
+.player-track-title.is-overflowing .title-marquee-inner,
+.emp-track-title.is-overflowing .title-marquee-inner {
+  display: inline-block;
+  animation: title-marquee-scroll var(--marquee-duration, 12s) ease-in-out infinite;
+  animation-play-state: paused;
+  will-change: transform;
+}
+
+.player-track-title.is-overflowing:hover .title-marquee-inner,
+.emp-track-title.is-overflowing:hover .title-marquee-inner {
+  animation-play-state: paused !important;
+}
+
+@keyframes title-marquee-scroll {
+  0%, 15% {
+    transform: translateX(0);
+  }
+  45%, 65% {
+    transform: translateX(var(--marquee-distance, 0px));
+  }
+  95%, 100% {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .player-track-title.is-overflowing .title-marquee-inner,
+  .emp-track-title.is-overflowing .title-marquee-inner {
+    animation: none !important;
+  }
+  .player-track-title.is-overflowing,
+  .emp-track-title.is-overflowing {
+    text-overflow: ellipsis !important;
+  }
+}

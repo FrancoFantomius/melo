@@ -73,6 +73,114 @@ export function initPlayerUI() {
   };
   const isMusic = (track) => !!(track && track.Id && !track.isPodcastEpisode && !track.enclosureUrl);
 
+  let isCurrentlyPlaying = false;
+
+  const handleMarqueeIteration = (e) => {
+    const inner = e.currentTarget;
+    if (!isCurrentlyPlaying) {
+      inner.style.animationPlayState = 'paused';
+    }
+  };
+
+  const attachMarqueeListeners = (inner) => {
+    if (!inner || inner._marqueeAttached) return;
+    inner._marqueeAttached = true;
+    inner.addEventListener('animationiteration', handleMarqueeIteration);
+  };
+
+  const setMarqueePlaying = (isPlaying) => {
+    isCurrentlyPlaying = isPlaying;
+    each(pairs.title, (el) => {
+      const inner = el.querySelector('.title-marquee-inner');
+      if (!inner) return;
+      if (!el.classList.contains('is-overflowing')) {
+        refreshMarquee(el, inner);
+      }
+      if (!el.classList.contains('is-overflowing')) return;
+      if (isPlaying) {
+        inner.style.animationPlayState = 'running';
+      }
+      // When paused, we do not abruptly freeze mid-animation;
+      // the animationiteration handler will pause it as soon as it completes its cycle at the start.
+    });
+  };
+
+  const refreshMarquee = (el, inner) => {
+    if (!el) return;
+    const targetInner = inner || el.querySelector('.title-marquee-inner');
+    if (!targetInner) return;
+    attachMarqueeListeners(targetInner);
+
+    const containerWidth = el.clientWidth;
+    if (containerWidth <= 0) return;
+
+    const contentWidth = Math.max(targetInner.scrollWidth, targetInner.offsetWidth);
+    const diff = contentWidth - containerWidth;
+
+    if (diff > 2) {
+      const scrollSec = diff / 18;
+      const totalSec = Math.min(35, Math.max(10, Math.round(scrollSec / 0.6)));
+      const distStr = `-${Math.ceil(diff)}px`;
+      const durStr = `${totalSec}s`;
+      el.style.setProperty('--marquee-distance', distStr);
+      el.style.setProperty('--marquee-duration', durStr);
+      targetInner.style.setProperty('--marquee-distance', distStr);
+      targetInner.style.setProperty('--marquee-duration', durStr);
+      el.classList.add('is-overflowing');
+      if (isCurrentlyPlaying) {
+        targetInner.style.animationPlayState = 'running';
+      }
+    } else {
+      el.classList.remove('is-overflowing');
+      el.style.removeProperty('--marquee-distance');
+      el.style.removeProperty('--marquee-duration');
+      targetInner.style.removeProperty('--marquee-distance');
+      targetInner.style.removeProperty('--marquee-duration');
+      targetInner.style.animationPlayState = '';
+    }
+  };
+
+  const updateTrackTitle = (el, text) => {
+    if (!el) return;
+    const titleText = text || '';
+    let inner = el.querySelector('.title-marquee-inner');
+    if (!inner) {
+      el.textContent = '';
+      inner = document.createElement('span');
+      inner.className = 'title-marquee-inner';
+      el.appendChild(inner);
+    }
+    attachMarqueeListeners(inner);
+
+    if (inner.textContent === titleText && el.title === titleText) {
+      refreshMarquee(el, inner);
+      return;
+    }
+
+    el.title = titleText;
+    inner.textContent = titleText;
+    inner.style.animation = 'none';
+    void inner.offsetWidth;
+    inner.style.animation = '';
+    refreshMarquee(el, inner);
+    if (el.classList.contains('is-overflowing')) {
+      inner.style.animationPlayState = isCurrentlyPlaying ? 'running' : 'paused';
+    }
+  };
+
+  const titleResizeObserver = typeof ResizeObserver !== 'undefined'
+    ? new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          const el = entry.target;
+          refreshMarquee(el);
+        }
+      })
+    : null;
+
+  each(pairs.title, (el) => {
+    if (titleResizeObserver) titleResizeObserver.observe(el);
+  });
+
   let currentPlayingTrack = null;
   const lyricsCache = new Map();
 
@@ -195,6 +303,8 @@ export function initPlayerUI() {
     if (empVol) updateSliderFill(empVol);
     const empProg = $('emp-progress');
     if (empProg) updateSliderFill(empProg);
+    each(pairs.title, (el) => refreshMarquee(el));
+    setTimeout(() => each(pairs.title, (el) => refreshMarquee(el)), 50);
   };
 
   // Open expanded player when mini-player bar is tapped on mobile
@@ -284,17 +394,17 @@ export function initPlayerUI() {
     let totalSec = 0;
     if (track && track.RunTimeTicks) {
       totalSec = track.RunTimeTicks / 10000000;
+    } else if (track && typeof track.duration === 'number' && track.duration > 0) {
+      totalSec = track.duration;
     } else if (isFinite(audio.duration) && audio.duration > 0) {
       totalSec = audio.duration + audioState.seekOffset;
-    } else if (track && track.duration) {
-      totalSec = track.duration;
     }
 
     if (!isAnySeeking && totalSec > 0) {
       const currentSecFloored = Math.floor(realCurrentTime);
       if (currentSecFloored !== lastFormattedSec) {
         lastFormattedSec = currentSecFloored;
-        const formattedCurrent = formatTime(currentSecFloored);
+        const formattedCurrent = formatTime(currentSecFloored, totalSec >= 3600);
         each(pairs.current, (el) => { el.textContent = formattedCurrent; });
       }
 
@@ -327,6 +437,9 @@ export function initPlayerUI() {
   initAudioPlayer((state) => {
     if (isQueueOpen()) renderQueueDrawerList();
 
+    const isPlaying = !!state.isPlaying;
+    isCurrentlyPlaying = isPlaying;
+
     const track = state.track;
     currentPlayingTrack = track;
     updateActionButtons(track);
@@ -348,13 +461,15 @@ export function initPlayerUI() {
       });
 
       const titleStr = track.title || track.Name || 'Unknown Title';
-      each(pairs.title, (el) => { el.textContent = titleStr; });
+      each(pairs.title, (el) => updateTrackTitle(el, titleStr));
 
       const artistStr = track.showTitle || track.Artists?.join(', ') || track.AlbumArtist || 'Unknown Artist';
       each(pairs.artist, (el) => { el.textContent = artistStr; });
 
       each(pairs.skipBack, (el) => setDisplay(el, isPodcast ? 'flex' : 'none'));
       each(pairs.skipForward, (el) => setDisplay(el, isPodcast ? 'flex' : 'none'));
+      each(pairs.shuffle, (el) => setDisplay(el, isPodcast ? 'none' : 'flex'));
+      each(pairs.repeat, (el) => setDisplay(el, isPodcast ? 'none' : 'flex'));
       each(pairs.speedBadge, (el) => {
         setDisplay(el, isPodcast ? 'flex' : 'none');
         el.textContent = `${state.playbackSpeed || 1.0}x`;
@@ -373,8 +488,9 @@ export function initPlayerUI() {
         totalSec = track.duration || (track.RunTimeTicks ? Math.floor(track.RunTimeTicks / 10000000) : 0);
       }
 
-      const formattedCurrent = formatTime(currentSec);
-      const formattedTotal = formatTime(totalSec);
+      const hasHours = totalSec >= 3600;
+      const formattedCurrent = formatTime(currentSec, hasHours);
+      const formattedTotal = formatTime(totalSec, hasHours);
 
       const isAnySeeking = pairs.progress.some((slider) => slider && slider.isSeeking);
       if (!isAnySeeking) {
@@ -391,12 +507,19 @@ export function initPlayerUI() {
         }
       });
       each(pairs.total, (el) => { el.textContent = formattedTotal; });
+    } else {
+      each(pairs.shuffle, (el) => setDisplay(el, 'flex'));
+      each(pairs.repeat, (el) => setDisplay(el, 'flex'));
+      each(pairs.skipBack, (el) => setDisplay(el, 'none'));
+      each(pairs.skipForward, (el) => setDisplay(el, 'none'));
+      each(pairs.speedBadge, (el) => setDisplay(el, 'none'));
+      each(pairs.title, (el) => updateTrackTitle(el, 'No track selected'));
     }
 
     updateLyricsSync(state.currentTime);
 
-    const isPlaying = !!state.isPlaying;
     document.querySelectorAll('.timeline-container').forEach((c) => c.classList.toggle('is-playing', isPlaying));
+    setMarqueePlaying(isPlaying);
 
     if (isPlaying) {
       startProgressAnim();
@@ -457,7 +580,7 @@ export function initPlayerUI() {
   each(pairs.play, (btn) => btn.addEventListener('click', () => togglePlayPause()));
   each(pairs.prev, (btn) => btn.addEventListener('click', () => playPrevTrack()));
   each(pairs.next, (btn) => btn.addEventListener('click', () => playNextTrack()));
-  each(pairs.skipBack, (btn) => btn.addEventListener('click', () => skipSeconds(-15)));
+  each(pairs.skipBack, (btn) => btn.addEventListener('click', () => skipSeconds(-10)));
   each(pairs.skipForward, (btn) => btn.addEventListener('click', () => skipSeconds(30)));
 
   const isInputTarget = (e) => {
@@ -561,7 +684,8 @@ export function initPlayerUI() {
     slider.addEventListener('input', (e) => {
       startSeeking();
       const val = parseFloat(e.target.value);
-      each(pairs.current, (el) => { el.textContent = formatTime(val); });
+      const totalSec = parseFloat(slider.max) || 0;
+      each(pairs.current, (el) => { el.textContent = formatTime(val, totalSec >= 3600); });
       updateSliderFill(slider);
     });
     slider.addEventListener('change', (e) => {
@@ -606,10 +730,15 @@ export function initPlayerUI() {
   $('btn-save-settings')?.addEventListener('click', () => saveSettingsFromModal());
 }
 
-function formatTime(seconds) {
-  if (!isFinite(seconds) || seconds < 0) return '0:00';
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
+function formatTime(seconds, forceHours = false) {
+  if (!isFinite(seconds) || seconds < 0) return forceHours ? '0:00:00' : '0:00';
+  const totalSec = Math.floor(seconds);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0 || forceHours) {
+    return `${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+  }
   return `${m}:${s < 10 ? '0' : ''}${s}`;
 }
 

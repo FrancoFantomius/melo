@@ -94,6 +94,7 @@ function playDirectStream(track, startPositionSec = 0) {
   destroyHls();
   state.isHls = false;
   state.streamType = streamUrl.startsWith('blob:') ? 'blob' : 'direct';
+  state.seekOffset = 0;
 
   if (audio.src === streamUrl) {
     audio.currentTime = startPositionSec > 0 ? startPositionSec : 0;
@@ -241,6 +242,8 @@ export async function seekTo(seconds) {
   let totalDuration = 0;
   if (track.RunTimeTicks) {
     totalDuration = track.RunTimeTicks / 10000000;
+  } else if (track && typeof track.duration === 'number' && track.duration > 0) {
+    totalDuration = track.duration;
   } else if (isFinite(audio.duration) && audio.duration > 0) {
     totalDuration = audio.duration + state.seekOffset;
   }
@@ -431,6 +434,8 @@ export function notifyUI() {
   let effectiveDuration = 0;
   if (track && track.RunTimeTicks) {
     effectiveDuration = track.RunTimeTicks / 10000000;
+  } else if (track && typeof track.duration === 'number' && track.duration > 0) {
+    effectiveDuration = track.duration;
   } else if (isFinite(audio.duration) && audio.duration > 0) {
     effectiveDuration = audio.duration + state.seekOffset;
   }

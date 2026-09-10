@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.0.3] - 2026-09-10
+
+### Added
+- **Jellyfin SDK Integration**: Migrated Jellyfin backend integration to the official `@francofantomius/jellyfin` SDK (`^0.4.1`), adding full dual-compatibility for Jellyfin v10.x.x and v12.
+  - Replaced bespoke client requests, caching, and storage modules with `JellyfinClient`, `IndexedDBCacheAdapter`, `LocalStorageAdapter`, and `OfflineStorageManager`.
+  - Moved podcast sync logic to `js/podcasts/sync.js`.
+- **Marquee Track Title Scrolling**: Implemented smooth horizontal marquee animation for overflowing song titles in both the mini player and expanded player views.
+- **Account Navigation**: Added a dedicated Account navigation item to both the sidebar and mobile bottom navigation.
+- **Icon Glyphs Tracking**: Added `fonts/icons.txt` tracking and enhanced `scripts/subset-icons.js` for Material Symbols font subsetting.
+
+### Changed
+- **Rewind Duration**: Replaced the 15-second skip back with a 10-second rewind control (`replay_10`), updating tooltips, button labels, and localized translations across all 8 supported languages.
+- **Player State & Queue Persistence**: Hardened queue and playback state caching using IndexedDB with automated storage clearance upon user re-authentication.
+- **Playback & Audio Streaming**: Improved stream error handling and audio lifecycle management in `js/player/stream.js`.
+- **Filter Chips Layout**: Unified filter pills to display and scroll on a single horizontal row across home and browse views.
+- Version bumped to `1.0.3`.
+- Service worker cache upgraded to `melo-v1.0.3`.
+
 ## [1.0.2] - 2026-09-02
 
 ### Security

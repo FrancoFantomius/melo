@@ -200,6 +200,7 @@ export function clearQueue() {
 export function getQueueState() {
   return {
     queue,
+    originalQueue,
     currentIndex,
     shuffle,
     repeat

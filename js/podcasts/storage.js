@@ -70,13 +70,37 @@ export function saveCachedFeed(feedUrl, feedData) {
   if (!feedUrl || !feedData) return;
   try {
     const feeds = getCachedFeeds();
+
+    // Prune feeds to prevent exceeding localStorage quota (keep at most 5 recent feeds)
+    const feedKeys = Object.keys(feeds);
+    if (feedKeys.length >= 5) {
+      feedKeys.sort((a, b) => (feeds[a]?.timestamp || 0) - (feeds[b]?.timestamp || 0));
+      while (feedKeys.length >= 5) {
+        const oldest = feedKeys.shift();
+        delete feeds[oldest];
+      }
+    }
+
+    // Trim episode list in cache to avoid storing megabytes of episode descriptions
+    let trimmedData = feedData;
+    if (feedData && Array.isArray(feedData.episodes) && feedData.episodes.length > 25) {
+      trimmedData = {
+        ...feedData,
+        episodes: feedData.episodes.slice(0, 25)
+      };
+    }
+
     feeds[feedUrl] = {
-      data: feedData,
+      data: trimmedData,
       timestamp: Date.now()
     };
     localStorage.setItem(LOCAL_STORAGE_KEY_FEEDS, JSON.stringify(feeds));
   } catch (e) {
     console.warn('[Podcast Storage] Error caching feed:', e);
+    // If quota exceeded, clear cached feeds to free up localStorage for the app
+    try {
+      localStorage.removeItem(LOCAL_STORAGE_KEY_FEEDS);
+    } catch (_) {}
   }
 }
 
