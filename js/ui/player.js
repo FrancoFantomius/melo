@@ -620,6 +620,7 @@ export function initPlayerUI() {
     }
 
     if (isInputTarget(e)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
     if (e.code === 'Space' || e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();

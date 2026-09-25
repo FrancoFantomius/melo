@@ -65,6 +65,7 @@ indeterminate_check_box
 keep
 keyboard
 last_page
+leading
 light_mode
 link
 lock
@@ -118,6 +119,7 @@ swap_vert
 sync
 tag
 theater_comedy
+trailing
 translate
 trending_up
 unarchive

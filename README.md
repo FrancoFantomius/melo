@@ -1,9 +1,9 @@
 # Melo
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Version](https://img.shields.io/badge/version-1.0.3-orange.svg)
+![Version](https://img.shields.io/badge/version-1.0.4-orange.svg)
 ![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
-![Vite](https://img.shields.io/badge/vite-v8.2-646CFF.svg)
+![Vite](https://img.shields.io/badge/vite-v8.3-646CFF.svg)
 ![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8.svg)
 
 Melo is a lightweight, installable Progressive Web App (PWA) music player built with Vanilla JavaScript and Vite, powered by a [Jellyfin](https://jellyfin.org/) media server backend. It combines a polished streaming experience with offline support, podcast subscription, and a personalized home screen — all without any heavy front-end framework.
@@ -101,7 +101,7 @@ Melo is a lightweight, installable Progressive Web App (PWA) music player built 
 ## Technology Stack
 
 - **Language**: Vanilla JavaScript (ES6 Modules)
-- **Build Tool**: Vite (`vite ^8.2`)
+- **Build Tool**: Vite (`vite ^8.3`)
 - **Templating**: Handlebars partials via `vite-plugin-handlebars`
 - **Styling**: Custom CSS (design-system variables, responsive layouts)
 - **Storage**: `localStorage` (session, settings) and IndexedDB (API cache, offline audio)

@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.0.4] - 2026-09-25
+
+### Changed
+- **Keyboard Shortcuts**: Added modifier key checks (`Ctrl`, `Meta`, `Alt`) to avoid triggering the global spacebar play/pause shortcut when modifier combinations are pressed.
+- **Dependencies & Components**:
+  - Updated `@francofantomius/material-components` to `^1.3.0`.
+  - Updated `vite` to `^8.3.0`.
+  - Updated `hls.js` to `^1.7.3`.
+  - Updated `@fontsource-variable/material-symbols-outlined` to `^5.3.6`.
+  - Updated Material Symbols icon subsetting tracking for `leading` and `trailing` glyphs.
+- Version bumped to `1.0.4`.
+- Service worker cache upgraded to `melo-v1.0.4`.
+
 ## [1.0.3] - 2026-09-10
 
 ### Added
