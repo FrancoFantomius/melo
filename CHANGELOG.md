@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.1.0] - 2026-11-07
+
+### Added
+- **Local SVG Icons System**: Migrated icon system from webfont subsets to standalone local SVG icons in `public/img/M3icons/` with an optimized runtime caching helper (`js/ui/icons.js`) and icon downloader script (`scripts/download-m3-icons.js`).
+- **Playlist Management & Admin Controls**: Redesigned playlist creation and editing modals adhering to Material Design 3 guidelines:
+  - Added support for playlist cover image upload and live preview.
+  - Added playlist public sharing toggles with administrator privilege checks and fallback indicators.
+  - Added playlist details editing with input validation.
+  - Expanded Jellyfin client API with `updatePlaylist` and `uploadPlaylistImage`.
+
+### Changed
+- **Account Menu**: Refactored the sign-out button to use standard Material Design components for consistency.
+- **Player & Modals UI**: Enhanced player layout, queue controls, podcast views, and modal styling using `@francofantomius/material-components`.
+- **Translations**: Added and synchronized missing translation keys for playlist management and administrator permission notices across all 8 supported languages (`de`, `en`, `es`, `fr`, `it`, `ja`, `pt`, `zh`).
+- Version bumped to `1.1.0`.
+- Service worker cache upgraded to `melo-v1.1.0`.
+- Fixed timescroll sinusoid.
+
 ## [1.0.4] - 2026-09-25
 
 ### Changed

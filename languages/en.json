@@ -231,5 +231,10 @@
   "4. User Responsibilities & Liability": "4. User Responsibilities & Liability",
   "You agree to use Melo in compliance with all applicable local, national, and international laws. You are exclusively liable for any illegal, unauthorized, or infringing content transmitted through your personal server setup. The developers of Melo assume no liability for misuse of the software or copyright violations committed by users.": "You agree to use Melo in compliance with all applicable local, national, and international laws. You are exclusively liable for any illegal, unauthorized, or infringing content transmitted through your personal server setup. The developers of Melo assume no liability for misuse of the software or copyright violations committed by users.",
   "5. Limitation of Liability": "5. Limitation of Liability",
-  "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.": "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application."
+  "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.": "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.",
+  "Playlist name is required": "Playlist name is required",
+  "Administrator privileges required to share playlists": "Administrator privileges required to share playlists",
+  "Administrator privileges required to upload cover images": "Administrator privileges required to upload cover images",
+  "New Playlist": "New Playlist",
+  "Upload Cover Image": "Upload Cover Image"
 }
