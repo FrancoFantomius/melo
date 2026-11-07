@@ -87,6 +87,11 @@ export async function validateSession() {
   }
   try {
     const info = await client.system.getInfo();
+    if (session.userId && typeof session.isAdmin !== 'boolean') {
+      try {
+        await isCurrentUserAdmin();
+      } catch (e) {}
+    }
     return Boolean(info);
   } catch (err) {
     if (err?.status === 401 || err?.statusCode === 401) {
@@ -106,6 +111,7 @@ export async function authenticateServer(serverUrl, username, password) {
   const accessToken = data.AccessToken;
   const userId = data.User.Id;
   const userPrimaryImageTag = data.User?.PrimaryImageTag || data.User?.ImageTags?.Primary || '';
+  const isAdmin = Boolean(data.User?.Policy?.IsAdministrator);
 
   await clearApiCache();
   try {
@@ -122,12 +128,51 @@ export async function authenticateServer(serverUrl, username, password) {
     accessToken: accessToken,
     userId: userId,
     userPrimaryImageTag: userPrimaryImageTag,
+    isAdmin: isAdmin,
     isLoggedIn: true
   });
 
   await reportCapabilities();
 
   return data;
+}
+
+export async function isCurrentUserAdmin() {
+  const session = getSession();
+  if (typeof session.isAdmin === 'boolean' && session.isAdmin) {
+    return true;
+  }
+  const current = client.auth?.getCurrentUser?.();
+  if (current?.Policy?.IsAdministrator !== undefined) {
+    const isAdmin = Boolean(current.Policy.IsAdministrator);
+    saveSession({ isAdmin });
+    return isAdmin;
+  }
+  if (session.userId && client.http?.request) {
+    try {
+      const user = await client.http.request(`/Users/${session.userId}`);
+      if (user?.Policy?.IsAdministrator !== undefined) {
+        const isAdmin = Boolean(user.Policy.IsAdministrator);
+        saveSession({ isAdmin });
+        return isAdmin;
+      }
+    } catch (e) {
+      console.warn('[Jellyfin] Failed to check admin status:', e);
+    }
+  }
+  return Boolean(session.isAdmin);
+}
+
+export function isCurrentUserAdminSync() {
+  const session = getSession();
+  if (typeof session.isAdmin === 'boolean') {
+    return session.isAdmin;
+  }
+  const current = client.auth?.getCurrentUser?.();
+  if (current?.Policy?.IsAdministrator !== undefined) {
+    return Boolean(current.Policy.IsAdministrator);
+  }
+  return false;
 }
 
 export async function reportCapabilities() {
@@ -289,8 +334,40 @@ export async function createPlaylist({ name, isPublic = false, trackIds = [] }) 
   return id;
 }
 
-export async function updatePlaylist(playlistId, { name }) {
+export async function updatePlaylist(playlistId, { name, isPublic }) {
   await client.playlists.updatePlaylist(playlistId, { name });
+  if (typeof isPublic === 'boolean') {
+    const session = getSession();
+    const userId = session.userId || client.auth?.getCurrentUser?.()?.Id;
+    if (userId && client.http?.request) {
+      if (isPublic) {
+        try {
+          await client.http.request(`/Playlists/${playlistId}/Users/${userId}`, {
+            method: 'POST',
+            body: { UserId: userId, CanEdit: true }
+          });
+        } catch {
+          try {
+            await client.http.request(`/Playlists/${playlistId}`, {
+              method: 'POST',
+              body: { IsPublic: true }
+            });
+          } catch (err) {
+            console.warn('[Jellyfin] Failed to update public status for playlist:', err);
+          }
+        }
+      } else {
+        try {
+          await client.http.request(`/Playlists/${playlistId}`, {
+            method: 'POST',
+            body: { IsPublic: false }
+          });
+        } catch (err) {
+          console.warn('[Jellyfin] Failed to update public status for playlist:', err);
+        }
+      }
+    }
+  }
   await clearApiCache();
 }
 

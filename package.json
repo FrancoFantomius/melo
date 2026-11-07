@@ -1,6 +1,6 @@
 {
   "name": "melo",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Melo - Music Player powered by Jellyfin",
   "type": "module",
   "license": "MIT",
@@ -13,23 +13,24 @@
     "vanilla-js"
   ],
   "scripts": {
-    "dev": "vite",
+    "subset:icons": "node scripts/download-m3-icons.js",
+    "download:icons": "node scripts/download-m3-icons.js",
+    "dev": "node scripts/download-m3-icons.js && vite",
     "optimize": "node scripts/optimize-build.js",
     "check:i18n": "node scripts/check-translations.js",
-    "build": "node scripts/optimize-build.js && vite build",
+    "build": "node scripts/download-m3-icons.js && vite build",
     "preview": "vite preview",
     "clean": "git clean -fdX"
   },
   "dependencies": {
-    "@fontsource-variable/material-symbols-outlined": "^5.3.6",
     "@fontsource-variable/roboto-flex": "^5.3.0",
-    "@francofantomius/jellyfin": "^0.4.1",
-    "@francofantomius/material-components": "^1.3.0",
-    "hls.js": "^1.7.3"
+    "@francofantomius/jellyfin": "^0.4.2",
+    "@francofantomius/material-components": "^1.4.1",
+    "hls.js": "^1.7.3",
+    "lit": "^3.3.3"
   },
   "devDependencies": {
-    "subset-font": "^2.7.0",
-    "vite": "^8.3.0",
+    "vite": "^8.3.6",
     "vite-plugin-handlebars": "^2.0.3"
   }
 }

@@ -9,7 +9,6 @@ import { openPodcastShow, renderPodcastsView } from './list.js';
 import { getPlaceholder } from '../../placeholders.js';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon-button';
-import '@francofantomius/material-components/tooltip';
 import '@francofantomius/material-components/icon';
 
 export function renderSubscribedCarousel(container, feeds) {
@@ -32,8 +31,7 @@ export function renderSubscribedCarousel(container, feeds) {
         <div style="font-size: 11px; color: var(--accent); margin-top: 4px;">${feed.episodeCount || 0} ${getTranslation('Episodes')}</div>
       </div>
       <div style="position: absolute; top: 12px; right: 12px; display: inline-flex;">
-        <md-icon-button class="btn-delete-podcast" data-feed-url="${encodeURIComponent(feed.feedUrl)}" variant="standard" icon="delete" aria-label="${getTranslation('Unsubscribe')}"></md-icon-button>
-        <md-tooltip position="top" data-i18n-value="Unsubscribe" value="${getTranslation('Unsubscribe')}"></md-tooltip>
+        <md-icon-button class="btn-delete-podcast" data-feed-url="${encodeURIComponent(feed.feedUrl)}" variant="standard" icon="delete" aria-label="${getTranslation('Unsubscribe')}" tooltip-position="top"></md-icon-button>
       </div>
     </div>
   `).join('');
@@ -99,7 +97,7 @@ export function renderContinuePlayingCarousel(container, feeds) {
         <div class="continue-playing-thumb-wrapper">
           <img src="${coverImg}" class="continue-playing-thumb" alt="${ep.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
           <div class="continue-playing-play-btn" title="Resume Episode">
-            <span class="material-symbols-outlined" style="font-size: 24px;">play_arrow</span>
+            <md-icon name="play_arrow" size="24"></md-icon>
           </div>
         </div>
         <div class="continue-playing-info">
@@ -197,16 +195,13 @@ export function renderLatestEpisodesGrid(container, feeds) {
 
         <div class="podcast-episode-actions">
           <div class="action-btn-wrapper">
-            <md-icon-button class="btn-episode-play" data-index="${idx}" variant="standard" icon="play_arrow" aria-label="${playLabel}"></md-icon-button>
-            <md-tooltip position="top" data-i18n-value="Play" value="${playLabel}"></md-tooltip>
+            <md-icon-button class="btn-episode-play" data-index="${idx}" variant="standard" icon="play_arrow" aria-label="${playLabel}" tooltip-position="top"></md-icon-button>
           </div>
           <div class="action-btn-wrapper">
-            <md-icon-button class="btn-track-add-queue" data-index="${idx}" variant="standard" icon="queue_music" aria-label="${queueLabel}"></md-icon-button>
-            <md-tooltip position="top" data-i18n-value="Add to Queue" value="${queueLabel}"></md-tooltip>
+            <md-icon-button class="btn-track-add-queue" data-index="${idx}" variant="standard" icon="queue_music" aria-label="${queueLabel}" tooltip-position="top"></md-icon-button>
           </div>
           <div class="action-btn-wrapper">
-            <md-icon-button class="btn-track-download" data-track-id="${ep.id}" variant="standard" icon="download" aria-label="${downloadLabel}"></md-icon-button>
-            <md-tooltip position="top" data-i18n-value="Download" value="${downloadLabel}"></md-tooltip>
+            <md-icon-button class="btn-track-download" data-track-id="${ep.id}" variant="standard" icon="download" aria-label="${downloadLabel}" tooltip-position="top"></md-icon-button>
           </div>
         </div>
       </div>

@@ -32,12 +32,8 @@ function renderSectionOrderListUI(container, orderArray) {
     <div class="section-order-item" data-key="${catKey}">
       <span>${CATEGORY_NAMES[catKey] || catKey}</span>
       <div class="section-order-actions">
-        <button type="button" class="btn-order-move btn-move-up" data-idx="${idx}" ${idx === 0 ? 'disabled' : ''} title="Move Up">
-          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_upward</span>
-        </button>
-        <button type="button" class="btn-order-move btn-move-down" data-idx="${idx}" ${idx === currentOrderState.length - 1 ? 'disabled' : ''} title="Move Down">
-          <span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
-        </button>
+        <md-icon-button type="button" class="btn-order-move btn-move-up" data-idx="${idx}" ${idx === 0 ? 'disabled' : ''} variant="standard" icon="arrow_upward" aria-label="Move Up" tooltip-position="top" style="--md-icon-button-size: 32px; --md-icon-button-icon-size: 16px;"></md-icon-button>
+        <md-icon-button type="button" class="btn-order-move btn-move-down" data-idx="${idx}" ${idx === currentOrderState.length - 1 ? 'disabled' : ''} variant="standard" icon="arrow_downward" aria-label="Move Down" tooltip-position="top" style="--md-icon-button-size: 32px; --md-icon-button-icon-size: 16px;"></md-icon-button>
       </div>
     </div>
   `).join('');

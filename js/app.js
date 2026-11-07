@@ -13,7 +13,9 @@ import '@francofantomius/material-components/side-sheet';
 import '@francofantomius/material-components/bottom-sheet';
 import '@francofantomius/material-components/badge';
 import '@francofantomius/material-components/chip';
-import '@francofantomius/material-components/tooltip';
+import '@francofantomius/material-components/text-field';
+import '@francofantomius/material-components/switch';
+import './ui/icons.js';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { generateIconSubset } from './scripts/subset-icons.js';
+import { downloadM3Icons } from './scripts/download-m3-icons.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -46,12 +46,12 @@ export default defineConfig({
       }
     }),
     {
-      name: 'subset-material-icons',
+      name: 'download-material-icons',
       async buildStart() {
         try {
-          await generateIconSubset();
+          await downloadM3Icons();
         } catch (err) {
-          console.warn('[Icon Subsetting] Error during buildStart icon subset generation:', err);
+          console.warn('[Icon Download] Error during buildStart icon download:', err);
         }
       }
     },

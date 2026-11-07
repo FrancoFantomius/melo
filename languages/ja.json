@@ -231,5 +231,10 @@
   "4. User Responsibilities & Liability": "4. ユーザーの責任と法的責任",
   "You agree to use Melo in compliance with all applicable local, national, and international laws. You are exclusively liable for any illegal, unauthorized, or infringing content transmitted through your personal server setup. The developers of Melo assume no liability for misuse of the software or copyright violations committed by users.": "適用されるすべての地域、国内、および国際的な法律に従って Melo を使用することに同意するものとします。ご自身のサーバー設定を通じて送信される違法、不正、または権利侵害コンテンツについては、ユーザーが単独で全責任を負います。Melo の開発者は、ソフトウェアの不正使用やユーザーによる著作権侵害について一切の責任を負いません。",
   "5. Limitation of Liability": "5. 責任の制限",
-  "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.": "Melo は明示または黙示を問わず、いかなる種類の保証もなく「現状有姿」で提供されます。Melo の作成者または貢献者は、本アプリケーションの使用または使用不能に起因するいかなる損害、法的請求、データの損失についても責任を負いません。"
+  "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.": "Melo は明示または黙示を問わず、いかなる種類の保証もなく「現状有姿」で提供されます。Melo の作成者または貢献者は、本アプリケーションの使用または使用不能に起因するいかなる損害、法的請求、データの損失についても責任を負いません。",
+  "Playlist name is required": "プレイリスト名は必須です",
+  "Administrator privileges required to share playlists": "プレイリストを共有するには管理者権限が必要です",
+  "Administrator privileges required to upload cover images": "カバー画像をアップロードするには管理者権限が必要です",
+  "New Playlist": "新しいプレイリスト",
+  "Upload Cover Image": "カバー画像をアップロード"
 }

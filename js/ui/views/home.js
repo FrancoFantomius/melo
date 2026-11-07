@@ -47,12 +47,8 @@ export async function renderHomeView(container) {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
           <h3 style="font-size: 20px; font-weight: 700;" data-i18n>Playlists</h3>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-playlists" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-playlists" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-playlists" class="carousel-nav-btn" variant="standard" icon="chevron_left" aria-label="Previous" tooltip-position="top"></md-icon-button>
+            <md-icon-button id="carousel-next-playlists" class="carousel-nav-btn" variant="standard" icon="chevron_right" aria-label="Next" tooltip-position="top"></md-icon-button>
           </div>
         </div>
         <div id="home-playlists" class="cards-carousel">
@@ -66,12 +62,8 @@ export async function renderHomeView(container) {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
           <h3 style="font-size: 20px; font-weight: 700;" data-i18n>Recommended Songs</h3>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-songs" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-songs" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-songs" class="carousel-nav-btn" variant="standard" icon="chevron_left" aria-label="Previous" tooltip-position="top"></md-icon-button>
+            <md-icon-button id="carousel-next-songs" class="carousel-nav-btn" variant="standard" icon="chevron_right" aria-label="Next" tooltip-position="top"></md-icon-button>
           </div>
         </div>
         <div id="home-tracks" class="tracks-grid-2col">
@@ -85,12 +77,8 @@ export async function renderHomeView(container) {
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 16px;">
           <h3 style="font-size: 20px; font-weight: 700;" data-i18n>Artists</h3>
           <div style="display: flex; gap: 8px;">
-            <button id="carousel-prev-artists" class="carousel-nav-btn" title="Previous">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_left</span>
-            </button>
-            <button id="carousel-next-artists" class="carousel-nav-btn" title="Next">
-              <span class="material-symbols-outlined" style="font-size: 20px;">chevron_right</span>
-            </button>
+            <md-icon-button id="carousel-prev-artists" class="carousel-nav-btn" variant="standard" icon="chevron_left" aria-label="Previous" tooltip-position="top"></md-icon-button>
+            <md-icon-button id="carousel-next-artists" class="carousel-nav-btn" variant="standard" icon="chevron_right" aria-label="Next" tooltip-position="top"></md-icon-button>
           </div>
         </div>
         <div id="home-artists" class="cards-carousel">
@@ -255,10 +243,10 @@ export async function renderHomeView(container) {
         podcastsGrid.innerHTML = `
           <div style="grid-column: 1/-1; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px;">
             <div style="font-weight: 600; color: var(--text-primary);" data-i18n>No podcasts subscribed yet. Search or browse the Discover section below to subscribe!</div>
-            <button id="btn-home-discover-podcasts" class="btn-primary" style="margin-top: 8px;">
-              <span class="material-symbols-outlined">explore</span>
+            <md-button id="btn-home-discover-podcasts" variant="filled" style="margin-top: 8px;">
+              <md-icon slot="icon" name="explore"></md-icon>
               <span data-i18n>Discover Podcasts</span>
-            </button>
+            </md-button>
           </div>
         `;
         document.getElementById('btn-home-discover-podcasts')?.addEventListener('click', () => {

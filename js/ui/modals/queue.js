@@ -198,7 +198,7 @@ export function renderQueueDrawerList(force = false) {
     if (force || lastRenderedSignature !== 'empty') {
       const emptyHtml = `
         <div class="queue-empty-state">
-          <span class="material-symbols-outlined queue-empty-icon">queue_music</span>
+          <md-icon name="queue_music" class="queue-empty-icon" size="48"></md-icon>
           <div class="queue-empty-text">Queue is empty</div>
         </div>
       `;
@@ -232,11 +232,11 @@ export function renderQueueDrawerList(force = false) {
     return `
       <div class="queue-track-item ${isCurrent ? 'playing' : ''}" data-queue-index="${idx}">
         <div class="queue-track-status">
-          ${isCurrent ? '<span class="material-symbols-outlined playing-indicator">volume_up</span>' : `<span class="queue-track-num">${idx + 1}</span>`}
+          ${isCurrent ? '<md-icon name="volume_up" class="playing-indicator" size="18"></md-icon>' : `<span class="queue-track-num">${idx + 1}</span>`}
         </div>
         <div class="queue-track-thumb-container">
           <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="queue-track-thumb" alt="Cover">
-          ${isCurrent ? '<div class="queue-playing-overlay"><span class="material-symbols-outlined queue-playing-icon">equalizer</span></div>' : ''}
+          ${isCurrent ? '<div class="queue-playing-overlay"><md-icon name="equalizer" class="queue-playing-icon" size="20"></md-icon></div>' : ''}
         </div>
         <div class="queue-track-details">
           <div class="queue-track-title">${escapeHtml(titleStr)}</div>
@@ -244,14 +244,10 @@ export function renderQueueDrawerList(force = false) {
         </div>
         <div class="queue-track-actions">
           ${canAddToPlaylist ? `
-            <button class="btn-queue-action btn-queue-add-playlist btn-icon" title="Add to Playlist" data-queue-index="${idx}" aria-label="Add to Playlist">
-              <span class="material-symbols-outlined" style="font-size: 20px;">playlist_add</span>
-            </button>
+            <md-icon-button class="btn-queue-action btn-queue-add-playlist" variant="standard" icon="playlist_add" data-queue-index="${idx}" aria-label="Add to Playlist" tooltip-position="top"></md-icon-button>
           ` : ''}
           ${!isCurrent ? `
-            <button class="btn-queue-action btn-queue-remove btn-icon" title="Remove from Queue" data-queue-index="${idx}" aria-label="Remove from Queue">
-              <span class="material-symbols-outlined" style="font-size: 20px;">close</span>
-            </button>
+            <md-icon-button class="btn-queue-action btn-queue-remove" variant="standard" icon="close" data-queue-index="${idx}" aria-label="Remove from Queue" tooltip-position="top"></md-icon-button>
           ` : ''}
         </div>
       </div>

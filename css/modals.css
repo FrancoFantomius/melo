@@ -124,3 +124,19 @@
   cursor: not-allowed;
 }
 
+/* Add Track to Playlist Rows */
+.add-track-item {
+  min-height: 52px;
+  box-sizing: border-box;
+}
+
+.btn-add-single-track {
+  height: 32px;
+  align-self: center;
+  margin: auto 0;
+}
+
+.btn-add-single-track::part(button) {
+  height: 32px;
+}
+

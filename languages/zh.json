@@ -231,5 +231,10 @@
   "4. User Responsibilities & Liability": "4. 用户责任与法律责任",
   "You agree to use Melo in compliance with all applicable local, national, and international laws. You are exclusively liable for any illegal, unauthorized, or infringing content transmitted through your personal server setup. The developers of Melo assume no liability for misuse of the software or copyright violations committed by users.": "您同意在遵守所有适用的地方、国家和国际法律的前提下使用 Melo。您对通过您的个人服务器设置传输的任何非法、未经授权或侵权的内容承担全部责任。Melo 开发者对软件的滥用或用户犯下的版权侵权行为不承担任何责任。",
   "5. Limitation of Liability": "5. 责任限制",
-  "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.": "Melo 按“原样”提供，不提供任何明示或暗示的保证。在任何情况下，Melo 的创建者或贡献者均不对因使用或无法使用本应用程序而导致的任何损害、法律索赔或数据丢失承担责任。"
+  "Melo is provided \"as is\" without warranties of any kind, whether express or implied. In no event shall the creators or contributors of Melo be liable for any damages, legal claims, or data loss resulting from the use or inability to use this application.": "Melo 按“原样”提供，不提供任何明示或暗示的保证。在任何情况下，Melo 的创建者或贡献者均不对因使用或无法使用本应用程序而导致的任何损害、法律索赔或数据丢失承担责任。",
+  "Playlist name is required": "播放列表名称为必填项",
+  "Administrator privileges required to share playlists": "共享播放列表需要管理员权限",
+  "Administrator privileges required to upload cover images": "上传封面图片需要管理员权限",
+  "New Playlist": "新建播放列表",
+  "Upload Cover Image": "上传封面图片"
 }

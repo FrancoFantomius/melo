@@ -1,4 +1,8 @@
 
+import '@francofantomius/material-components/button';
+import '@francofantomius/material-components/icon';
+import './ui/icons.js';
+
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';
 import { getSession } from './jellyfin/session.js';

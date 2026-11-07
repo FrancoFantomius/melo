@@ -15,7 +15,6 @@ import { escapeHtml } from '../../modals/shared.js';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/icon';
-import '@francofantomius/material-components/tooltip';
 
 let discoverDailyRefreshCount = 0;
 
@@ -121,41 +120,35 @@ export async function renderAlbumDetailView(container, albumOrId) {
               <span class="btn-play-label-full" data-i18n>Play All</span>
               <span class="btn-play-label-short" data-i18n hidden>Play</span>
             </md-button>
-            <md-icon-button id="btn-shuffle-album-all" variant="tonal" icon="shuffle" aria-label="Random Play"></md-icon-button>
-            <md-tooltip for="btn-shuffle-album-all" position="top" data-i18n-value="Random Play" value="Random Play"></md-tooltip>
+            <md-icon-button id="btn-shuffle-album-all" variant="tonal" icon="shuffle" aria-label="Random Play" tooltip-position="top"></md-icon-button>
             ${isDiscoverDaily ? `
-              <md-button id="btn-refresh-discover-daily" variant="tonal" aria-label="Refresh Discover Daily">
+              <md-button id="btn-refresh-discover-daily" variant="tonal" aria-label="Refresh Discover Daily" tooltip-position="top">
                 <md-icon slot="icon" name="refresh"></md-icon>
                 <span class="btn-refresh-label" data-i18n>Refresh</span>
               </md-button>
-              <md-tooltip for="btn-refresh-discover-daily" position="top" data-i18n-value="Refresh Discover Daily" value="Refresh Discover Daily"></md-tooltip>
             ` : ''}
             ${isPlaylist ? '' : `
-              <md-button id="btn-add-album-to-playlist" variant="tonal" aria-label="Add all to playlist">
+              <md-button id="btn-add-album-to-playlist" variant="tonal" aria-label="Add to Playlist" tooltip-position="top">
                 <md-icon slot="icon" name="playlist_add"></md-icon>
                 <span data-i18n>Add to Playlist</span>
               </md-button>
-              <md-tooltip for="btn-add-album-to-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
             `}
-            <md-button id="btn-download-album" variant="tonal" aria-label="Download">
+            <md-button id="btn-download-album" variant="tonal" aria-label="Download" tooltip-position="top">
               <md-icon slot="icon" name="download"></md-icon>
               <span id="btn-download-album-label" data-i18n>Download</span>
             </md-button>
-            <md-tooltip id="tooltip-download-album" for="btn-download-album" position="top" data-i18n-value="Download" value="Download"></md-tooltip>
           </div>
           ${isPlaylist && !isDiscoverDaily ? `
             <div class="playlist-manage-actions">
-              <md-button id="btn-add-playlist-tracks" variant="tonal">
+              <md-button id="btn-add-playlist-tracks" variant="tonal" aria-label="Add Tracks to Playlist" tooltip-position="top">
                 <md-icon slot="icon" name="playlist_add"></md-icon>
                 <span data-i18n>Add Tracks to Playlist</span>
               </md-button>
-              <md-tooltip for="btn-add-playlist-tracks" position="top" data-i18n-value="Add Tracks to Playlist" value="Add Tracks to Playlist"></md-tooltip>
               ${!isLikedSongs ? `
-                <md-button id="btn-edit-playlist" variant="tonal">
+                <md-button id="btn-edit-playlist" variant="tonal" aria-label="Edit" tooltip-position="top">
                   <md-icon slot="icon" name="edit"></md-icon>
                   <span data-i18n>Edit</span>
                 </md-button>
-                <md-tooltip for="btn-edit-playlist" position="top" data-i18n-value="Edit" value="Edit"></md-tooltip>
               ` : ''}
             </div>
           ` : ''}
@@ -165,19 +158,14 @@ export async function renderAlbumDetailView(container, albumOrId) {
       <h2 class="section-title" data-i18n>Tracks</h2>
 
       <div id="album-tracks-toolbar" class="tracks-toolbar">
-        <md-icon-button id="btn-tracks-select-all" variant="standard" icon="check_box_outline_blank" aria-label="Select All"></md-icon-button>
-        <md-tooltip for="btn-tracks-select-all" position="top" data-i18n-value="Select All" value="Select All"></md-tooltip>
+        <md-icon-button id="btn-tracks-select-all" variant="standard" icon="check_box_outline_blank" aria-label="Select All" tooltip-position="top"></md-icon-button>
         <span id="album-tracks-selected-count" class="tracks-toolbar-count"></span>
         ${!isLikedSongs && !isDiscoverDaily && album.Type === 'Playlist' ? `
-          <md-icon-button id="btn-tracks-remove-playlist" variant="standard" icon="playlist_remove" aria-label="Remove from Playlist"></md-icon-button>
-          <md-tooltip for="btn-tracks-remove-playlist" position="top" data-i18n-value="Remove from Playlist" value="Remove from Playlist"></md-tooltip>
+          <md-icon-button id="btn-tracks-remove-playlist" variant="standard" icon="playlist_remove" aria-label="Remove from Playlist" tooltip-position="top"></md-icon-button>
         ` : ''}
-        <md-icon-button id="btn-tracks-add-playlist" variant="standard" icon="playlist_add" aria-label="Add to Playlist"></md-icon-button>
-        <md-tooltip for="btn-tracks-add-playlist" position="top" data-i18n-value="Add to Playlist" value="Add to Playlist"></md-tooltip>
-        <md-icon-button id="btn-tracks-add-queue" variant="standard" icon="queue_music" aria-label="Add to Queue"></md-icon-button>
-        <md-tooltip for="btn-tracks-add-queue" position="top" data-i18n-value="Add to Queue" value="Add to Queue"></md-tooltip>
-        <md-icon-button id="btn-tracks-clear-selection" variant="standard" icon="close" aria-label="Clear selection"></md-icon-button>
-        <md-tooltip for="btn-tracks-clear-selection" position="top" data-i18n-value="Clear selection" value="Clear selection"></md-tooltip>
+        <md-icon-button id="btn-tracks-add-playlist" variant="standard" icon="playlist_add" aria-label="Add to Playlist" tooltip-position="top"></md-icon-button>
+        <md-icon-button id="btn-tracks-add-queue" variant="standard" icon="queue_music" aria-label="Add to Queue" tooltip-position="top"></md-icon-button>
+        <md-icon-button id="btn-tracks-clear-selection" variant="standard" icon="close" aria-label="Clear selection" tooltip-position="top"></md-icon-button>
       </div>
 
       <div id="album-songs-list" class="tracks-list">
@@ -219,7 +207,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
   const btnEdit = container.querySelector('#btn-edit-playlist');
   if (btnEdit) {
     btnEdit.addEventListener('click', () => {
-      openEditPlaylistModal(album.Id, album.Name, () => {
+      openEditPlaylistModal(album, () => {
         renderAlbumDetailView(container, album.Id);
       }, () => {
         window.history.pushState({ view: 'playlists' }, '', 'playlists.html');

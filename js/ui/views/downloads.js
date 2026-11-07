@@ -25,7 +25,7 @@ function renderTrackRowHTML(rec) {
   return `
     <div class="track-row downloads-row" data-track-id="${rec.id}">
       <span class="track-num">
-        <span class="material-symbols-outlined" style="font-size: 18px;">${rec.isPodcast ? 'podcasts' : 'music_note'}</span>
+        <md-icon name="${rec.isPodcast ? 'podcasts' : 'music_note'}" size="18"></md-icon>
       </span>
       <div class="track-info">
         <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="track-cover" alt="Cover">
@@ -37,9 +37,7 @@ function renderTrackRowHTML(rec) {
       <div style="color: var(--text-secondary); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${rec.album || ''}</div>
       <div style="color: var(--text-muted); font-size: 12px; white-space: nowrap;">${formatBytes(rec.size)}</div>
       <div style="display: flex; justify-content: center; align-items: center;">
-        <button class="btn-track-download downloaded" data-track-id="${rec.id}" title="Remove Download">
-          <span class="material-symbols-outlined" style="font-size: 18px;">download_done</span>
-        </button>
+        <md-icon-button class="btn-track-download downloaded" data-track-id="${rec.id}" variant="standard" icon="download_done" aria-label="Remove Download" tooltip-position="top"></md-icon-button>
       </div>
     </div>
   `;
@@ -55,19 +53,15 @@ function renderGroupHTML(group) {
       <div class="downloads-group-header" role="button" aria-expanded="false">
         <div class="downloads-group-cover-wrap">
           <img src="${artUrl}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('${placeholderType}') : '${getPlaceholder(placeholderType)}';" data-placeholder-type="${placeholderType}" class="track-cover" alt="${group.name}">
-          <button class="downloads-group-play" title="Play All" aria-label="Play All">
-            <span class="material-symbols-outlined" style="font-size: 18px;">play_arrow</span>
-          </button>
+          <md-icon-button class="downloads-group-play" variant="standard" icon="play_arrow" aria-label="Play All" tooltip-position="top"></md-icon-button>
         </div>
         <div style="overflow: hidden;">
           <div class="downloads-group-title">${group.name}</div>
           <div class="downloads-group-subtitle">${typeLabel}${group.owner ? ' • ' + group.owner : ''} • ${count} ${getTranslation(count === 1 ? 'track' : 'tracks')} • ${formatBytes(group.size)}</div>
         </div>
         <div style="flex: 1; min-width: 8px;"></div>
-        <button class="btn-track-download downloaded" data-remove-group="${group.id}" title="Remove Download">
-          <span class="material-symbols-outlined" style="font-size: 18px;">download_done</span>
-        </button>
-        <span class="material-symbols-outlined downloads-group-chevron" style="font-size: 20px;">expand_more</span>
+        <md-icon-button class="btn-track-download downloaded" data-remove-group="${group.id}" variant="standard" icon="download_done" aria-label="Remove Download" tooltip-position="top"></md-icon-button>
+        <md-icon name="expand_more" class="downloads-group-chevron" size="20"></md-icon>
       </div>
       <div class="downloads-group-tracks">
         ${group.tracks.map(renderTrackRowHTML).join('')}
@@ -85,7 +79,7 @@ async function loadDownloads(container) {
   if (downloads.length === 0) {
     listEl.innerHTML = `
       <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; text-align: center; color: var(--text-secondary);">
-        <span class="material-symbols-outlined" style="font-size: 48px; opacity: 0.4;">download</span>
+        <md-icon name="download" size="48" style="opacity: 0.4;"></md-icon>
         <div>${getTranslation('No downloads yet.')}</div>
         <div style="font-size: 13px; color: var(--text-muted);">${getTranslation('Tap the download icon on any track to save it for offline listening.')}</div>
       </div>

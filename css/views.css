@@ -90,6 +90,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  padding-top: 6px;
   padding-bottom: 12px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
@@ -183,8 +184,10 @@
   position: absolute;
   bottom: 60px;
   right: 24px;
-  width: 44px;
-  height: 44px;
+  --md-icon-button-size: 44px;
+  --md-icon-button-icon-size: 24px;
+  --md-sys-color-primary: var(--accent);
+  --md-sys-color-on-primary: var(--accent-text);
   border-radius: var(--radius-full);
   background: var(--accent);
   color: var(--accent-text);
@@ -381,6 +384,9 @@
 .btn-track-download,
 .btn-track-add-queue,
 .btn-track-add-playlist {
+  --md-icon-button-size: 32px;
+  --md-icon-button-icon-size: 18px;
+  --md-sys-color-on-surface-variant: var(--text-muted);
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -395,6 +401,7 @@
 
 .btn-track-like:hover {
   color: #f97316;
+  --md-sys-color-on-surface-variant: #f97316;
   background: rgba(249, 115, 22, 0.1);
 }
 
@@ -402,11 +409,13 @@
 .btn-track-add-queue:hover,
 .btn-track-add-playlist:hover {
   color: var(--accent);
+  --md-sys-color-on-surface-variant: var(--accent);
   background: rgba(249, 115, 22, 0.1);
 }
 
 .btn-track-like.liked {
-  color: #f97316;
+  color: #f97316 !important;
+  --md-sys-color-on-surface-variant: #f97316 !important;
 }
 
 .btn-track-like.liked .material-symbols-outlined {
@@ -414,7 +423,8 @@
 }
 
 .btn-track-download.downloaded {
-  color: var(--accent);
+  color: var(--accent) !important;
+  --md-sys-color-on-surface-variant: var(--accent) !important;
 }
 
 .btn-track-download.downloaded .material-symbols-outlined {
@@ -423,6 +433,7 @@
 
 .btn-track-download.downloading {
   color: var(--accent);
+  --md-sys-color-on-surface-variant: var(--accent);
   cursor: progress;
 }
 

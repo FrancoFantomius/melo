@@ -6,9 +6,7 @@
     <span id="desktop-queue-count" class="queue-count-badge"></span>
   </div>
   <div slot="header-actions">
-    <button id="desktop-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
-      <span class="material-symbols-outlined">delete_sweep</span>
-    </button>
+    <md-icon-button id="desktop-btn-clear-queue" class="queue-clear-btn" variant="standard" icon="delete_sweep" aria-label="Clear Queue" tooltip-position="bottom" data-i18n-title="Clear Queue"></md-icon-button>
   </div>
   <div id="desktop-queue-tracks-list" class="queue-tracks-list"></div>
 </md-side-sheet>
@@ -21,9 +19,7 @@
     <span id="mobile-queue-count" class="queue-count-badge"></span>
   </div>
   <div slot="header-actions">
-    <button id="mobile-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
-      <span class="material-symbols-outlined">delete_sweep</span>
-    </button>
+    <md-icon-button id="mobile-btn-clear-queue" class="queue-clear-btn" variant="standard" icon="delete_sweep" aria-label="Clear Queue" tooltip-position="bottom" data-i18n-title="Clear Queue"></md-icon-button>
   </div>
   <div id="mobile-queue-tracks-list" class="queue-tracks-list"></div>
 </md-bottom-sheet>
@@ -33,12 +29,10 @@
   <div class="modal-card">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">settings</span>
+        <md-icon name="settings" style="color: var(--accent);"></md-icon>
         <span data-i18n>App Settings</span>
       </h2>
-      <button id="btn-settings-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-settings-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <!-- Language Selector -->
@@ -109,13 +103,13 @@
     </div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
-      <button id="btn-save-settings" class="btn btn-primary" style="width: 100%;" data-i18n>Save Settings</button>
+      <md-button id="btn-save-settings" variant="filled" style="width: 100%;"><span data-i18n>Save Settings</span></md-button>
     </div>
 
     <div style="text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
       <a href="https://github.com/FrancoFantomius/melo" target="_blank" rel="noopener noreferrer"
         style="font-size: 13px; color: var(--text-secondary); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-        <span class="material-symbols-outlined" style="font-size: 16px;">link</span>
+        <md-icon name="link" size="16"></md-icon>
         <span data-i18n>View Project on GitHub</span>
       </a>
     </div>
@@ -134,9 +128,7 @@
       <div id="lyrics-track-title" class="lyrics-header-title" data-i18n>Lyrics</div>
       <div id="lyrics-track-artist" class="lyrics-header-artist"></div>
     </div>
-    <button id="btn-lyrics-close" class="btn-icon lyrics-close-btn" title="Close lyrics">
-      <span class="material-symbols-outlined">close</span>
-    </button>
+    <md-icon-button id="btn-lyrics-close" class="lyrics-close-btn" variant="standard" icon="close" aria-label="Close lyrics" tooltip-position="bottom"></md-icon-button>
   </div>
 
   <div id="lyrics-view-body" class="lyrics-view-body">
@@ -149,7 +141,7 @@
   <div class="modal-card">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">podcasts</span>
+        <md-icon name="podcasts" style="color: var(--accent);"></md-icon>
         <span data-i18n>Add Podcast</span>
       </h2>
       <md-icon-button id="btn-add-podcast-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
@@ -177,36 +169,47 @@
   <div class="modal-card">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
-        <span data-i18n>Create Playlist</span>
+        <md-icon name="playlist_add" style="color: var(--accent);"></md-icon>
+        <span data-i18n>New Playlist</span>
       </h2>
-      <button id="btn-create-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-create-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <form id="create-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
-      <div class="input-group">
-        <label for="create-playlist-name" data-i18n>Playlist Name</label>
-        <input type="text" id="create-playlist-name" required placeholder="My Awesome Playlist">
+      <md-text-field
+        id="create-playlist-name"
+        variant="outlined"
+        label="Playlist Name"
+        data-i18n-label="Playlist Name"
+        error-text="Playlist name is required"
+        data-i18n-error-text="Playlist name is required"
+        required
+        style="width: 100%;">
+      </md-text-field>
+
+      <div style="display: flex; align-items: center; padding: 4px 0;">
+        <md-switch id="create-playlist-public">
+          <span data-i18n>Visible to all users on this server</span>
+        </md-switch>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
-        <input type="checkbox" id="create-playlist-public" style="width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;">
-        <label for="create-playlist-public" style="font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-primary);" data-i18n>Visible to all users on this server</label>
-      </div>
-
       <div class="input-group">
-        <label for="create-playlist-image" data-i18n>Cover Image (Optional)</label>
-        <input type="file" id="create-playlist-image" accept="image/png, image/jpeg, image/webp">
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);" data-i18n>Cover Image (Optional)</label>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <md-button type="button" id="btn-create-playlist-cover" variant="outlined" icon="upload">
+            <span data-i18n>Upload Cover Image</span>
+          </md-button>
+          <span id="create-playlist-file-name" style="font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; max-width: 220px; white-space: nowrap;"></span>
+          <input type="file" id="create-playlist-image" accept="image/png, image/jpeg, image/webp" style="display: none;">
+        </div>
       </div>
 
       <div id="create-playlist-error" style="color: var(--danger); font-size: 13px; display: none;">
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" id="btn-cancel-create-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
-        <button type="submit" id="btn-submit-create-playlist" class="btn btn-primary" data-i18n>Create</button>
+        <md-button type="button" id="btn-cancel-create-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+        <md-button type="submit" id="btn-submit-create-playlist" variant="filled"><span data-i18n>Create</span></md-button>
       </div>
     </form>
   </div>
@@ -217,41 +220,55 @@
   <div class="modal-card">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">edit</span>
+        <md-icon name="edit" style="color: var(--accent);"></md-icon>
         <span data-i18n>Edit Playlist</span>
       </h2>
-      <button id="btn-edit-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-edit-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
-    <form id="edit-playlist-form">
+    <form id="edit-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
       <input type="hidden" id="edit-playlist-id">
+      <md-text-field
+        id="edit-playlist-name"
+        variant="outlined"
+        label="Playlist Name"
+        data-i18n-label="Playlist Name"
+        error-text="Playlist name is required"
+        data-i18n-error-text="Playlist name is required"
+        required
+        style="width: 100%;">
+      </md-text-field>
+
+      <div style="display: flex; align-items: center; padding: 4px 0;">
+        <md-switch id="edit-playlist-public">
+          <span data-i18n>Visible to all users on this server</span>
+        </md-switch>
+      </div>
+
       <div class="input-group">
-        <label for="edit-playlist-name" data-i18n>Playlist Name</label>
-        <input type="text" id="edit-playlist-name" required
-          style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);" data-i18n>Change Cover Image (Optional)</label>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <md-button type="button" id="btn-edit-playlist-cover" variant="outlined" icon="upload">
+            <span data-i18n>Upload Cover Image</span>
+          </md-button>
+          <span id="edit-playlist-file-name" style="font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; max-width: 220px; white-space: nowrap;"></span>
+          <input type="file" id="edit-playlist-image" accept="image/png, image/jpeg, image/webp" style="display: none;">
+        </div>
       </div>
 
-      <div class="input-group" style="margin-top: 14px;">
-        <label for="edit-playlist-image" data-i18n>Change Cover Image (Optional)</label>
-        <input type="file" id="edit-playlist-image" accept="image/png, image/jpeg, image/webp"
-          style="width: 100%; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
-      </div>
-
-      <div id="edit-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-top: 10px;">
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-        <button type="button" id="btn-cancel-edit-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
-        <button type="submit" id="btn-save-edit-playlist" class="btn btn-primary" data-i18n>Save Changes</button>
-      </div>
-
-      <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
-        <button type="button" id="btn-delete-playlist-in-edit" class="btn" style="width: 100%; background: transparent; color: var(--danger); border: 1px solid var(--danger);">
-          <span class="material-symbols-outlined">delete</span>
+      <div>
+        <md-button type="button" id="btn-delete-playlist-in-edit" variant="outlined" style="width: 100%; --md-sys-color-primary: var(--danger); --md-sys-color-outline: var(--danger);">
+          <md-icon slot="icon" name="delete"></md-icon>
           <span data-i18n>Delete Playlist</span>
-        </button>
+        </md-button>
+      </div>
+
+      <div id="edit-playlist-error" style="color: var(--danger); font-size: 13px; display: none;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <md-button type="button" id="btn-cancel-edit-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+        <md-button type="submit" id="btn-save-edit-playlist" variant="filled"><span data-i18n>Save Changes</span></md-button>
       </div>
     </form>
   </div>
@@ -262,19 +279,24 @@
   <div class="modal-card" style="max-width: 520px; width: 90%;">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <md-icon name="playlist_add" style="color: var(--accent);"></md-icon>
         <span data-i18n>Add Tracks to Playlist</span>
       </h2>
-      <button id="btn-add-tracks-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-add-tracks-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <input type="hidden" id="add-tracks-playlist-id">
 
     <div style="margin-bottom: 14px;">
-      <input type="text" id="add-tracks-search-input" placeholder="Search tracks by name or artist..." data-i18n-placeholder autocomplete="off"
-        style="width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+      <md-text-field
+        id="add-tracks-search-input"
+        variant="outlined"
+        placeholder="Search tracks by name or artist..."
+        data-i18n-placeholder="Search tracks by name or artist..."
+        trailing-icon="search"
+        no-tooltip
+        style="width: 100%;">
+      </md-text-field>
     </div>
 
     <div id="add-tracks-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
@@ -284,7 +306,7 @@
     <div id="add-tracks-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-add-tracks" class="btn btn-secondary" data-i18n>Close</button>
+      <md-button type="button" id="btn-cancel-add-tracks" variant="text"><span data-i18n>Close</span></md-button>
     </div>
   </div>
 </div>
@@ -294,12 +316,10 @@
   <div class="modal-card" style="max-width: 400px;">
     <div class="modal-header">
       <h2 class="modal-title" style="color: var(--danger);">
-        <span class="material-symbols-outlined" style="color: var(--danger);">delete</span>
+        <md-icon name="delete" style="color: var(--danger);"></md-icon>
         <span data-i18n>Delete Playlist</span>
       </h2>
-      <button id="btn-delete-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-delete-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <input type="hidden" id="delete-playlist-id">
@@ -310,8 +330,8 @@
     <div id="delete-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-delete-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
-      <button type="button" id="btn-confirm-delete-playlist" class="btn btn-danger" style="background: var(--danger); color: white; border: none;" data-i18n>Delete</button>
+      <md-button type="button" id="btn-cancel-delete-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+      <md-button type="button" id="btn-confirm-delete-playlist" variant="filled" style="--md-sys-color-primary: var(--danger);"><span data-i18n>Delete</span></md-button>
     </div>
   </div>
 </div>
@@ -321,19 +341,17 @@
   <div class="modal-card" style="max-width: 440px; width: 90%;">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
+        <md-icon name="playlist_add" style="color: var(--accent);"></md-icon>
         <span data-i18n>Add to Playlist</span>
       </h2>
-      <button id="btn-select-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-select-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <div style="margin-bottom: 12px;">
-      <button id="btn-select-playlist-create-new" class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px;">
-        <span class="material-symbols-outlined" style="color: var(--accent);">add</span>
+      <md-button id="btn-select-playlist-create-new" variant="tonal" style="width: 100%;">
+        <md-icon slot="icon" name="add"></md-icon>
         <span data-i18n>Create New Playlist</span>
-      </button>
+      </md-button>
     </div>
 
     <div id="select-playlist-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
@@ -343,7 +361,7 @@
     <div id="select-playlist-status" style="font-size: 13px; text-align: center; display: none; margin-bottom: 8px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-select-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+      <md-button type="button" id="btn-cancel-select-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
     </div>
   </div>
 </div>

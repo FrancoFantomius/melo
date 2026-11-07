@@ -29,7 +29,8 @@ export function setupDownloadAllButton({ button, label, getAlbum, isLikedSongs, 
     const tooltip = document.getElementById('tooltip-download-album');
     if (allDownloaded) {
       button.classList.add('downloaded');
-      button.title = 'Remove Download';
+      button.setAttribute('aria-label', getTranslation('Remove Download'));
+      button.dataset.i18nTitleEn = 'Remove Download';
       if (tooltip) {
         tooltip.dataset.i18nValue = 'Remove Download';
         tooltip.value = getTranslation('Remove Download');
@@ -41,7 +42,8 @@ export function setupDownloadAllButton({ button, label, getAlbum, isLikedSongs, 
       if (label) label.textContent = getTranslation('Remove Download');
     } else {
       button.classList.remove('downloaded');
-      button.title = 'Download';
+      button.setAttribute('aria-label', getTranslation('Download'));
+      button.dataset.i18nTitleEn = 'Download';
       if (tooltip) {
         tooltip.dataset.i18nValue = 'Download';
         tooltip.value = getTranslation('Download');
@@ -68,6 +70,7 @@ export function setupDownloadAllButton({ button, label, getAlbum, isLikedSongs, 
 
       button.disabled = true;
       button.classList.add('downloading');
+      button.setAttribute('aria-label', getTranslation('Downloading...'));
       const tooltip = document.getElementById('tooltip-download-album');
       if (tooltip) {
         tooltip.value = getTranslation('Downloading...');

@@ -1,5 +1,4 @@
 @import "@fontsource-variable/roboto-flex/index.css";
-@import "./fonts.css";
 
 /* Reset & Global Base */
 *, *::before, *::after {
@@ -143,6 +142,15 @@ md-navigation-bar-item[selected] md-icon,
 }
 
 .btn-secondary:hover {
+  background-color: var(--bg-hover);
+}
+
+md-icon-button {
+  border-radius: var(--radius-full);
+  transition: color var(--transition-speed), background-color var(--transition-speed), transform var(--transition-speed);
+}
+
+md-icon-button:not([disabled]):hover {
   background-color: var(--bg-hover);
 }
 

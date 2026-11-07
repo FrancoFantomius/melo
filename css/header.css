@@ -168,6 +168,7 @@ md-top-app-bar.main-header {
 }
 
 .btn-remove-header-recent {
+  border-radius: var(--radius-full);
   transition: color var(--transition-speed), background-color var(--transition-speed);
 }
 

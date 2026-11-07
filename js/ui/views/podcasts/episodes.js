@@ -5,7 +5,6 @@ import { getTranslation } from '../../../i18n.js';
 import { toggleTrackDownload, refreshDownloadButton } from '../../downloads.js';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon-button';
-import '@francofantomius/material-components/tooltip';
 import '@francofantomius/material-components/icon';
 
 export function renderEpisodeListHtml(container, episodes, is2Col = false) {
@@ -35,10 +34,9 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
       <div class="episode-item" data-episode-id="${ep.id}" data-index="${idx}">
         <div class="episode-main-row">
           <div class="action-btn-wrapper">
-            <md-icon-button class="episode-play-btn" data-index="${idx}" variant="filled" aria-label="${playLabel}">
+            <md-icon-button class="episode-play-btn" data-index="${idx}" variant="filled" aria-label="${playLabel}" tooltip-position="top">
               <md-icon name="play_arrow" filled></md-icon>
             </md-icon-button>
-            <md-tooltip position="top" data-i18n-value="Play Episode" value="${playLabel}"></md-tooltip>
           </div>
           <div class="episode-details">
             <div class="episode-title" title="${ep.title}">${ep.title}</div>
@@ -49,16 +47,13 @@ export function renderEpisodeListHtml(container, episodes, is2Col = false) {
               ${badgeHtml}
               <md-button class="btn-toggle-notes" data-note-target="${uniqueNoteId}" variant="text" style="font-size: 12px; height: 28px; --md-button-padding-horizontal: 8px;"><span data-i18n>Show Notes</span></md-button>
               <div class="action-btn-wrapper" style="margin-left: auto;">
-                <md-icon-button class="btn-track-add-queue" data-index="${idx}" variant="standard" icon="queue_music" aria-label="${queueLabel}"></md-icon-button>
-                <md-tooltip position="top" data-i18n-value="Add to Queue" value="${queueLabel}"></md-tooltip>
+                <md-icon-button class="btn-track-add-queue" data-index="${idx}" variant="standard" icon="queue_music" aria-label="${queueLabel}" tooltip-position="top"></md-icon-button>
               </div>
               <div class="action-btn-wrapper">
-                <md-icon-button class="btn-track-download" data-track-id="${ep.id}" variant="standard" icon="download" aria-label="${downloadLabel}"></md-icon-button>
-                <md-tooltip position="top" data-i18n-value="Download" value="${downloadLabel}"></md-tooltip>
+                <md-icon-button class="btn-track-download" data-track-id="${ep.id}" variant="standard" icon="download" aria-label="${downloadLabel}" tooltip-position="top"></md-icon-button>
               </div>
               <div class="action-btn-wrapper">
-                <md-icon-button class="btn-toggle-played" data-id="${ep.id}" variant="standard" icon="${state.isPlayed ? 'check_circle' : 'radio_button_unchecked'}" aria-label="${togglePlayedLabel}"></md-icon-button>
-                <md-tooltip position="top" data-i18n-value="${state.isPlayed ? 'Mark as Unplayed' : 'Mark as Played'}" value="${togglePlayedLabel}"></md-tooltip>
+                <md-icon-button class="btn-toggle-played" data-id="${ep.id}" variant="standard" icon="${state.isPlayed ? 'check_circle' : 'radio_button_unchecked'}" aria-label="${togglePlayedLabel}" tooltip-position="top"></md-icon-button>
               </div>
             </div>
           </div>
