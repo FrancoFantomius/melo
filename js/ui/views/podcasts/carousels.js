@@ -97,7 +97,7 @@ export function renderContinuePlayingCarousel(container, feeds) {
         <div class="continue-playing-thumb-wrapper">
           <img src="${coverImg}" class="continue-playing-thumb" alt="${ep.title}" onerror="this.onerror=null; this.src=window.getPlaceholder ? window.getPlaceholder('podcast') : '${getPlaceholder('podcast')}';" data-placeholder-type="podcast">
           <div class="continue-playing-play-btn" title="Resume Episode">
-            <span class="material-symbols-outlined" style="font-size: 24px;">play_arrow</span>
+            <md-icon name="play_arrow" size="24"></md-icon>
           </div>
         </div>
         <div class="continue-playing-info">

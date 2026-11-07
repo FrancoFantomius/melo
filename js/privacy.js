@@ -1,6 +1,7 @@
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/card';
 import '@francofantomius/material-components/divider';
+import './ui/icons.js';
 
 import { initPWA } from './pwa.js';
 import { initTheme } from './ui/theme.js';

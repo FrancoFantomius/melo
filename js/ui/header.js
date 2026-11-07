@@ -72,7 +72,7 @@ export function initHeader() {
 
       html += recentSearches.slice(0, 6).map(term => `
         <div class="search-dropdown-item search-dropdown-recent-item" data-query="${encodeURIComponent(term)}">
-          <span class="material-symbols-outlined" style="font-size: 20px; color: var(--text-secondary); flex-shrink: 0;">history</span>
+          <md-icon name="history" size="20" style="color: var(--text-secondary); flex-shrink: 0;"></md-icon>
           <div class="search-dropdown-info">
             <div class="search-dropdown-title">${escapeHtml(term)}</div>
           </div>
@@ -158,7 +158,7 @@ export function initHeader() {
               <div class="search-dropdown-title">${escapeHtml(track.Name || '')}</div>
               <div class="search-dropdown-subtitle">${escapeHtml(artist)}</div>
             </div>
-            <span class="material-symbols-outlined" style="color: var(--accent); font-size: 20px; flex-shrink: 0; margin-left: auto;">play_circle</span>
+            <md-icon name="play_circle" size="20" style="color: var(--accent); flex-shrink: 0; margin-left: auto;"></md-icon>
           </div>
         `;
       }).join('');

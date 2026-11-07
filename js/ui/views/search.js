@@ -58,7 +58,7 @@ export async function renderSearchView(container, query) {
       <div class="view-section search-view-section">
         <div class="search-page-bar-container">
           <div class="search-page-bar">
-            <span class="material-symbols-outlined search-page-icon">search</span>
+            <md-icon name="search" class="search-page-icon"></md-icon>
             <input type="text" id="search-page-input" class="search-page-input" placeholder="Search artists, albums, tracks..." value="${query.replace(/"/g, '&quot;')}" autocomplete="off" data-i18n-placeholder>
             <md-icon-button id="btn-clear-search-input" class="search-page-clear-btn" variant="standard" icon="close" aria-label="Clear search" tooltip-position="top" style="${query ? 'display: flex;' : 'display: none;'}"></md-icon-button>
           </div>
@@ -237,11 +237,10 @@ function renderRecentSearches(resultsContainer) {
         itemEl.className = 'recent-search-item';
         itemEl.setAttribute('data-query', encodeURIComponent(term));
 
-        const iconEl = document.createElement('span');
-        iconEl.className = 'material-symbols-outlined';
-        iconEl.style.fontSize = '20px';
+        const iconEl = document.createElement('md-icon');
+        iconEl.setAttribute('name', 'history');
+        iconEl.setAttribute('size', '20');
         iconEl.style.color = 'var(--text-muted)';
-        iconEl.textContent = 'history';
 
         const textEl = document.createElement('span');
         textEl.className = 'recent-search-text';

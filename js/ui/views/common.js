@@ -190,7 +190,7 @@ export function renderTrackRowHTML(track, index) {
       </div>
       <div class="track-duration" style="color: var(--text-muted); font-size: 12px; text-align: right;">${timeStr}</div>
       <div class="track-action-play" style="text-align: right; color: var(--text-muted);">
-        <span class="material-symbols-outlined" style="font-size: 18px;">play_circle</span>
+        <md-icon name="play_circle" size="18"></md-icon>
       </div>
     </div>
   `;
