@@ -84,6 +84,7 @@ note_stack
 palette
 pause
 pause_circle
+paused
 people
 person
 person_add
@@ -103,6 +104,7 @@ repeat
 repeat_one
 replay_10
 restore
+running
 schedule
 science
 search

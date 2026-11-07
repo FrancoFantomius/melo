@@ -9,13 +9,19 @@ const ICONS = {
 
 export function setDownloadButtonState(button, state, title = '') {
   if (!button) return;
-  const icon = button.querySelector('.material-symbols-outlined');
-  if (icon) icon.textContent = ICONS[state] || ICONS.idle;
+  const iconName = ICONS[state] || ICONS.idle;
+  if (button.tagName === 'MD-ICON-BUTTON') button.icon = iconName;
+  const icon = button.querySelector('.material-symbols-outlined') || button.querySelector('md-icon');
+  if (icon) {
+    if (icon.tagName === 'MD-ICON') icon.setAttribute('name', iconName);
+    else icon.textContent = iconName;
+  }
   button.classList.toggle('downloading', state === 'downloading');
   button.classList.toggle('downloaded', state === 'downloaded');
   if (title) {
     const translated = getTranslation(title);
     button.setAttribute('aria-label', translated);
+    button.dataset.i18nTitleEn = title;
     if (button.id) {
       const tooltip = document.querySelector(`md-tooltip[for="${button.id}"]`);
       if (tooltip) {
@@ -46,6 +52,7 @@ export function setDownloadButtonProgress(button, progress) {
     const titleKey = pct >= 100 ? 'Downloading...' : `${pct}%`;
     const translated = pct >= 100 ? getTranslation('Downloading...') : `${pct}%`;
     button.setAttribute('aria-label', translated);
+    button.dataset.i18nTitleEn = titleKey;
     if (button.id) {
       const tooltip = document.querySelector(`md-tooltip[for="${button.id}"]`);
       if (tooltip) {

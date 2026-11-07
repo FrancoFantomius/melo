@@ -60,7 +60,7 @@ export async function renderSearchView(container, query) {
           <div class="search-page-bar">
             <span class="material-symbols-outlined search-page-icon">search</span>
             <input type="text" id="search-page-input" class="search-page-input" placeholder="Search artists, albums, tracks..." value="${query.replace(/"/g, '&quot;')}" autocomplete="off" data-i18n-placeholder>
-            <button id="btn-clear-search-input" class="search-page-clear-btn" title="Clear search" style="${query ? 'display: flex;' : 'display: none;'}"><span class="material-symbols-outlined">close</span></button>
+            <md-icon-button id="btn-clear-search-input" class="search-page-clear-btn" variant="standard" icon="close" aria-label="Clear search" tooltip-position="top" style="${query ? 'display: flex;' : 'display: none;'}"></md-icon-button>
           </div>
         </div>
         <div id="search-page-results-container"></div>
@@ -218,7 +218,7 @@ function renderRecentSearches(resultsContainer) {
     <div class="recent-searches-section">
       <div class="recent-searches-header">
         <h2 class="section-title" style="font-size: 20px;" data-i18n>Recent Searches</h2>
-        ${recentSearches.length > 0 ? `<button id="btn-clear-all-recent" style="font-size: 13px; color: var(--text-muted); cursor: pointer; background: none; border: none; font-weight: 600;" data-i18n>Clear all</button>` : ''}
+        ${recentSearches.length > 0 ? `<md-button id="btn-clear-all-recent" variant="text" style="font-size: 13px; font-weight: 600; color: var(--text-muted); min-width: auto; height: 28px;" data-i18n>Clear all</md-button>` : ''}
       </div>
       ${recentSearches.length > 0 ? `
         <div class="recent-searches-list"></div>
@@ -247,17 +247,16 @@ function renderRecentSearches(resultsContainer) {
         textEl.className = 'recent-search-text';
         textEl.textContent = term;
 
-        const btnEl = document.createElement('button');
+        const btnEl = document.createElement('md-icon-button');
         btnEl.className = 'btn-remove-recent';
+        btnEl.setAttribute('variant', 'standard');
+        btnEl.setAttribute('icon', 'close');
         btnEl.setAttribute('data-term', encodeURIComponent(term));
-        btnEl.title = 'Remove from history';
+        btnEl.setAttribute('aria-label', 'Remove from history');
+        btnEl.setAttribute('tooltip-position', 'top');
+        btnEl.style.setProperty('--md-icon-button-size', '28px');
+        btnEl.style.setProperty('--md-icon-button-icon-size', '18px');
 
-        const closeIconEl = document.createElement('span');
-        closeIconEl.className = 'material-symbols-outlined';
-        closeIconEl.style.fontSize = '18px';
-        closeIconEl.textContent = 'close';
-
-        btnEl.appendChild(closeIconEl);
         itemEl.appendChild(iconEl);
         itemEl.appendChild(textEl);
         itemEl.appendChild(btnEl);

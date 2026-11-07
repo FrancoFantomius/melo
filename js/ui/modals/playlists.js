@@ -310,10 +310,10 @@ function renderAddTracksResults(items, playlistId) {
             <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(artistName)}</div>
           </div>
         </div>
-        <button class="btn-add-single-track btn btn-primary" data-track-id="${track.Id}" style="padding: 4px 10px; font-size: 12px; height: 30px; display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-          <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+        <md-button class="btn-add-single-track" variant="filled" data-track-id="${track.Id}" style="--md-button-padding-horizontal: 10px; font-size: 12px; height: 30px; flex-shrink: 0;">
+          <md-icon slot="icon" name="add"></md-icon>
           <span>Add</span>
-        </button>
+        </md-button>
       </div>
     `;
   }).join('');
@@ -322,15 +322,15 @@ function renderAddTracksResults(items, playlistId) {
     btn.addEventListener('click', async () => {
       const trackId = btn.getAttribute('data-track-id');
       btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px;">sync</span><span>Adding...</span>';
+      btn.innerHTML = '<md-icon slot="icon" name="sync"></md-icon><span>Adding...</span>';
       try {
         await addTracksToPlaylist(playlistId, [trackId]);
-        btn.style.background = 'var(--success)';
-        btn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 16px;">check</span><span>Added</span>';
+        btn.style.setProperty('--md-sys-color-primary', 'var(--success)');
+        btn.innerHTML = '<md-icon slot="icon" name="check"></md-icon><span>Added</span>';
         if (currentAddTracksCallback) currentAddTracksCallback();
       } catch (err) {
         btn.disabled = false;
-        btn.style.background = 'var(--danger)';
+        btn.style.setProperty('--md-sys-color-primary', 'var(--danger)');
         btn.innerHTML = 'Failed';
         console.error('[Playlist] Add track failed:', err);
       }
@@ -448,10 +448,10 @@ function renderSelectPlaylistItems(playlists) {
             <div style="font-size: 12px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(count)}</div>
           </div>
         </div>
-        <button class="btn btn-primary btn-add-to-this-playlist" data-playlist-id="${pl.Id}" style="padding: 6px 12px; font-size: 12px; height: 32px; display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-          <span class="material-symbols-outlined" style="font-size: 16px;">add</span>
+        <md-button class="btn-add-to-this-playlist" variant="filled" data-playlist-id="${pl.Id}" style="--md-button-padding-horizontal: 12px; font-size: 12px; height: 32px; flex-shrink: 0;">
+          <md-icon slot="icon" name="add"></md-icon>
           <span data-i18n>Add</span>
-        </button>
+        </md-button>
       </div>
     `;
   }).join('');

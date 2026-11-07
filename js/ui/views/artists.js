@@ -10,7 +10,6 @@ import { escapeHtml } from '../modals/shared.js';
 import '@francofantomius/material-components/button';
 import '@francofantomius/material-components/icon-button';
 import '@francofantomius/material-components/icon';
-import '@francofantomius/material-components/tooltip';
 
 export function openArtist(artistIdOrName, artistObj = null) {
   if (!artistIdOrName) return;
@@ -78,8 +77,7 @@ export async function renderArtistDetailView(container, artistOrId) {
               <md-icon slot="icon" name="play_arrow" filled></md-icon>
               <span data-i18n>Play All</span>
             </md-button>
-            <md-icon-button id="btn-shuffle-artist-all" variant="tonal" icon="shuffle" aria-label="Random Play"></md-icon-button>
-            <md-tooltip for="btn-shuffle-artist-all" position="top" data-i18n-value="Random Play" value="Random Play"></md-tooltip>
+            <md-icon-button id="btn-shuffle-artist-all" variant="tonal" icon="shuffle" aria-label="Random Play" tooltip-position="top"></md-icon-button>
           </div>
         </div>
       </div>

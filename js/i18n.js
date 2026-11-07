@@ -96,7 +96,7 @@ function startTranslationObserver() {
     if (pendingNodes.length === 0) return;
     requestAnimationFrame(() => {
       for (const node of pendingNodes) {
-        if (node.isConnected && (node.querySelector('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-label], [data-i18n-headline], [data-i18n-value]') || node.hasAttribute('data-i18n') || node.hasAttribute('data-i18n-placeholder') || node.hasAttribute('data-i18n-title') || node.hasAttribute('data-i18n-label') || node.hasAttribute('data-i18n-headline') || node.hasAttribute('data-i18n-value'))) {
+        if (node.isConnected && (node.querySelector('[data-i18n], [data-i18n-placeholder], [data-i18n-title], [data-i18n-aria-label], [data-i18n-label], [data-i18n-headline], [data-i18n-value]') || node.hasAttribute('data-i18n') || node.hasAttribute('data-i18n-placeholder') || node.hasAttribute('data-i18n-title') || node.hasAttribute('data-i18n-aria-label') || node.hasAttribute('data-i18n-label') || node.hasAttribute('data-i18n-headline') || node.hasAttribute('data-i18n-value'))) {
           applyTranslations(node);
         }
       }
@@ -138,18 +138,33 @@ export function applyTranslations(container = document) {
     }
   });
 
-  // 3. Titles / Aria-labels with data-i18n-title
+  // 3. Titles / Aria-labels with data-i18n-title & data-i18n-aria-label
   const titleElements = container.querySelectorAll('[data-i18n-title]');
   titleElements.forEach(el => {
     if (!el.dataset.i18nTitleEn) {
       const attrVal = el.getAttribute('data-i18n-title');
-      el.dataset.i18nTitleEn = (attrVal && attrVal !== 'true') ? attrVal : el.title;
+      el.dataset.i18nTitleEn = (attrVal && attrVal !== 'true') ? attrVal : (el.title || el.getAttribute('aria-label') || '');
     }
     const key = el.dataset.i18nTitleEn;
     if (key) {
       const translated = getTranslation(key);
       if (translated) {
-        el.title = translated;
+        if (el.hasAttribute('title')) el.title = translated;
+        el.setAttribute('aria-label', translated);
+      }
+    }
+  });
+
+  const ariaElements = container.querySelectorAll('[data-i18n-aria-label]');
+  ariaElements.forEach(el => {
+    if (!el.dataset.i18nAriaLabelEn) {
+      const attrVal = el.getAttribute('data-i18n-aria-label');
+      el.dataset.i18nAriaLabelEn = (attrVal && attrVal !== 'true') ? attrVal : el.getAttribute('aria-label');
+    }
+    const key = el.dataset.i18nAriaLabelEn;
+    if (key) {
+      const translated = getTranslation(key);
+      if (translated) {
         el.setAttribute('aria-label', translated);
       }
     }

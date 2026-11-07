@@ -6,9 +6,7 @@
     <span id="desktop-queue-count" class="queue-count-badge"></span>
   </div>
   <div slot="header-actions">
-    <button id="desktop-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
-      <span class="material-symbols-outlined">delete_sweep</span>
-    </button>
+    <md-icon-button id="desktop-btn-clear-queue" class="queue-clear-btn" variant="standard" icon="delete_sweep" aria-label="Clear Queue" tooltip-position="bottom" data-i18n-title="Clear Queue"></md-icon-button>
   </div>
   <div id="desktop-queue-tracks-list" class="queue-tracks-list"></div>
 </md-side-sheet>
@@ -21,9 +19,7 @@
     <span id="mobile-queue-count" class="queue-count-badge"></span>
   </div>
   <div slot="header-actions">
-    <button id="mobile-btn-clear-queue" class="btn-icon queue-clear-btn" title="Clear Queue" aria-label="Clear Queue" data-i18n-title>
-      <span class="material-symbols-outlined">delete_sweep</span>
-    </button>
+    <md-icon-button id="mobile-btn-clear-queue" class="queue-clear-btn" variant="standard" icon="delete_sweep" aria-label="Clear Queue" tooltip-position="bottom" data-i18n-title="Clear Queue"></md-icon-button>
   </div>
   <div id="mobile-queue-tracks-list" class="queue-tracks-list"></div>
 </md-bottom-sheet>
@@ -36,9 +32,7 @@
         <span class="material-symbols-outlined" style="color: var(--accent);">settings</span>
         <span data-i18n>App Settings</span>
       </h2>
-      <button id="btn-settings-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-settings-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <!-- Language Selector -->
@@ -109,7 +103,7 @@
     </div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 12px;">
-      <button id="btn-save-settings" class="btn btn-primary" style="width: 100%;" data-i18n>Save Settings</button>
+      <md-button id="btn-save-settings" variant="filled" style="width: 100%;"><span data-i18n>Save Settings</span></md-button>
     </div>
 
     <div style="text-align: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
@@ -134,9 +128,7 @@
       <div id="lyrics-track-title" class="lyrics-header-title" data-i18n>Lyrics</div>
       <div id="lyrics-track-artist" class="lyrics-header-artist"></div>
     </div>
-    <button id="btn-lyrics-close" class="btn-icon lyrics-close-btn" title="Close lyrics">
-      <span class="material-symbols-outlined">close</span>
-    </button>
+    <md-icon-button id="btn-lyrics-close" class="lyrics-close-btn" variant="standard" icon="close" aria-label="Close lyrics" tooltip-position="bottom"></md-icon-button>
   </div>
 
   <div id="lyrics-view-body" class="lyrics-view-body">
@@ -180,9 +172,7 @@
         <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
         <span data-i18n>Create Playlist</span>
       </h2>
-      <button id="btn-create-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-create-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <form id="create-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
@@ -205,8 +195,8 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button type="button" id="btn-cancel-create-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
-        <button type="submit" id="btn-submit-create-playlist" class="btn btn-primary" data-i18n>Create</button>
+        <md-button type="button" id="btn-cancel-create-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+        <md-button type="submit" id="btn-submit-create-playlist" variant="filled"><span data-i18n>Create</span></md-button>
       </div>
     </form>
   </div>
@@ -220,9 +210,7 @@
         <span class="material-symbols-outlined" style="color: var(--accent);">edit</span>
         <span data-i18n>Edit Playlist</span>
       </h2>
-      <button id="btn-edit-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-edit-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <form id="edit-playlist-form">
@@ -243,15 +231,15 @@
       </div>
 
       <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-        <button type="button" id="btn-cancel-edit-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
-        <button type="submit" id="btn-save-edit-playlist" class="btn btn-primary" data-i18n>Save Changes</button>
+        <md-button type="button" id="btn-cancel-edit-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+        <md-button type="submit" id="btn-save-edit-playlist" variant="filled"><span data-i18n>Save Changes</span></md-button>
       </div>
 
       <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
-        <button type="button" id="btn-delete-playlist-in-edit" class="btn" style="width: 100%; background: transparent; color: var(--danger); border: 1px solid var(--danger);">
-          <span class="material-symbols-outlined">delete</span>
+        <md-button type="button" id="btn-delete-playlist-in-edit" variant="outlined" style="width: 100%; --md-sys-color-primary: var(--danger); --md-sys-color-outline: var(--danger);">
+          <md-icon slot="icon" name="delete"></md-icon>
           <span data-i18n>Delete Playlist</span>
-        </button>
+        </md-button>
       </div>
     </form>
   </div>
@@ -265,9 +253,7 @@
         <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
         <span data-i18n>Add Tracks to Playlist</span>
       </h2>
-      <button id="btn-add-tracks-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-add-tracks-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <input type="hidden" id="add-tracks-playlist-id">
@@ -284,7 +270,7 @@
     <div id="add-tracks-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-add-tracks" class="btn btn-secondary" data-i18n>Close</button>
+      <md-button type="button" id="btn-cancel-add-tracks" variant="text"><span data-i18n>Close</span></md-button>
     </div>
   </div>
 </div>
@@ -297,9 +283,7 @@
         <span class="material-symbols-outlined" style="color: var(--danger);">delete</span>
         <span data-i18n>Delete Playlist</span>
       </h2>
-      <button id="btn-delete-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-delete-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <input type="hidden" id="delete-playlist-id">
@@ -310,8 +294,8 @@
     <div id="delete-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-bottom: 12px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-delete-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
-      <button type="button" id="btn-confirm-delete-playlist" class="btn btn-danger" style="background: var(--danger); color: white; border: none;" data-i18n>Delete</button>
+      <md-button type="button" id="btn-cancel-delete-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+      <md-button type="button" id="btn-confirm-delete-playlist" variant="filled" style="--md-sys-color-primary: var(--danger);"><span data-i18n>Delete</span></md-button>
     </div>
   </div>
 </div>
@@ -324,16 +308,14 @@
         <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
         <span data-i18n>Add to Playlist</span>
       </h2>
-      <button id="btn-select-playlist-close" class="btn-icon" aria-label="Close modal">
-        <span class="material-symbols-outlined">close</span>
-      </button>
+      <md-icon-button id="btn-select-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <div style="margin-bottom: 12px;">
-      <button id="btn-select-playlist-create-new" class="btn btn-secondary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px;">
-        <span class="material-symbols-outlined" style="color: var(--accent);">add</span>
+      <md-button id="btn-select-playlist-create-new" variant="tonal" style="width: 100%;">
+        <md-icon slot="icon" name="add"></md-icon>
         <span data-i18n>Create New Playlist</span>
-      </button>
+      </md-button>
     </div>
 
     <div id="select-playlist-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
@@ -343,7 +325,7 @@
     <div id="select-playlist-status" style="font-size: 13px; text-align: center; display: none; margin-bottom: 8px;"></div>
 
     <div style="display: flex; justify-content: flex-end; gap: 10px;">
-      <button type="button" id="btn-cancel-select-playlist" class="btn btn-secondary" data-i18n>Cancel</button>
+      <md-button type="button" id="btn-cancel-select-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
     </div>
   </div>
 </div>

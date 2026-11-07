@@ -66,7 +66,7 @@ export function initHeader() {
       let html = `
         <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px 6px 16px;">
           <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 0.5px;">Recent Searches</span>
-          <button id="btn-clear-header-recent" style="background: transparent; border: none; font-size: 11px; font-weight: 600; color: var(--accent); cursor: pointer; padding: 2px 4px; border-radius: 4px;">Clear All</button>
+          <md-button id="btn-clear-header-recent" variant="text" style="--md-button-padding-horizontal: 4px; font-size: 11px; height: 24px; min-width: auto; color: var(--accent);">Clear All</md-button>
         </div>
       `;
 
@@ -76,9 +76,7 @@ export function initHeader() {
           <div class="search-dropdown-info">
             <div class="search-dropdown-title">${escapeHtml(term)}</div>
           </div>
-          <button class="btn-remove-header-recent" data-term="${encodeURIComponent(term)}" title="Remove" style="background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 50%;">
-            <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-          </button>
+          <md-icon-button class="btn-remove-header-recent" data-term="${encodeURIComponent(term)}" variant="standard" icon="close" aria-label="Remove" tooltip-position="top" style="--md-icon-button-size: 28px; --md-icon-button-icon-size: 16px;"></md-icon-button>
         </div>
       `).join('');
 

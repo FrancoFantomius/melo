@@ -57,13 +57,22 @@ export function initPlayerUI() {
   const each = (els, fn) => els.forEach((el, i) => el && fn(el, i));
   const setDisplay = (el, value) => { el.style.display = value; };
   const setIcon = (el, text) => {
-    const icon = el.querySelector('.material-symbols-outlined');
-    if (icon) icon.textContent = text;
+    if (!el) return;
+    if (el.tagName === 'MD-ICON-BUTTON' || el.tagName === 'MD-BUTTON') {
+      el.icon = text;
+      el.setAttribute('icon', text);
+    }
+    const icon = el.querySelector('.material-symbols-outlined') || el.querySelector('md-icon');
+    if (icon) {
+      if (icon.tagName === 'MD-ICON') icon.setAttribute('name', text);
+      else icon.textContent = text;
+    }
   };
   const setButtonTooltip = (btn, textKey) => {
     if (!btn) return;
     const translated = getTranslation(textKey);
     btn.setAttribute('aria-label', translated);
+    btn.dataset.i18nTitleEn = textKey;
     const tooltip = document.querySelector(`md-tooltip[for="${btn.id}"]`);
     if (tooltip) {
       tooltip.dataset.i18nValueEn = textKey;
