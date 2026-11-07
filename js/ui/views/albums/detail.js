@@ -207,7 +207,7 @@ export async function renderAlbumDetailView(container, albumOrId) {
   const btnEdit = container.querySelector('#btn-edit-playlist');
   if (btnEdit) {
     btnEdit.addEventListener('click', () => {
-      openEditPlaylistModal(album.Id, album.Name, () => {
+      openEditPlaylistModal(album, () => {
         renderAlbumDetailView(container, album.Id);
       }, () => {
         window.history.pushState({ view: 'playlists' }, '', 'playlists.html');

@@ -334,8 +334,40 @@ export async function createPlaylist({ name, isPublic = false, trackIds = [] }) 
   return id;
 }
 
-export async function updatePlaylist(playlistId, { name }) {
+export async function updatePlaylist(playlistId, { name, isPublic }) {
   await client.playlists.updatePlaylist(playlistId, { name });
+  if (typeof isPublic === 'boolean') {
+    const session = getSession();
+    const userId = session.userId || client.auth?.getCurrentUser?.()?.Id;
+    if (userId && client.http?.request) {
+      if (isPublic) {
+        try {
+          await client.http.request(`/Playlists/${playlistId}/Users/${userId}`, {
+            method: 'POST',
+            body: { UserId: userId, CanEdit: true }
+          });
+        } catch {
+          try {
+            await client.http.request(`/Playlists/${playlistId}`, {
+              method: 'POST',
+              body: { IsPublic: true }
+            });
+          } catch (err) {
+            console.warn('[Jellyfin] Failed to update public status for playlist:', err);
+          }
+        }
+      } else {
+        try {
+          await client.http.request(`/Playlists/${playlistId}`, {
+            method: 'POST',
+            body: { IsPublic: false }
+          });
+        } catch (err) {
+          console.warn('[Jellyfin] Failed to update public status for playlist:', err);
+        }
+      }
+    }
+  }
   await clearApiCache();
 }
 

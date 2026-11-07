@@ -116,11 +116,42 @@ export function initPlaylistModals() {
   const btnEditClose = document.getElementById('btn-edit-playlist-close');
   const btnEditCancel = document.getElementById('btn-cancel-edit-playlist');
   const editForm = document.getElementById('edit-playlist-form');
+  const btnEditCover = document.getElementById('btn-edit-playlist-cover');
+  const editFileInput = document.getElementById('edit-playlist-image');
+  const editFileName = document.getElementById('edit-playlist-file-name');
+  const editNameInput = document.getElementById('edit-playlist-name');
 
   btnEditClose?.addEventListener('click', () => closeEditPlaylistModal());
   btnEditCancel?.addEventListener('click', () => closeEditPlaylistModal());
   editModal?.addEventListener('click', (e) => {
     if (e.target === editModal) closeEditPlaylistModal();
+  });
+
+  btnEditCover?.addEventListener('click', () => {
+    if (!btnEditCover.disabled && !btnEditCover.hasAttribute('disabled')) {
+      editFileInput?.click();
+    }
+  });
+
+  editFileInput?.addEventListener('change', () => {
+    if (editFileInput.files && editFileInput.files[0]) {
+      if (editFileName) editFileName.textContent = editFileInput.files[0].name;
+    } else {
+      if (editFileName) editFileName.textContent = '';
+    }
+  });
+
+  editNameInput?.addEventListener('input', () => {
+    if (editNameInput.value?.trim()) {
+      editNameInput.error = false;
+    }
+  });
+
+  editNameInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      editForm?.requestSubmit();
+    }
   });
 
   const btnEditDelete = document.getElementById('btn-delete-playlist-in-edit');
@@ -133,13 +164,28 @@ export function initPlaylistModals() {
 
   editForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const playlistId = document.getElementById('edit-playlist-id')?.value;
-    const newName = document.getElementById('edit-playlist-name')?.value;
+    const idInput = document.getElementById('edit-playlist-id');
+    const nameInput = document.getElementById('edit-playlist-name');
+    const publicSwitch = document.getElementById('edit-playlist-public');
     const fileInput = document.getElementById('edit-playlist-image');
     const saveBtn = document.getElementById('btn-save-edit-playlist');
     const errorEl = document.getElementById('edit-playlist-error');
 
+    const playlistId = idInput?.value;
+    const newName = nameInput?.value?.trim();
+    const isPublic = Boolean(publicSwitch?.selected ?? publicSwitch?.checked);
+
     if (!playlistId) return;
+
+    if (!newName) {
+      if (nameInput) {
+        nameInput.error = true;
+        nameInput.errorText = nameInput.getAttribute('error-text') || getTranslation('Playlist name is required') || 'Playlist name is required';
+        nameInput.focus?.();
+      }
+      return;
+    }
+
     if (saveBtn) saveBtn.disabled = true;
     if (errorEl) {
       errorEl.textContent = '';
@@ -147,9 +193,7 @@ export function initPlaylistModals() {
     }
 
     try {
-      if (newName) {
-        await updatePlaylist(playlistId, { name: newName });
-      }
+      await updatePlaylist(playlistId, { name: newName, isPublic });
 
       let imageError = null;
       if (fileInput && fileInput.files && fileInput.files[0]) {
@@ -176,7 +220,7 @@ export function initPlaylistModals() {
       }
     } catch (err) {
       if (errorEl) {
-        errorEl.textContent = err.message;
+        errorEl.textContent = err.message || 'Failed to update playlist';
         errorEl.style.display = 'block';
       }
     } finally {
@@ -276,23 +320,81 @@ export function initPlaylistModals() {
   });
 }
 
-export function openEditPlaylistModal(playlistId, currentName, onSaveCallback, onDeleteCallback) {
+export function openEditPlaylistModal(playlistOrId, currentName, onSaveCallback, onDeleteCallback) {
   const modal = document.getElementById('edit-playlist-modal');
   const idInput = document.getElementById('edit-playlist-id');
   const nameInput = document.getElementById('edit-playlist-name');
+  const publicSwitch = document.getElementById('edit-playlist-public');
   const fileInput = document.getElementById('edit-playlist-image');
+  const fileNameEl = document.getElementById('edit-playlist-file-name');
+  const btnCover = document.getElementById('btn-edit-playlist-cover');
   const errorEl = document.getElementById('edit-playlist-error');
 
   if (!modal) return;
-  currentEditPlaylistCallback = onSaveCallback;
-  currentEditPlaylistDeleteCallback = onDeleteCallback || null;
+
+  let playlistId = '';
+  let playlistName = '';
+  let isPublic = false;
+
+  if (playlistOrId && typeof playlistOrId === 'object') {
+    playlistId = playlistOrId.Id || '';
+    playlistName = playlistOrId.Name || '';
+    isPublic = Boolean(playlistOrId.IsPublic || playlistOrId.Shares?.length > 0 || playlistOrId.Users?.length > 1);
+    currentEditPlaylistCallback = currentName; // 2nd param is onSaveCallback
+    currentEditPlaylistDeleteCallback = onSaveCallback || null; // 3rd param is onDeleteCallback
+  } else {
+    playlistId = playlistOrId || '';
+    playlistName = typeof currentName === 'string' ? currentName : '';
+    currentEditPlaylistCallback = onSaveCallback;
+    currentEditPlaylistDeleteCallback = onDeleteCallback || null;
+  }
+
   if (idInput) idInput.value = playlistId;
-  if (nameInput) nameInput.value = currentName || '';
+  if (nameInput) {
+    nameInput.value = playlistName;
+    nameInput.error = false;
+    nameInput.errorText = nameInput.getAttribute('error-text') || getTranslation('Playlist name is required') || 'Playlist name is required';
+  }
+  if (publicSwitch) {
+    publicSwitch.selected = isPublic;
+    if ('checked' in publicSwitch) publicSwitch.checked = isPublic;
+  }
   if (fileInput) fileInput.value = '';
+  if (fileNameEl) fileNameEl.textContent = '';
   if (errorEl) {
     errorEl.textContent = '';
     errorEl.style.display = 'none';
   }
+
+  const applyAdminState = (isAdmin) => {
+    if (publicSwitch) {
+      publicSwitch.disabled = !isAdmin;
+      if (isAdmin) {
+        publicSwitch.removeAttribute('disabled');
+        publicSwitch.removeAttribute('title');
+      } else {
+        publicSwitch.setAttribute('disabled', '');
+        publicSwitch.setAttribute('title', getTranslation('Administrator privileges required to share playlists') || 'Administrator privileges required');
+      }
+    }
+    if (btnCover) {
+      btnCover.disabled = !isAdmin;
+      if (isAdmin) {
+        btnCover.removeAttribute('disabled');
+        btnCover.removeAttribute('title');
+      } else {
+        btnCover.setAttribute('disabled', '');
+        btnCover.setAttribute('title', getTranslation('Administrator privileges required to upload cover images') || 'Administrator privileges required');
+      }
+    }
+    if (fileInput) {
+      fileInput.disabled = !isAdmin;
+    }
+  };
+
+  applyAdminState(isCurrentUserAdminSync());
+  isCurrentUserAdmin().then(applyAdminState).catch(() => {});
+
   modal.style.display = 'flex';
 }
 
@@ -350,7 +452,7 @@ function renderAddTracksResults(items, playlistId) {
             <div style="font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${escapeHtml(artistName)}</div>
           </div>
         </div>
-        <md-button class="btn-add-single-track" variant="filled" data-track-id="${track.Id}" style="--md-button-padding-horizontal: 10px; font-size: 12px; height: 30px; flex-shrink: 0;">
+        <md-button class="btn-add-single-track" variant="filled" data-track-id="${track.Id}" style="--md-button-padding-horizontal: 10px; font-size: 12px; height: 32px; flex-shrink: 0; align-self: center;" no-tooltip>
           <md-icon slot="icon" name="add"></md-icon>
           <span>Add</span>
         </md-button>

@@ -226,33 +226,49 @@
       <md-icon-button id="btn-edit-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
-    <form id="edit-playlist-form">
+    <form id="edit-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
       <input type="hidden" id="edit-playlist-id">
+      <md-text-field
+        id="edit-playlist-name"
+        variant="outlined"
+        label="Playlist Name"
+        data-i18n-label="Playlist Name"
+        error-text="Playlist name is required"
+        data-i18n-error-text="Playlist name is required"
+        required
+        style="width: 100%;">
+      </md-text-field>
+
+      <div style="display: flex; align-items: center; padding: 4px 0;">
+        <md-switch id="edit-playlist-public">
+          <span data-i18n>Visible to all users on this server</span>
+        </md-switch>
+      </div>
+
       <div class="input-group">
-        <label for="edit-playlist-name" data-i18n>Playlist Name</label>
-        <input type="text" id="edit-playlist-name" required
-          style="width: 100%; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);" data-i18n>Change Cover Image (Optional)</label>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <md-button type="button" id="btn-edit-playlist-cover" variant="outlined" icon="upload">
+            <span data-i18n>Upload Cover Image</span>
+          </md-button>
+          <span id="edit-playlist-file-name" style="font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; max-width: 220px; white-space: nowrap;"></span>
+          <input type="file" id="edit-playlist-image" accept="image/png, image/jpeg, image/webp" style="display: none;">
+        </div>
       </div>
 
-      <div class="input-group" style="margin-top: 14px;">
-        <label for="edit-playlist-image" data-i18n>Change Cover Image (Optional)</label>
-        <input type="file" id="edit-playlist-image" accept="image/png, image/jpeg, image/webp"
-          style="width: 100%; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary); font-size: 13px;">
-      </div>
-
-      <div id="edit-playlist-error" style="color: var(--danger); font-size: 13px; display: none; margin-top: 10px;">
-      </div>
-
-      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-        <md-button type="button" id="btn-cancel-edit-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
-        <md-button type="submit" id="btn-save-edit-playlist" variant="filled"><span data-i18n>Save Changes</span></md-button>
-      </div>
-
-      <div style="margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+      <div>
         <md-button type="button" id="btn-delete-playlist-in-edit" variant="outlined" style="width: 100%; --md-sys-color-primary: var(--danger); --md-sys-color-outline: var(--danger);">
           <md-icon slot="icon" name="delete"></md-icon>
           <span data-i18n>Delete Playlist</span>
         </md-button>
+      </div>
+
+      <div id="edit-playlist-error" style="color: var(--danger); font-size: 13px; display: none;">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <md-button type="button" id="btn-cancel-edit-playlist" variant="text"><span data-i18n>Cancel</span></md-button>
+        <md-button type="submit" id="btn-save-edit-playlist" variant="filled"><span data-i18n>Save Changes</span></md-button>
       </div>
     </form>
   </div>
@@ -272,8 +288,15 @@
     <input type="hidden" id="add-tracks-playlist-id">
 
     <div style="margin-bottom: 14px;">
-      <input type="text" id="add-tracks-search-input" placeholder="Search tracks by name or artist..." data-i18n-placeholder autocomplete="off"
-        style="width: 100%; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-secondary); color: var(--text-primary);">
+      <md-text-field
+        id="add-tracks-search-input"
+        variant="outlined"
+        placeholder="Search tracks by name or artist..."
+        data-i18n-placeholder="Search tracks by name or artist..."
+        trailing-icon="search"
+        no-tooltip
+        style="width: 100%;">
+      </md-text-field>
     </div>
 
     <div id="add-tracks-list" style="max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px;">
