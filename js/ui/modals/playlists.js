@@ -1,4 +1,6 @@
-import { createPlaylist, updatePlaylist, uploadPlaylistImage, deletePlaylist, addTracksToPlaylist, searchJellyfinCached, getSongsCached, getPlaylistsCached, getArtworkUrl } from '../../jellyfin/client.js';
+import { createPlaylist, updatePlaylist, uploadPlaylistImage, deletePlaylist, addTracksToPlaylist, searchJellyfinCached, getSongsCached, getPlaylistsCached, getArtworkUrl, isCurrentUserAdmin, isCurrentUserAdminSync } from '../../jellyfin/client.js';
+import '@francofantomius/material-components/text-field';
+import '@francofantomius/material-components/switch';
 import { getTranslation } from '../../i18n.js';
 import { escapeHtml } from './shared.js';
 import { getPlaceholder } from '../placeholders.js';
@@ -16,6 +18,10 @@ export function initPlaylistModals() {
   const btnCreateClose = document.getElementById('btn-create-playlist-close');
   const btnCreateCancel = document.getElementById('btn-cancel-create-playlist');
   const createForm = document.getElementById('create-playlist-form');
+  const btnCreateCover = document.getElementById('btn-create-playlist-cover');
+  const createFileInput = document.getElementById('create-playlist-image');
+  const createFileName = document.getElementById('create-playlist-file-name');
+  const createNameInput = document.getElementById('create-playlist-name');
 
   btnCreateClose?.addEventListener('click', () => closeCreatePlaylistModal());
   btnCreateCancel?.addEventListener('click', () => closeCreatePlaylistModal());
@@ -23,18 +29,52 @@ export function initPlaylistModals() {
     if (e.target === createModal) closeCreatePlaylistModal();
   });
 
+  btnCreateCover?.addEventListener('click', () => {
+    if (!btnCreateCover.disabled && !btnCreateCover.hasAttribute('disabled')) {
+      createFileInput?.click();
+    }
+  });
+
+  createFileInput?.addEventListener('change', () => {
+    if (createFileInput.files && createFileInput.files[0]) {
+      if (createFileName) createFileName.textContent = createFileInput.files[0].name;
+    } else {
+      if (createFileName) createFileName.textContent = '';
+    }
+  });
+
+  createNameInput?.addEventListener('input', () => {
+    if (createNameInput.value?.trim()) {
+      createNameInput.error = false;
+    }
+  });
+
+  createNameInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      createForm?.requestSubmit();
+    }
+  });
+
   createForm?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const nameInput = document.getElementById('create-playlist-name');
-    const publicCheckbox = document.getElementById('create-playlist-public');
+    const publicSwitch = document.getElementById('create-playlist-public');
     const fileInput = document.getElementById('create-playlist-image');
     const submitBtn = document.getElementById('btn-submit-create-playlist');
     const errorEl = document.getElementById('create-playlist-error');
 
     const name = nameInput?.value?.trim();
-    const isPublic = publicCheckbox?.checked || false;
+    const isPublic = Boolean(publicSwitch?.selected ?? publicSwitch?.checked);
 
-    if (!name) return;
+    if (!name) {
+      if (nameInput) {
+        nameInput.error = true;
+        nameInput.errorText = nameInput.getAttribute('error-text') || getTranslation('Playlist name is required') || 'Playlist name is required';
+        nameInput.focus?.();
+      }
+      return;
+    }
     if (submitBtn) submitBtn.disabled = true;
     if (errorEl) {
       errorEl.textContent = '';
@@ -368,19 +408,60 @@ export function closeDeletePlaylistModal() {
 export function openCreatePlaylistModal(onCreateCallback) {
   const modal = document.getElementById('create-playlist-modal');
   const nameInput = document.getElementById('create-playlist-name');
-  const publicCheckbox = document.getElementById('create-playlist-public');
+  const publicSwitch = document.getElementById('create-playlist-public');
   const fileInput = document.getElementById('create-playlist-image');
+  const fileNameEl = document.getElementById('create-playlist-file-name');
+  const btnCover = document.getElementById('btn-create-playlist-cover');
   const errorEl = document.getElementById('create-playlist-error');
 
   if (!modal) return;
   currentCreatePlaylistCallback = onCreateCallback;
-  if (nameInput) nameInput.value = '';
-  if (publicCheckbox) publicCheckbox.checked = false;
+
+  if (nameInput) {
+    nameInput.value = '';
+    nameInput.error = false;
+    nameInput.errorText = nameInput.getAttribute('error-text') || getTranslation('Playlist name is required') || 'Playlist name is required';
+  }
+  if (publicSwitch) {
+    publicSwitch.selected = false;
+    if ('checked' in publicSwitch) publicSwitch.checked = false;
+  }
   if (fileInput) fileInput.value = '';
+  if (fileNameEl) fileNameEl.textContent = '';
   if (errorEl) {
     errorEl.textContent = '';
     errorEl.style.display = 'none';
   }
+
+  const applyAdminState = (isAdmin) => {
+    if (publicSwitch) {
+      publicSwitch.disabled = !isAdmin;
+      if (isAdmin) {
+        publicSwitch.removeAttribute('disabled');
+        publicSwitch.removeAttribute('title');
+      } else {
+        publicSwitch.setAttribute('disabled', '');
+        publicSwitch.setAttribute('title', getTranslation('Administrator privileges required to share playlists') || 'Administrator privileges required');
+      }
+    }
+    if (btnCover) {
+      btnCover.disabled = !isAdmin;
+      if (isAdmin) {
+        btnCover.removeAttribute('disabled');
+        btnCover.removeAttribute('title');
+      } else {
+        btnCover.setAttribute('disabled', '');
+        btnCover.setAttribute('title', getTranslation('Administrator privileges required to upload cover images') || 'Administrator privileges required');
+      }
+    }
+    if (fileInput) {
+      fileInput.disabled = !isAdmin;
+    }
+  };
+
+  applyAdminState(isCurrentUserAdminSync());
+  isCurrentUserAdmin().then(applyAdminState).catch(() => {});
+
   modal.style.display = 'flex';
 }
 

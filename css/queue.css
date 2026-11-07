@@ -51,12 +51,15 @@
 
 .queue-clear-btn {
   color: var(--text-secondary);
+  --md-sys-color-on-surface-variant: var(--text-secondary);
+  border-radius: var(--radius-full);
   transition: color var(--transition-speed), background-color var(--transition-speed);
 }
 
 .queue-clear-btn:hover {
   color: var(--danger);
-  background-color: var(--bg-tertiary);
+  --md-sys-color-on-surface-variant: var(--danger);
+  background-color: var(--bg-hover);
 }
 
 /* Queue Tracks List Container */

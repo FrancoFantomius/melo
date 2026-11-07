@@ -225,6 +225,23 @@ export function applyTranslations(container = document) {
       }
     }
   });
+
+  // 7. Custom Element error-text with data-i18n-error-text
+  const errorTextElements = container.querySelectorAll('[data-i18n-error-text]');
+  errorTextElements.forEach(el => {
+    if (!el.dataset.i18nErrorTextEn) {
+      const attrVal = el.getAttribute('data-i18n-error-text');
+      el.dataset.i18nErrorTextEn = (attrVal && attrVal !== 'true') ? attrVal : (el.getAttribute('error-text') || '');
+    }
+    const key = el.dataset.i18nErrorTextEn;
+    if (key) {
+      const translated = getTranslation(key);
+      if (translated) {
+        el.setAttribute('error-text', translated);
+        el.errorText = translated;
+      }
+    }
+  });
 }
 
 export async function initI18n() {

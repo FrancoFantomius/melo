@@ -146,6 +146,15 @@ md-navigation-bar-item[selected] md-icon,
   background-color: var(--bg-hover);
 }
 
+md-icon-button {
+  border-radius: var(--radius-full);
+  transition: color var(--transition-speed), background-color var(--transition-speed), transform var(--transition-speed);
+}
+
+md-icon-button:not([disabled]):hover {
+  background-color: var(--bg-hover);
+}
+
 .btn-icon {
   background: transparent;
   border: none;

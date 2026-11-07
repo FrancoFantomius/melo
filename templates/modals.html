@@ -169,26 +169,39 @@
   <div class="modal-card">
     <div class="modal-header">
       <h2 class="modal-title">
-        <span class="material-symbols-outlined" style="color: var(--accent);">playlist_add</span>
-        <span data-i18n>Create Playlist</span>
+        <md-icon name="playlist_add" style="color: var(--accent);"></md-icon>
+        <span data-i18n>New Playlist</span>
       </h2>
       <md-icon-button id="btn-create-playlist-close" variant="standard" icon="close" aria-label="Close modal"></md-icon-button>
     </div>
 
     <form id="create-playlist-form" style="display: flex; flex-direction: column; gap: 20px;">
-      <div class="input-group">
-        <label for="create-playlist-name" data-i18n>Playlist Name</label>
-        <input type="text" id="create-playlist-name" required placeholder="My Awesome Playlist">
+      <md-text-field
+        id="create-playlist-name"
+        variant="outlined"
+        label="Playlist Name"
+        data-i18n-label="Playlist Name"
+        error-text="Playlist name is required"
+        data-i18n-error-text="Playlist name is required"
+        required
+        style="width: 100%;">
+      </md-text-field>
+
+      <div style="display: flex; align-items: center; padding: 4px 0;">
+        <md-switch id="create-playlist-public">
+          <span data-i18n>Visible to all users on this server</span>
+        </md-switch>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
-        <input type="checkbox" id="create-playlist-public" style="width: 18px; height: 18px; accent-color: var(--accent); cursor: pointer;">
-        <label for="create-playlist-public" style="font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-primary);" data-i18n>Visible to all users on this server</label>
-      </div>
-
       <div class="input-group">
-        <label for="create-playlist-image" data-i18n>Cover Image (Optional)</label>
-        <input type="file" id="create-playlist-image" accept="image/png, image/jpeg, image/webp">
+        <label style="font-size: 12px; font-weight: 600; color: var(--text-secondary);" data-i18n>Cover Image (Optional)</label>
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+          <md-button type="button" id="btn-create-playlist-cover" variant="outlined" icon="upload">
+            <span data-i18n>Upload Cover Image</span>
+          </md-button>
+          <span id="create-playlist-file-name" style="font-size: 13px; color: var(--text-secondary); overflow: hidden; text-overflow: ellipsis; max-width: 220px; white-space: nowrap;"></span>
+          <input type="file" id="create-playlist-image" accept="image/png, image/jpeg, image/webp" style="display: none;">
+        </div>
       </div>
 
       <div id="create-playlist-error" style="color: var(--danger); font-size: 13px; display: none;">

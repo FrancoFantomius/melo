@@ -348,17 +348,20 @@
 .player-speed-badge {
   font-size: 12px;
   font-weight: 700;
-  height: 28px;
-  --md-button-padding-horizontal: 8px;
-  min-width: auto;
+  --md-sys-typescale-label-large-size: 12px;
+  border-radius: var(--radius-full);
+  background: transparent !important;
+  border: none !important;
   cursor: pointer;
   transition: all var(--transition-speed);
 }
 
-.player-speed-badge:hover {
-  background: var(--accent);
-  color: var(--accent-text);
-  border-color: var(--accent);
+.player-speed-badge:hover, .player-speed-badge.active {
+  color: var(--accent);
+  background: transparent !important;
+  border-color: transparent !important;
+  --md-sys-color-secondary-container: var(--accent-bg-glow);
+  --md-sys-color-on-secondary-container: var(--accent);
 }
 
 .btn-skip {

@@ -482,6 +482,9 @@ export function initPlayerUI() {
       each(pairs.speedBadge, (el) => {
         setDisplay(el, isPodcast ? 'flex' : 'none');
         el.textContent = `${state.playbackSpeed || 1.0}x`;
+        const isEmp = el.id.includes('emp');
+        const isCustomSpeed = (state.playbackSpeed || 1.0) !== 1.0;
+        el.className = `player-speed-badge ${isEmp ? 'emp-speed-badge' : ''} ${isCustomSpeed ? 'active' : ''}`;
       });
       each(pairs.qualityBadge, (el) => {
         setDisplay(el, isPodcast ? 'none' : 'flex');

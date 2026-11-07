@@ -30,6 +30,7 @@ export function getSession() {
       forceTranscode: false,
       searchPodcasts: true,
       homeSectionOrder: ['playlists', 'songs', 'artists', 'podcasts', 'albums'],
+      isAdmin: false,
       isLoggedIn: false
     };
     localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(defaultSession));
@@ -40,6 +41,7 @@ export function getSession() {
     const data = JSON.parse(raw);
     if (!data.deviceId) data.deviceId = stableDeviceId;
     if (typeof data.searchPodcasts === 'undefined') data.searchPodcasts = true;
+    if (typeof data.isAdmin === 'undefined') data.isAdmin = false;
     if (!data.homeSectionOrder || !Array.isArray(data.homeSectionOrder)) {
       data.homeSectionOrder = ['playlists', 'songs', 'artists', 'podcasts', 'albums'];
     }
@@ -56,6 +58,7 @@ export function getSession() {
       forceTranscode: false,
       searchPodcasts: true,
       homeSectionOrder: ['playlists', 'songs', 'artists', 'podcasts', 'albums'],
+      isAdmin: false,
       isLoggedIn: false
     };
   }
@@ -86,6 +89,7 @@ export function clearSession(preserveCredentials = true) {
     accessToken: '',
     userId: '',
     userPrimaryImageTag: '',
+    isAdmin: false,
     isLoggedIn: false
   };
   localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(cleared));

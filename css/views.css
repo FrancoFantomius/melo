@@ -90,6 +90,7 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
+  padding-top: 6px;
   padding-bottom: 12px;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
